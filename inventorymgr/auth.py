@@ -30,7 +30,7 @@ def login() -> Dict[str, bool]:
     password = request.json['password']
 
     if is_password_correct(username, password):
-        session['username'] = username
+        session['user'] = fetch_user(username)
         return {'success': True}
 
     raise APIError(
@@ -58,11 +58,20 @@ def is_password_correct(username: str, password: str) -> bool:
     return check_password_hash(password_hash, password) and password_row is not None
 
 
+def fetch_user(username: str) -> Dict[str, Any]:
+    """Look up a user as a dictionary from the DB."""
+    user_row = get_db().execute(
+        'SELECT * FROM users WHERE username = ?',
+        (username,)
+    ).fetchone()
+    return dict(user_row)
+
+
 def authentication_required(to_be_wrapped: Callable[..., Any]) -> Callable[..., Any]:
     """Wraps a view with a check for whether the user is authenticated."""
     @functools.wraps(to_be_wrapped)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
-        if session.get('username') is None:
+        if session.get('user') is None:
             raise APIError(
                 'Authentication required',
                 reason='authentication_required',

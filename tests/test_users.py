@@ -28,7 +28,8 @@ def test_creating_existing_user(client, app):
         assert not is_password_correct(**user)
 
 
-def test_updating_user(client, app, authenticated_user):
+def test_updating_user(client, app):
+    authenticate_user(client, 'test')
     user = {'username': 'test', 'password': '123456'}
     response = client.put('/users/', json=user)
     assert response.status_code == 200
@@ -52,7 +53,21 @@ def test_updating_user_unauthenticated(client, app):
         assert not is_password_correct(**user)
 
 
-def test_updating_nonexistant_user(client, app, authenticated_user):
+def test_updating_user_with_insufficient_permissions(client, app):
+    authenticate_user(client, 'min_permissions_user')
+    user = {'username': 'test', 'password': '123456'}
+    response = client.put('/users/', json=user)
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+    with app.app_context():
+        assert count_users_with_name(user['username']) == 1
+        assert not is_password_correct(**user)
+
+
+def test_updating_nonexistant_user(client, app):
+    authenticate_user(client, 'test')
     user = {'username': 'a_new_user', 'password': '123456'}
     response = client.put('/users/', json=user)
     assert response.status_code == 400
@@ -63,11 +78,12 @@ def test_updating_nonexistant_user(client, app, authenticated_user):
         assert count_users_with_name(user['username']) == 0
 
 
-def test_list_users(client, authenticated_user):
+def test_list_users(client):
+    authenticate_user(client, 'test')
     response = client.get('/users/')
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'users': ['test']}
+    assert set(response.json['users']) == {'test', 'min_permissions_user'}
 
 
 def test_list_users_unauthenticated(client):
@@ -77,8 +93,21 @@ def test_list_users_unauthenticated(client):
     assert response.json['reason'] == 'authentication_required'
 
 
+def test_list_users_with_insufficient_permissions(client):
+    authenticate_user(client, 'min_permissions_user')
+    response = client.get('/users/')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+
 def count_users_with_name(username):
     return get_db().execute(
         'SELECT COUNT(*) FROM users WHERE username = ?',
         (username,)
     ).fetchone()[0]
+
+
+def authenticate_user(client, username):
+    user = {'username': username, 'password': 'test'}
+    client.post('/auth/login', json=user)

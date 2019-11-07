@@ -17,6 +17,7 @@ from typing import Dict, List
 from flask import Blueprint, request
 from werkzeug.security import generate_password_hash
 
+from .accesscontrol import requires_permissions
 from .api import APIError
 from .auth import authentication_required
 from .db import get_db
@@ -47,6 +48,7 @@ def new_user() -> Dict[str, bool]:
 
 @bp.route('/', methods=('PUT',))
 @authentication_required
+@requires_permissions('view_users', 'update_user')
 def update_user() -> Dict[str, bool]:
     """Flask view to update a user using PUT."""
     username = request.json['username']
@@ -69,6 +71,7 @@ def update_user() -> Dict[str, bool]:
 
 @bp.route('/', methods=('GET',))
 @authentication_required
+@requires_permissions('view_users')
 def list_users() -> Dict[str, List[str]]:
     """Flask view to get a list of users using GET."""
     db = get_db()

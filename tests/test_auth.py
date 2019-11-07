@@ -7,11 +7,11 @@ def test_login_invalid_user_and_password(client):
 
     with client:
         invalid_user_response = client.post('/auth/login', json=invalid_user)
-        assert session.get('username') is None
+        assert session.get('user') is None
 
     with client:
         invalid_pw_response = client.post('/auth/login', json=invalid_password_user)
-        assert session.get('username') is None
+        assert session.get('user') is None
 
     assert invalid_user_response.status_code == 403
     assert invalid_pw_response.status_code == 403
@@ -25,7 +25,8 @@ def test_login_valid_user_and_password(client):
 
     with client:
         response = client.post('/auth/login', json=user)
-        assert session.get('username') == user['username']
+        assert session.get('user') is not None
+        assert session['user']['username'] == user['username']
 
     assert response.status_code == 200
     assert response.is_json
