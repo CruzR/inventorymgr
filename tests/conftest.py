@@ -39,3 +39,10 @@ def client(app):
 @pytest.fixture
 def runner(app):
     return app.test_cli_runner()
+
+
+@pytest.fixture
+def authenticated_user(client):
+    user = {'username': 'test', 'password': 'test'}
+    client.post('/auth/login', json=user)
+    return user

@@ -5,7 +5,8 @@ login()
     Flask view to log a user in.
 """
 
-from typing import Callable, Dict, cast
+import functools
+from typing import Any, Callable, cast, Dict
 
 from flask import Blueprint, request, session
 from werkzeug.security import check_password_hash as _check_password_hash
@@ -27,8 +28,21 @@ def login() -> Dict[str, bool]:
     """Flask view for logging a user in."""
     username = request.json['username']
     password = request.json['password']
-    db = get_db()
 
+    if is_password_correct(username, password):
+        session['username'] = username
+        return {'success': True}
+
+    raise APIError(
+        'Invalid username or password',
+        reason='invalid_user_or_password',
+        status_code=403
+    )
+
+
+def is_password_correct(username: str, password: str) -> bool:
+    """Checks whether password is valid for user, tries to avoid timing attacks."""
+    db = get_db()
     password_row = db.execute(
         'SELECT password FROM users WHERE username = ?',
         (username,)
@@ -41,12 +55,18 @@ def login() -> Dict[str, bool]:
     else:
         password_hash = password_row['password']
 
-    if check_password_hash(password_hash, password) and password_row is not None:
-        session['username'] = username
-        return {'success': True}
+    return check_password_hash(password_hash, password) and password_row is not None
 
-    raise APIError(
-        'Invalid username or password',
-        reason='invalid_user_or_password',
-        status_code=403
-    )
+
+def authentication_required(to_be_wrapped: Callable[..., Any]) -> Callable[..., Any]:
+    """Wraps a view with a check for whether the user is authenticated."""
+    @functools.wraps(to_be_wrapped)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        if session.get('username') is None:
+            raise APIError(
+                'Authentication required',
+                reason='authentication_required',
+                status_code=403
+            )
+        return to_be_wrapped(*args, **kwargs)
+    return wrapper
