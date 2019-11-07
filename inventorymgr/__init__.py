@@ -36,6 +36,9 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     from . import api
     app.errorhandler(api.APIError)(api.handle_api_error)
 
+    from . import auth
+    app.register_blueprint(auth.bp)
+
     from . import users
     app.register_blueprint(users.bp)
 
