@@ -12,7 +12,7 @@ from flask import Blueprint, request, session
 from werkzeug.security import check_password_hash as _check_password_hash
 
 from .api import APIError
-from .db import get_db
+from .db.models import User
 
 
 # This is the conventional name for Blueprint objects, disable the warning.
@@ -42,29 +42,26 @@ def login() -> Dict[str, bool]:
 
 def is_password_correct(username: str, password: str) -> bool:
     """Checks whether password is valid for user, tries to avoid timing attacks."""
-    db = get_db()
-    password_row = db.execute(
-        'SELECT password FROM users WHERE username = ?',
-        (username,)
-    ).fetchone()
-
-    if password_row is None:
+    user = User.query.filter_by(username=username).first()
+    if user is None:
         # We need to prevent timing-based side-channel attacks
         # that could be exploited for user enumeration
         password_hash = _CHECK_HASH_ANYWAY
     else:
-        password_hash = password_row['password']
+        password_hash = user.password
 
-    return check_password_hash(password_hash, password) and password_row is not None
+    return check_password_hash(password_hash, password) and user is not None
 
 
 def fetch_user(username: str) -> Dict[str, Any]:
     """Look up a user as a dictionary from the DB."""
-    user_row = get_db().execute(
-        'SELECT * FROM users WHERE username = ?',
-        (username,)
-    ).fetchone()
-    return dict(user_row)
+    user = User.query.filter_by(username=username).first()
+    return {
+        'id': user.id,
+        'username': user.username,
+        'view_users': user.view_users,
+        'update_user': user.update_user,
+    }
 
 
 def authentication_required(to_be_wrapped: Callable[..., Any]) -> Callable[..., Any]:

@@ -1,15 +1,12 @@
 import os
 import tempfile
-from pathlib import Path
 
 import pytest
+from werkzeug.security import generate_password_hash
 
 from inventorymgr import create_app
-from inventorymgr.db import get_db, init_db
-
-
-with open(Path(__file__).parent / 'data.sql') as test_db_sql:
-    _TEST_DB_CONTENTS = test_db_sql.read()
+from inventorymgr.db import db
+from inventorymgr.db.models import User
 
 
 @pytest.fixture
@@ -18,12 +15,14 @@ def app():
 
     app = create_app({
         'TESTING': True,
-        'DATABASE': db_path,
+        'SQLALCHEMY_DATABASE_URI': 'sqlite:///{}'.format(db_path),
     })
 
     with app.app_context():
-        init_db()
-        get_db().executescript(_TEST_DB_CONTENTS)
+        db.create_all()
+        db.session.add(User(username='test', password=generate_password_hash('test'), view_users=True, update_user=True))
+        db.session.add(User(username='min_permissions_user', password=generate_password_hash('test')))
+        db.session.commit()
 
     yield app
 

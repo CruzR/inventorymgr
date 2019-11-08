@@ -1,7 +1,5 @@
-from werkzeug.security import check_password_hash
-
 from inventorymgr.auth import is_password_correct
-from inventorymgr.db import get_db
+from inventorymgr.db.models import User
 
 
 def test_creating_new_users(client, app):
@@ -102,10 +100,7 @@ def test_list_users_with_insufficient_permissions(client):
 
 
 def count_users_with_name(username):
-    return get_db().execute(
-        'SELECT COUNT(*) FROM users WHERE username = ?',
-        (username,)
-    ).fetchone()[0]
+    return User.query.filter_by(username=username).count()
 
 
 def authenticate_user(client, username):

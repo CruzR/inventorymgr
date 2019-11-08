@@ -18,9 +18,13 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     # Lazy-loading of modules is intentional here.
     # pylint: disable=import-outside-toplevel
     app = Flask(__name__, instance_relative_config=True)
+
+    db_path = os.path.join(app.instance_path, 'inventorymgr.sqlite')
+
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'inventorymgr.sqlite')
+        SQLALCHEMY_DATABASE_URI='sqlite:///{}'.format(db_path),
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
     if test_config is None:
@@ -42,7 +46,8 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     from . import users
     app.register_blueprint(users.bp)
 
-    from . import db
+    from .db import db, init_db_command
     db.init_app(app)
+    app.cli.add_command(init_db_command)
 
     return app
