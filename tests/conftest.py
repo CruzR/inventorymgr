@@ -1,3 +1,4 @@
+import datetime
 import os
 import tempfile
 
@@ -6,7 +7,7 @@ from werkzeug.security import generate_password_hash
 
 from inventorymgr import create_app
 from inventorymgr.db import db
-from inventorymgr.db.models import User
+from inventorymgr.db.models import User, RegistrationToken
 
 
 @pytest.fixture
@@ -22,6 +23,8 @@ def app():
         db.create_all()
         db.session.add(User(username='test', password=generate_password_hash('test'), view_users=True, update_user=True))
         db.session.add(User(username='min_permissions_user', password=generate_password_hash('test')))
+        db.session.add(RegistrationToken(token='expired', expires=datetime.datetime(2019, 11, 11)))
+        db.session.add(RegistrationToken(token='valid', expires=datetime.datetime(2049, 11, 11)))
         db.session.commit()
 
     yield app

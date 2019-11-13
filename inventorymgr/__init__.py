@@ -25,6 +25,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///{}'.format(db_path),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        SERVER_NAME='localhost:5000',
     )
 
     if test_config is None:
@@ -42,6 +43,10 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
 
     from . import auth
     app.register_blueprint(auth.bp)
+
+    from . import registration
+    app.register_blueprint(registration.bp)
+    app.cli.add_command(registration.generate_registration_token_command)
 
     from . import users
     app.register_blueprint(users.bp)
