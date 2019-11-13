@@ -24,8 +24,7 @@ from .db import db
 from .db.models import User
 
 
-# This is the conventional name for Blueprint objects, disable the warning.
-bp = Blueprint('users', __name__, url_prefix='/users') # pylint: disable=invalid-name
+bp = Blueprint('users', __name__, url_prefix='/users')
 
 
 @bp.route('/', methods=('POST',))

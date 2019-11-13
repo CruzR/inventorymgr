@@ -15,8 +15,7 @@ from .api import APIError
 from .db.models import User
 
 
-# This is the conventional name for Blueprint objects, disable the warning.
-bp = Blueprint('auth', __name__, url_prefix='/auth') # pylint: disable=invalid-name
+bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 _CHECK_HASH_ANYWAY = 'pbkdf2:sha256:150000$tRQtwnYW$80442246fe5dbd649c8a90cd0209f7a3751e8a0ec1327f88f6b331f929642050' # pylint: disable=line-too-long
 
