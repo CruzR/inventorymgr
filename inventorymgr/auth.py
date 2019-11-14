@@ -58,8 +58,9 @@ def fetch_user(username: str) -> Dict[str, Any]:
     return {
         'id': user.id,
         'username': user.username,
+        'create_users': user.create_users,
         'view_users': user.view_users,
-        'update_user': user.update_user,
+        'update_users': user.update_users,
     }
 
 

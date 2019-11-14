@@ -28,6 +28,8 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 
 
 @bp.route('/', methods=('POST',))
+@authentication_required
+@requires_permissions('create_users')
 def new_user() -> Dict[str, bool]:
     """Flask view to create a new user using POST."""
     username = request.json['username']
@@ -45,7 +47,7 @@ def new_user() -> Dict[str, bool]:
 
 @bp.route('/', methods=('PUT',))
 @authentication_required
-@requires_permissions('view_users', 'update_user')
+@requires_permissions('view_users', 'update_users')
 def update_user() -> Dict[str, bool]:
     """Flask view to update a user using PUT."""
     username = request.json['username']

@@ -2,7 +2,31 @@ from inventorymgr.auth import is_password_correct
 from inventorymgr.db.models import User
 
 
+def test_creating_new_users_unauthenticated(client, app):
+    user = {'username': 'a_new_user', 'password': '123456'}
+    response = client.post('/users/', json=user)
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+    with app.app_context():
+        assert count_users_with_name(user['username']) == 0
+
+
+def test_creating_new_users_with_insufficient_permissions(client, app):
+    authenticate_user(client, 'min_permissions_user')
+    user = {'username': 'a_new_user', 'password': '123456'}
+    response = client.post('/users/', json=user)
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+    with app.app_context():
+        assert count_users_with_name(user['username']) == 0
+
+
 def test_creating_new_users(client, app):
+    authenticate_user(client, 'test')
     user = {'username': 'a_new_user', 'password': '123456'}
     response = client.post('/users/', json=user)
     assert response.status_code == 200
@@ -15,6 +39,7 @@ def test_creating_new_users(client, app):
 
 
 def test_creating_existing_user(client, app):
+    authenticate_user(client, 'test')
     user = {'username': 'test', 'password': '123456'}
     response = client.post('/users/', json=user)
     assert response.status_code == 400

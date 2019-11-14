@@ -14,8 +14,9 @@ class User(db.Model): # type: ignore
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
+    create_users = db.Column(db.Boolean, nullable=False, default=False)
     view_users = db.Column(db.Boolean, nullable=False, default=False)
-    update_user = db.Column(db.Boolean, nullable=False, default=False)
+    update_users = db.Column(db.Boolean, nullable=False, default=False)
 
 
 class RegistrationToken(db.Model): # type: ignore
