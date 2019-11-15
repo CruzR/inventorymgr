@@ -31,3 +31,19 @@ def test_login_valid_user_and_password(client):
     assert response.status_code == 200
     assert response.is_json
     assert response.json == {'success': True}
+
+
+def test_logout_when_not_logged_in(client):
+    with client:
+        response = client.post('/auth/logout')
+        assert response.status_code == 200
+        assert session.get('user') is None
+
+
+def test_logout_when_logged_in(client):
+    client.post('/auth/login', json={'username': 'test', 'password': 'test'})
+
+    with client:
+        response = client.post('/auth/logout')
+        assert response.status_code == 200
+        assert session.get('user') is None

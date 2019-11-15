@@ -39,6 +39,14 @@ def login() -> Dict[str, bool]:
     )
 
 
+@bp.route('/logout', methods=('POST',))
+def logout() -> Dict[str, bool]:
+    """Flask view to log a user out."""
+    if 'user' in session:
+        del session['user']
+    return {'success': True}
+
+
 def is_password_correct(username: str, password: str) -> bool:
     """Checks whether password is valid for user, tries to avoid timing attacks."""
     user = User.query.filter_by(username=username).first()
