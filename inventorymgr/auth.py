@@ -69,6 +69,7 @@ def fetch_user(username: str) -> Dict[str, Any]:
         'create_users': user.create_users,
         'view_users': user.view_users,
         'update_users': user.update_users,
+        'edit_qualifications': user.edit_qualifications,
     }
 
 

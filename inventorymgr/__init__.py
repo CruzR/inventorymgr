@@ -48,6 +48,9 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     app.register_blueprint(registration.bp)
     app.cli.add_command(registration.generate_registration_token_command)
 
+    from . import qualifications
+    app.register_blueprint(qualifications.bp)
+
     from . import users
     app.register_blueprint(users.bp)
 
