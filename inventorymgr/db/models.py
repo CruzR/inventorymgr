@@ -7,6 +7,15 @@ from . import db
 
 # pylint: disable=too-few-public-methods
 
+
+_USER_QUALIFICATIONS_TABLE = db.Table(
+    'user_qualifications',
+    db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('qualification_id', db.Integer, db.ForeignKey('qualification.id'))
+)
+
+
 class User(db.Model): # type: ignore
 
     """ORM model for user objects."""
@@ -18,6 +27,10 @@ class User(db.Model): # type: ignore
     view_users = db.Column(db.Boolean, nullable=False, default=False)
     update_users = db.Column(db.Boolean, nullable=False, default=False)
     edit_qualifications = db.Column(db.Boolean, nullable=False, default=False)
+    qualifications = db.relationship(
+        'Qualification',
+        secondary=_USER_QUALIFICATIONS_TABLE
+    )
 
 
 class RegistrationToken(db.Model): # type: ignore

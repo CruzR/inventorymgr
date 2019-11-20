@@ -21,11 +21,25 @@ def app():
 
     with app.app_context():
         db.create_all()
-        db.session.add(User(username='test', password=generate_password_hash('test'), create_users=True, view_users=True, update_users=True, edit_qualifications=True))
-        db.session.add(User(username='min_permissions_user', password=generate_password_hash('test')))
+        all_permissions_user = User(
+            username='test',
+            password=generate_password_hash('test'),
+            create_users=True,
+            view_users=True,
+            update_users=True,
+            edit_qualifications=True
+        )
+        db.session.add(all_permissions_user)
+        min_permissions_user = User(
+            username='min_permissions_user',
+            password=generate_password_hash('test')
+        )
+        db.session.add(min_permissions_user)
         db.session.add(RegistrationToken(token='expired', expires=datetime.datetime(2019, 11, 11)))
         db.session.add(RegistrationToken(token='valid', expires=datetime.datetime(2049, 11, 11)))
-        db.session.add(Qualification(name="Driver's License"))
+        drivers_license = Qualification(name="Driver's License")
+        all_permissions_user.qualifications = [drivers_license]
+        db.session.add(drivers_license)
         db.session.commit()
 
     yield app
