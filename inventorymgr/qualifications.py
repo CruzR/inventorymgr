@@ -8,23 +8,16 @@ hold some kind of qualification or skill, e.g. a driver's license.
 from typing import Any, Dict, cast
 
 from flask import Blueprint, jsonify, request
-from marshmallow import Schema, fields
 from sqlalchemy.exc import IntegrityError # type: ignore
 
 from .accesscontrol import requires_permissions
-from .api import APIError
+from .api import APIError, QualificationSchema
 from .auth import authentication_required
 from .db import db
 from .db.models import Qualification
 
 
 bp = Blueprint('qualifications', __name__, url_prefix='/qualifications')
-
-
-class QualificationSchema(Schema):
-    """Marshmallow schema to validate qualification JSON objects."""
-    id = fields.Integer(required=True)
-    name = fields.Str(required=True)
 
 
 @bp.route('', methods=('GET',))
