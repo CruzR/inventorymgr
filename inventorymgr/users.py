@@ -32,7 +32,7 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 @requires_permissions('create_users')
 def new_user() -> Dict[str, bool]:
     """Flask view to create a new user using POST."""
-    user_dict = UserSchema().load(request.json)
+    user_dict = UserSchema().load(request.json, partial=('id',))
     username = user_dict['username']
     password = user_dict['password']
 
@@ -46,21 +46,21 @@ def new_user() -> Dict[str, bool]:
     return {'success': True}
 
 
-@bp.route('/', methods=('PUT',))
+@bp.route('/<int:user_id>', methods=('PUT',))
 @authentication_required
 @requires_permissions('view_users', 'update_users')
-def update_user() -> Dict[str, bool]:
+def update_user(user_id: int) -> Dict[str, bool]:
     """Flask view to update a user using PUT."""
     user_dict = UserSchema().load(request.json)
-    username = user_dict['username']
-    password = user_dict['password']
 
-    user = User.query.filter_by(username=username).first()
+    if user_dict['id'] != user_id:
+        raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
+
+    user = User.query.get(user_id)
     if user is None:
         raise APIError('No such user', reason='no_such_user', status_code=400)
 
-    user.password = generate_password_hash(password)
-    db.session.add(user)
+    user.password = generate_password_hash(user_dict['password'])
     db.session.commit()
 
     return {'success': True}

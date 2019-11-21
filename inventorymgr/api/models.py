@@ -12,7 +12,7 @@ class QualificationSchema(Schema):
 
 class UserSchema(Schema):
     """Marshmallow schema to validate user JSON objects."""
-    id = fields.Integer()
+    id = fields.Integer(required=True)
     username = fields.Str(required=True)
     password = fields.Str(required=True, load_only=True)
     create_users = fields.Bool()
