@@ -18,7 +18,7 @@ from sqlalchemy.exc import IntegrityError # type: ignore
 from werkzeug.security import generate_password_hash
 
 from .accesscontrol import requires_permissions
-from .api import APIError
+from .api import APIError, UserSchema
 from .auth import authentication_required
 from .db import db
 from .db.models import User
@@ -32,8 +32,9 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 @requires_permissions('create_users')
 def new_user() -> Dict[str, bool]:
     """Flask view to create a new user using POST."""
-    username = request.json['username']
-    password = request.json['password']
+    user_dict = UserSchema().load(request.json)
+    username = user_dict['username']
+    password = user_dict['password']
 
     try:
         user = User(username=username, password=generate_password_hash(password))
@@ -50,8 +51,9 @@ def new_user() -> Dict[str, bool]:
 @requires_permissions('view_users', 'update_users')
 def update_user() -> Dict[str, bool]:
     """Flask view to update a user using PUT."""
-    username = request.json['username']
-    password = request.json['password']
+    user_dict = UserSchema().load(request.json)
+    username = user_dict['username']
+    password = user_dict['password']
 
     user = User.query.filter_by(username=username).first()
     if user is None:

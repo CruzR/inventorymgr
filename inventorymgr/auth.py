@@ -11,7 +11,7 @@ from typing import Any, Callable, cast, Dict
 from flask import Blueprint, request, session
 from werkzeug.security import check_password_hash as _check_password_hash
 
-from .api import APIError
+from .api import APIError, UserSchema
 from .db.models import User
 
 
@@ -25,8 +25,9 @@ check_password_hash: Callable[[str, str], bool] = cast(Callable[[str, str], bool
 @bp.route('/login', methods=('POST',))
 def login() -> Dict[str, bool]:
     """Flask view for logging a user in."""
-    username = request.json['username']
-    password = request.json['password']
+    user_dict = UserSchema().load(request.json)
+    username = user_dict['username']
+    password = user_dict['password']
 
     if is_password_correct(username, password):
         session['user'] = fetch_user(username)
@@ -63,14 +64,7 @@ def is_password_correct(username: str, password: str) -> bool:
 def fetch_user(username: str) -> Dict[str, Any]:
     """Look up a user as a dictionary from the DB."""
     user = User.query.filter_by(username=username).first()
-    return {
-        'id': user.id,
-        'username': user.username,
-        'create_users': user.create_users,
-        'view_users': user.view_users,
-        'update_users': user.update_users,
-        'edit_qualifications': user.edit_qualifications,
-    }
+    return cast(Dict[str, Any], UserSchema().dump(user))
 
 
 def authentication_required(to_be_wrapped: Callable[..., Any]) -> Callable[..., Any]:

@@ -2,7 +2,7 @@
 
 
 from .error import APIError, handle_api_error
-from .models import QualificationSchema
+from .models import QualificationSchema, UserSchema
 
 
-__all__ = ['APIError', 'handle_api_error', 'QualificationSchema']
+__all__ = ['APIError', 'handle_api_error', 'QualificationSchema', 'UserSchema']
