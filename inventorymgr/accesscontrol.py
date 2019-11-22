@@ -3,11 +3,27 @@ Utility functions for access control.
 """
 
 import functools
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 from flask import session
 
 from .api import APIError
+
+
+PERMISSIONS = (
+    'create_users',
+    'view_users',
+    'update_users',
+    'edit_qualifications',
+)
+
+def can_set_permissions(user_dict: Dict[str, Any]) -> bool:
+    """
+    Check if current session's user can set permissions in user_dict.
+
+    A user can set permissions if they are a subset of their own permissions.
+    """
+    return all(session['user'][k] or not user_dict[k] for k in PERMISSIONS)
 
 
 def requires_permissions(*permissions: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:

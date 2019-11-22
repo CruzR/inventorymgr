@@ -17,7 +17,8 @@ from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError # type: ignore
 from werkzeug.security import generate_password_hash
 
-from .accesscontrol import requires_permissions
+from .accesscontrol import (PERMISSIONS, can_set_permissions,
+                            requires_permissions)
 from .api import APIError, UserSchema
 from .auth import authentication_required
 from .db import db
@@ -36,8 +37,20 @@ def new_user() -> Dict[str, bool]:
     username = user_dict['username']
     password = user_dict['password']
 
+    if not can_set_permissions(user_dict):
+        raise APIError(
+            "Cannot set permissions",
+            reason="permissions_not_subset",
+            status_code=403
+        )
+
     try:
-        user = User(username=username, password=generate_password_hash(password))
+        user = User(
+            username=username,
+            password=generate_password_hash(password),
+            **{k: user_dict[k] for k in PERMISSIONS},
+        )
+
         db.session.add(user)
         db.session.commit()
     except IntegrityError as exc:
@@ -62,6 +75,17 @@ def update_user(user_id: int) -> Dict[str, bool]:
 
     user.username = user_dict['username']
     user.password = generate_password_hash(user_dict['password'])
+
+    if not can_set_permissions(user_dict):
+        raise APIError(
+            "Cannot set permissions",
+            reason="permissions_not_subset",
+            status_code=403
+        )
+
+    for perm in PERMISSIONS:
+        setattr(user, perm, user_dict[perm])
+
     db.session.commit()
 
     return {'success': True}
