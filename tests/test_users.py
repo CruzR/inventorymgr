@@ -64,6 +64,7 @@ def test_creating_existing_user(client, app):
 
 def test_updating_user(client, app, test_user):
     authenticate_user(client, 'test')
+    test_user['username'] = 'test_1'
     test_user['password'] = '123456'
     response = client.put('/users/1', json=test_user)
     assert response.status_code == 200
@@ -71,6 +72,7 @@ def test_updating_user(client, app, test_user):
     assert response.json == {'success': True}
 
     with app.app_context():
+        assert count_users_with_name('test') == 0
         assert count_users_with_name(test_user['username']) == 1
         assert is_password_correct(test_user['username'], test_user['password'])
 

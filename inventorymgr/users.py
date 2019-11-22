@@ -60,6 +60,7 @@ def update_user(user_id: int) -> Dict[str, bool]:
     if user is None:
         raise APIError('No such user', reason='no_such_user', status_code=400)
 
+    user.username = user_dict['username']
     user.password = generate_password_hash(user_dict['password'])
     db.session.commit()
 
