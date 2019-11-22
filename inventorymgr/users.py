@@ -27,7 +27,7 @@ from .db.models import User
 bp = Blueprint('users', __name__, url_prefix='/users')
 
 
-@bp.route('/', methods=('POST',))
+@bp.route('', methods=('POST',))
 @authentication_required
 @requires_permissions('create_users')
 def new_user() -> Dict[str, bool]:
@@ -67,7 +67,7 @@ def update_user(user_id: int) -> Dict[str, bool]:
     return {'success': True}
 
 
-@bp.route('/', methods=('GET',))
+@bp.route('', methods=('GET',))
 @authentication_required
 @requires_permissions('view_users')
 def list_users() -> Dict[str, List[str]]:
