@@ -119,7 +119,9 @@ def test_list_users(client):
     response = client.get('/users')
     assert response.status_code == 200
     assert response.is_json
-    assert set(response.json['users']) == {'test', 'min_permissions_user'}
+    usernames = {u['username'] for u in response.json['users']}
+    assert usernames == {'test', 'min_permissions_user'}
+    assert not any('password' in u for u in response.json['users'])
 
 
 def test_list_users_unauthenticated(client):

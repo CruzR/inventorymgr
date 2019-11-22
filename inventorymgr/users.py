@@ -72,5 +72,5 @@ def update_user(user_id: int) -> Dict[str, bool]:
 @requires_permissions('view_users')
 def list_users() -> Dict[str, List[str]]:
     """Flask view to get a list of users using GET."""
-    users = [user.username for user in User.query.all()]
+    users = UserSchema(many=True).dump(User.query.all())
     return {'users': users}
