@@ -106,6 +106,7 @@ def test_updating_user_permissions_not_subset(client, app, test_user):
         db.session.commit()
 
     authenticate_user(client, 'test')
+    test_user.update({'password': '123456'})
     response = client.put('/users/1', json=test_user)
     assert response.status_code == 403
     assert response.is_json
@@ -114,6 +115,7 @@ def test_updating_user_permissions_not_subset(client, app, test_user):
     with app.app_context():
         user = User.query.get(1)
         assert not user.edit_qualifications
+        assert not is_password_correct(test_user['username'], test_user['password'])
 
 
 def test_updating_user_unauthenticated(client, app, test_user):

@@ -66,6 +66,13 @@ def update_user(user_id: int) -> Dict[str, bool]:
     """Flask view to update a user using PUT."""
     user_dict = UserSchema().load(request.json)
 
+    if not can_set_permissions(user_dict):
+        raise APIError(
+            "Cannot set permissions",
+            reason="permissions_not_subset",
+            status_code=403
+        )
+
     if user_dict['id'] != user_id:
         raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
 
@@ -75,13 +82,6 @@ def update_user(user_id: int) -> Dict[str, bool]:
 
     user.username = user_dict['username']
     user.password = generate_password_hash(user_dict['password'])
-
-    if not can_set_permissions(user_dict):
-        raise APIError(
-            "Cannot set permissions",
-            reason="permissions_not_subset",
-            status_code=403
-        )
 
     for perm in PERMISSIONS:
         setattr(user, perm, user_dict[perm])
