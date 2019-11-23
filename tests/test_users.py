@@ -15,6 +15,7 @@ def test_user():
         'view_users': True,
         'update_users': True,
         'edit_qualifications': True,
+        'qualifications': [{'id': 1, 'name': "Driver's License"}],
     }
 
 
@@ -52,12 +53,15 @@ def test_creating_new_users(client, app, test_user):
     with app.app_context():
         assert count_users_with_name(test_user['username']) == 1
         assert is_password_correct(test_user['username'], test_user['password'])
+        user = User.query.filter_by(username=test_user['username']).first()
+        assert user.qualifications[0].id == 1
+        assert user.qualifications[0].name == "Driver's License"
 
 
 def test_creating_new_users_permissions_not_subset(client, app, test_user):
     with app.app_context():
         user = User.query.get(1)
-        user.edit_qualifications = False
+        user.view_users = False
         db.session.commit()
 
     authenticate_user(client, 'test')
@@ -66,6 +70,50 @@ def test_creating_new_users_permissions_not_subset(client, app, test_user):
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'permissions_not_subset'
+
+    with app.app_context():
+        assert count_users_with_name(test_user['username']) == 0
+
+
+def test_creating_new_unqualified_users_without_edit_qualifications(client, app, test_user):
+    with app.app_context():
+        user = User.query.get(1)
+        user.edit_qualifications = False
+        db.session.commit()
+
+    authenticate_user(client, 'test')
+    test_user.update({
+        'username': 'a_new_user',
+        'password': '123456',
+        'edit_qualifications': False,
+        'qualifications': [],
+    })
+    response = client.post('/users', json=test_user)
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json == {'success': True}
+
+    with app.app_context():
+        assert count_users_with_name(test_user['username']) == 1
+        assert is_password_correct(test_user['username'], test_user['password'])
+
+
+def test_creating_new_qualified_users_without_edit_qualifications(client, app, test_user):
+    with app.app_context():
+        user = User.query.get(1)
+        user.edit_qualifications = False
+        db.session.commit()
+
+    authenticate_user(client, 'test')
+    test_user.update({
+        'username': 'a_new_user',
+        'password': '123456',
+        'edit_qualifications': False,
+    })
+    response = client.post('/users', json=test_user)
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
 
     with app.app_context():
         assert count_users_with_name(test_user['username']) == 0

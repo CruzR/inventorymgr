@@ -19,4 +19,4 @@ class UserSchema(Schema):
     view_users = fields.Bool(required=True)
     update_users = fields.Bool(required=True)
     edit_qualifications = fields.Bool(required=True)
-    qualifications = fields.Nested(QualificationSchema, many=True)
+    qualifications = fields.Nested(QualificationSchema, required=True, many=True)

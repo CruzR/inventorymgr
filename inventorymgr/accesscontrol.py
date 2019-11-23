@@ -26,6 +26,11 @@ def can_set_permissions(user_dict: Dict[str, Any]) -> bool:
     return all(session['user'][k] or not user_dict[k] for k in PERMISSIONS)
 
 
+def can_set_qualifications() -> bool:
+    """Check if the current session's user can set qualifications."""
+    return bool(session['user']['edit_qualifications'])
+
+
 def requires_permissions(*permissions: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Wrap a view and check for permissions, raising APIError if user does not have them."""
     def outer(to_be_wrapped: Callable[..., Any]) -> Callable[..., Any]:

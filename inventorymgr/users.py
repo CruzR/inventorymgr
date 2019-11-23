@@ -18,11 +18,11 @@ from sqlalchemy.exc import IntegrityError # type: ignore
 from werkzeug.security import generate_password_hash
 
 from .accesscontrol import (PERMISSIONS, can_set_permissions,
-                            requires_permissions)
+                            can_set_qualifications, requires_permissions)
 from .api import APIError, UserSchema
 from .auth import authentication_required
 from .db import db
-from .db.models import User
+from .db.models import User, Qualification
 
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -37,6 +37,13 @@ def new_user() -> Dict[str, bool]:
     username = user_dict['username']
     password = user_dict['password']
 
+    if user_dict['qualifications'] and not can_set_qualifications():
+        raise APIError(
+            "Requires edit_qualifications",
+            reason="insufficient_permissions",
+            status_code=403
+        )
+
     if not can_set_permissions(user_dict):
         raise APIError(
             "Cannot set permissions",
@@ -44,10 +51,14 @@ def new_user() -> Dict[str, bool]:
             status_code=403
         )
 
+    qualifications = [
+        Qualification.query.get(q['id']) for q in user_dict['qualifications']]
+
     try:
         user = User(
             username=username,
             password=generate_password_hash(password),
+            qualifications=qualifications,
             **{k: user_dict[k] for k in PERMISSIONS},
         )
 

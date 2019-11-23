@@ -26,7 +26,10 @@ check_password_hash: Callable[[str, str], bool] = cast(Callable[[str, str], bool
 @bp.route('/login', methods=('POST',))
 def login() -> Dict[str, bool]:
     """Flask view for logging a user in."""
-    user_dict = UserSchema().load(request.json, partial=('id',) + PERMISSIONS)
+    user_dict = UserSchema().load(
+        request.json,
+        partial=('id', 'qualifications') + PERMISSIONS
+    )
     username = user_dict['username']
     password = user_dict['password']
 
