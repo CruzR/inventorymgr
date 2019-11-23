@@ -141,6 +141,18 @@ def test_updating_user_with_insufficient_permissions(client, app, test_user):
         assert not is_password_correct(test_user['username'], test_user['password'])
 
 
+def test_updating_user_with_incorrect_id(client, app, test_user):
+    authenticate_user(client, 'test')
+    test_user.update({'id': 2, 'username': 'a_new_user', 'password': '123456'})
+    response = client.put('/users/1', json=test_user)
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'incorrect_id'
+
+    with app.app_context():
+        assert count_users_with_name(test_user['username']) == 0
+
+
 def test_updating_nonexistant_user(client, app, test_user):
     authenticate_user(client, 'test')
     test_user.update({'id': 3, 'username': 'a_new_user', 'password': '123456'})
