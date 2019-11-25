@@ -117,6 +117,20 @@ def update_user(user_id: int) -> Dict[str, Any]:
     return cast(Dict[str, Any], user_schema.dump(user))
 
 
+@bp.route('/<int:user_id>', methods=('DELETE',))
+@authentication_required
+@requires_permissions('view_users', 'update_users')
+def delete_user(user_id: int) -> str:
+    """Flask view to delete a user with DELETE."""
+
+    user = User.query.get(user_id)
+    if user is not None:
+        db.session.delete(User.query.get(user_id))
+        db.session.commit()
+
+    return str(user_id)
+
+
 @bp.route('', methods=('GET',))
 @authentication_required
 @requires_permissions('view_users')

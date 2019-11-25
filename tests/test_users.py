@@ -385,6 +385,45 @@ def test_list_users_with_insufficient_permissions(client):
     assert response.json['reason'] == 'insufficient_permissions'
 
 
+def test_delete_user_unauthenticated(client, app):
+    response = client.delete('/users/2')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+    with app.app_context():
+        assert User.query.get(2) is not None
+
+
+def test_delete_user_with_insufficient_permissions(client, app):
+    authenticate_user(client, 'min_permissions_user')
+    response = client.delete('/users/1')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+    with app.app_context():
+        assert User.query.get(1) is not None
+
+
+def test_delete_user(client, app):
+    authenticate_user(client, 'test')
+    response = client.delete('/users/2')
+    assert response.status_code == 200
+
+    with app.app_context():
+        assert User.query.get(2) is None
+
+
+def test_delete_user_but_user_does_not_exist(client, app):
+    authenticate_user(client, 'test')
+    response = client.delete('/users/3')
+    assert response.status_code == 200
+
+    with app.app_context():
+        assert User.query.get(3) is None
+
+
 def count_users_with_name(username):
     return User.query.filter_by(username=username).count()
 
