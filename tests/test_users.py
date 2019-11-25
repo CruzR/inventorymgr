@@ -166,6 +166,51 @@ def test_updating_user_permissions_not_subset(client, app, test_user):
         assert not is_password_correct(test_user['username'], test_user['password'])
 
 
+def test_updating_user_permissions_subset(client, app, test_user):
+    with app.app_context():
+        user = User.query.get(1)
+        user.edit_qualifications = False
+        db.session.commit()
+
+    authenticate_user(client, 'test')
+    test_user.update({
+        'password': '123456',
+        'edit_qualifications': False,
+        'update_users': False,
+    })
+    response = client.put('/users/1', json=test_user)
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json == {'success': True}
+
+    with app.app_context():
+        user = User.query.get(1)
+        assert not user.edit_qualifications
+        assert not user.update_users
+        assert is_password_correct(test_user['username'], test_user['password'])
+
+
+def test_updating_user_with_more_permissions(client, app, test_user):
+    with app.app_context():
+        user = User.query.get(2)
+        user.view_users = True
+        user.update_users = True
+        db.session.commit()
+
+    authenticate_user(client, 'min_permissions_user')
+    test_user.update({
+        'username': 'changed',
+    })
+    response = client.put('/users/1', json=test_user)
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json == {'success': True}
+
+    with app.app_context():
+        assert count_users_with_name('test') == 0
+        assert count_users_with_name(test_user['username']) == 1
+
+
 def test_updating_user_unauthenticated(client, app, test_user):
     test_user['password'] = '123456'
     response = client.put('/users/1', json=test_user)
