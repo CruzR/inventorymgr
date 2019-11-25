@@ -11,7 +11,7 @@ list_users()
     Flask view to get a list of users using GET.
 """
 
-from typing import Dict, List
+from typing import Any, Dict, List, cast
 
 from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError # type: ignore
@@ -31,9 +31,10 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 @bp.route('', methods=('POST',))
 @authentication_required
 @requires_permissions('create_users')
-def new_user() -> Dict[str, bool]:
+def new_user() -> Dict[str, Any]:
     """Flask view to create a new user using POST."""
-    user_dict = UserSchema().load(request.json, partial=('id',))
+    user_schema = UserSchema()
+    user_dict = user_schema.load(request.json, partial=('id',))
     username = user_dict['username']
     password = user_dict['password']
 
@@ -64,10 +65,10 @@ def new_user() -> Dict[str, bool]:
 
         db.session.add(user)
         db.session.commit()
+        return cast(Dict[str, Any], user_schema.dump(user))
+
     except IntegrityError as exc:
         raise APIError('Username already taken', reason='user_exists', status_code=400) from exc
-
-    return {'success': True}
 
 
 @bp.route('/<int:user_id>', methods=('PUT',))

@@ -48,7 +48,10 @@ def test_creating_new_users(client, app, test_user):
     response = client.post('/users', json=test_user)
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'success': True}
+    assert response.json['username'] == 'a_new_user'
+    assert response.json['qualifications'] == [{'id': 1, 'name': "Driver's License"}]
+    assert response.json['view_users']
+    assert 'password' not in response.json
 
     with app.app_context():
         assert count_users_with_name(test_user['username']) == 1
@@ -91,7 +94,11 @@ def test_creating_new_unqualified_users_without_edit_qualifications(client, app,
     response = client.post('/users', json=test_user)
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'success': True}
+    assert response.json['username'] == 'a_new_user'
+    assert response.json['qualifications'] == []
+    assert response.json['view_users']
+    assert not response.json['edit_qualifications']
+    assert 'password' not in response.json
 
     with app.app_context():
         assert count_users_with_name(test_user['username']) == 1
