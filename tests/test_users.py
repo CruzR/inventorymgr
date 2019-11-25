@@ -215,6 +215,80 @@ def test_updating_nonexistant_user(client, app, test_user):
         assert count_users_with_name(test_user['username']) == 0
 
 
+def test_updating_unqualified_users_without_edit_qualifications(client, app, test_user):
+    with app.app_context():
+        user = User.query.get(1)
+        user.edit_qualifications = False
+        db.session.commit()
+
+    authenticate_user(client, 'test')
+    test_user.update({
+        'id': 2,
+        'username': 'changed',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+        'qualifications': [],
+    })
+    response = client.put('/users/2', json=test_user)
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json == {'success': True}
+
+    with app.app_context():
+        assert count_users_with_name('min_permissions_user') == 0
+        assert count_users_with_name(test_user['username']) == 1
+
+
+def test_updating_qualified_users_without_edit_qualifications(client, app, test_user):
+    with app.app_context():
+        user = User.query.get(1)
+        user.edit_qualifications = False
+        db.session.commit()
+
+    authenticate_user(client, 'test')
+    test_user.update({
+        'id': 2,
+        'username': 'changed',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+    })
+    response = client.put('/users/2', json=test_user)
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+    with app.app_context():
+        assert count_users_with_name('min_permissions_user') == 1
+        assert count_users_with_name(test_user['username']) == 0
+
+
+def test_updating_qualified_users_with_edit_qualifications(client, app, test_user):
+    authenticate_user(client, 'test')
+    test_user.update({
+        'id': 2,
+        'username': 'changed',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+        'qualifications': [{'id': 1, 'name': "Driver's License"}],
+    })
+    response = client.put('/users/2', json=test_user)
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json == {'success': True}
+
+    with app.app_context():
+        assert count_users_with_name('min_permissions_user') == 0
+        assert count_users_with_name(test_user['username']) == 1
+        user = User.query.get(test_user['id'])
+        assert len(user.qualifications) == 1
+
+
 def test_list_users(client):
     authenticate_user(client, 'test')
     response = client.get('/users')

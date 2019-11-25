@@ -91,6 +91,19 @@ def update_user(user_id: int) -> Dict[str, bool]:
     if user is None:
         raise APIError('No such user', reason='no_such_user', status_code=400)
 
+    current_qualifications = {q.id for q in user.qualifications}
+    new_qualifications = {q['id'] for q in user_dict['qualifications']}
+
+    if current_qualifications != new_qualifications:
+        if not can_set_qualifications():
+            raise APIError(
+                "Requires edit_qualifications",
+                reason="insufficient_permissions",
+                status_code=403
+            )
+        qualifications = [Qualification.query.get(q_id) for q_id in new_qualifications]
+        user.qualifications = qualifications
+
     user.username = user_dict['username']
     user.password = generate_password_hash(user_dict['password'])
 
