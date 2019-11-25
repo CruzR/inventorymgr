@@ -74,9 +74,10 @@ def new_user() -> Dict[str, Any]:
 @bp.route('/<int:user_id>', methods=('PUT',))
 @authentication_required
 @requires_permissions('view_users', 'update_users')
-def update_user(user_id: int) -> Dict[str, bool]:
+def update_user(user_id: int) -> Dict[str, Any]:
     """Flask view to update a user using PUT."""
-    user_dict = UserSchema().load(request.json)
+    user_schema = UserSchema()
+    user_dict = user_schema.load(request.json)
 
     if user_dict['id'] != user_id:
         raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
@@ -113,7 +114,7 @@ def update_user(user_id: int) -> Dict[str, bool]:
 
     db.session.commit()
 
-    return {'success': True}
+    return cast(Dict[str, Any], user_schema.dump(user))
 
 
 @bp.route('', methods=('GET',))

@@ -146,7 +146,10 @@ def test_updating_user(client, app, test_user):
     response = client.put('/users/1', json=test_user)
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'success': True}
+    assert response.json['username'] == 'test_1'
+    assert response.json['qualifications'] == [{'id': 1, 'name': "Driver's License"}]
+    assert response.json['view_users']
+    assert 'password' not in response.json
 
     with app.app_context():
         assert count_users_with_name('test') == 0
@@ -188,7 +191,11 @@ def test_updating_user_permissions_subset(client, app, test_user):
     response = client.put('/users/1', json=test_user)
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'success': True}
+    assert response.json['username'] == 'test'
+    assert response.json['qualifications'] == [{'id': 1, 'name': "Driver's License"}]
+    assert response.json['view_users']
+    assert not response.json['edit_qualifications']
+    assert 'password' not in response.json
 
     with app.app_context():
         user = User.query.get(1)
@@ -211,7 +218,11 @@ def test_updating_user_with_more_permissions(client, app, test_user):
     response = client.put('/users/1', json=test_user)
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'success': True}
+    assert response.json['username'] == 'changed'
+    assert response.json['qualifications'] == [{'id': 1, 'name': "Driver's License"}]
+    assert response.json['view_users']
+    assert response.json['edit_qualifications']
+    assert 'password' not in response.json
 
     with app.app_context():
         assert count_users_with_name('test') == 0
@@ -286,7 +297,11 @@ def test_updating_unqualified_users_without_edit_qualifications(client, app, tes
     response = client.put('/users/2', json=test_user)
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'success': True}
+    assert response.json['username'] == 'changed'
+    assert response.json['qualifications'] == []
+    assert not response.json['view_users']
+    assert not response.json['edit_qualifications']
+    assert 'password' not in response.json
 
     with app.app_context():
         assert count_users_with_name('min_permissions_user') == 0
@@ -332,7 +347,11 @@ def test_updating_qualified_users_with_edit_qualifications(client, app, test_use
     response = client.put('/users/2', json=test_user)
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'success': True}
+    assert response.json['username'] == 'changed'
+    assert response.json['qualifications'] == [{'id': 1, 'name': "Driver's License"}]
+    assert not response.json['view_users']
+    assert not response.json['edit_qualifications']
+    assert 'password' not in response.json
 
     with app.app_context():
         assert count_users_with_name('min_permissions_user') == 0
