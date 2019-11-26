@@ -424,6 +424,28 @@ def test_delete_user_but_user_does_not_exist(client, app):
         assert User.query.get(3) is None
 
 
+def test_create_user_command(runner, app):
+    result = runner.invoke(args=[
+        'create-user',
+        '--username', 'test2',
+        '--password', '123456',
+        '--create-users', 'no',
+        '--view-users', 'yes',
+        '--update-users=1',
+        '--edit-qualifications', 'false',
+    ])
+    assert 'Created user' in result.output
+
+    with app.app_context():
+        user = User.query.filter_by(username='test2').first()
+        assert user is not None
+        assert is_password_correct('test2', '123456')
+        assert not user.create_users
+        assert user.view_users
+        assert user.update_users
+        assert not user.edit_qualifications
+
+
 def count_users_with_name(username):
     return User.query.filter_by(username=username).count()
 

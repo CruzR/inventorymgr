@@ -13,7 +13,9 @@ list_users()
 
 from typing import Any, Dict, List, cast
 
+import click
 from flask import Blueprint, request
+from flask.cli import with_appcontext
 from sqlalchemy.exc import IntegrityError # type: ignore
 from werkzeug.security import generate_password_hash
 
@@ -138,3 +140,19 @@ def list_users() -> Dict[str, List[str]]:
     """Flask view to get a list of users using GET."""
     users = UserSchema(many=True).dump(User.query.all())
     return {'users': users}
+
+
+@click.command('create-user')
+@click.option('--username', prompt='Username')
+@click.option('--password', prompt='Password', confirmation_prompt=True, hide_input=True)
+@click.option('--create-users', prompt='Permission create_users [y/n]', type=bool)
+@click.option('--view-users', prompt="Permission view_users [y/n]", type=bool)
+@click.option('--update-users', prompt="Permission update_users [y/n]", type=bool)
+@click.option('--edit-qualifications', prompt="Permission edit_qualifications [y/n]", type=bool)
+@with_appcontext
+def create_user_command(**args: Any) -> None:
+    """CLI command to create a new user."""
+    args['password'] = generate_password_hash(args['password'])
+    db.session.add(User(**args))
+    db.session.commit()
+    click.echo('Created user {}'.format(args['username']))

@@ -53,6 +53,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
 
     from . import users
     app.register_blueprint(users.bp)
+    app.cli.add_command(users.create_user_command)
 
     from .db import db, init_db_command
     db.init_app(app)
