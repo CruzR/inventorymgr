@@ -17,7 +17,7 @@ from .db import db
 from .db.models import Qualification
 
 
-bp = Blueprint('qualifications', __name__, url_prefix='/qualifications')
+bp = Blueprint('qualifications', __name__, url_prefix='/api/v1/qualifications')
 
 
 @bp.route('', methods=('GET',))
