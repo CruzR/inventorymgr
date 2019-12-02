@@ -21,7 +21,7 @@ def test_user():
 
 def test_creating_new_users_unauthenticated(client, app, test_user):
     test_user.update({'username': 'a_new_user', 'password': '123456'})
-    response = client.post('/users', json=test_user)
+    response = client.post('/api/v1/users', json=test_user)
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'authentication_required'
@@ -33,7 +33,7 @@ def test_creating_new_users_unauthenticated(client, app, test_user):
 def test_creating_new_users_with_insufficient_permissions(client, app, test_user):
     authenticate_user(client, 'min_permissions_user')
     test_user.update({'username': 'a_new_user', 'password': '123456'})
-    response = client.post('/users', json=test_user)
+    response = client.post('/api/v1/users', json=test_user)
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'insufficient_permissions'
@@ -45,7 +45,7 @@ def test_creating_new_users_with_insufficient_permissions(client, app, test_user
 def test_creating_new_users(client, app, test_user):
     authenticate_user(client, 'test')
     test_user.update({'username': 'a_new_user', 'password': '123456'})
-    response = client.post('/users', json=test_user)
+    response = client.post('/api/v1/users', json=test_user)
     assert response.status_code == 200
     assert response.is_json
     assert response.json['username'] == 'a_new_user'
@@ -69,7 +69,7 @@ def test_creating_new_users_permissions_not_subset(client, app, test_user):
 
     authenticate_user(client, 'test')
     test_user.update({'username': 'a_new_user', 'password': '123456'})
-    response = client.post('/users', json=test_user)
+    response = client.post('/api/v1/users', json=test_user)
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'permissions_not_subset'
@@ -91,7 +91,7 @@ def test_creating_new_unqualified_users_without_edit_qualifications(client, app,
         'edit_qualifications': False,
         'qualifications': [],
     })
-    response = client.post('/users', json=test_user)
+    response = client.post('/api/v1/users', json=test_user)
     assert response.status_code == 200
     assert response.is_json
     assert response.json['username'] == 'a_new_user'
@@ -117,7 +117,7 @@ def test_creating_new_qualified_users_without_edit_qualifications(client, app, t
         'password': '123456',
         'edit_qualifications': False,
     })
-    response = client.post('/users', json=test_user)
+    response = client.post('/api/v1/users', json=test_user)
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'insufficient_permissions'
@@ -129,7 +129,7 @@ def test_creating_new_qualified_users_without_edit_qualifications(client, app, t
 def test_creating_existing_user(client, app, test_user):
     authenticate_user(client, 'test')
     test_user.update({'password': '123456'})
-    response = client.post('/users', json=test_user)
+    response = client.post('/api/v1/users', json=test_user)
     assert response.status_code == 400
     assert response.is_json
     assert response.json['reason'] == 'user_exists'
@@ -143,7 +143,7 @@ def test_updating_user(client, app, test_user):
     authenticate_user(client, 'test')
     test_user['username'] = 'test_1'
     test_user['password'] = '123456'
-    response = client.put('/users/1', json=test_user)
+    response = client.put('/api/v1/users/1', json=test_user)
     assert response.status_code == 200
     assert response.is_json
     assert response.json['username'] == 'test_1'
@@ -165,7 +165,7 @@ def test_updating_user_permissions_not_subset(client, app, test_user):
 
     authenticate_user(client, 'test')
     test_user.update({'password': '123456'})
-    response = client.put('/users/1', json=test_user)
+    response = client.put('/api/v1/users/1', json=test_user)
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'permissions_not_subset'
@@ -188,7 +188,7 @@ def test_updating_user_permissions_subset(client, app, test_user):
         'edit_qualifications': False,
         'update_users': False,
     })
-    response = client.put('/users/1', json=test_user)
+    response = client.put('/api/v1/users/1', json=test_user)
     assert response.status_code == 200
     assert response.is_json
     assert response.json['username'] == 'test'
@@ -215,7 +215,7 @@ def test_updating_user_with_more_permissions(client, app, test_user):
     test_user.update({
         'username': 'changed',
     })
-    response = client.put('/users/1', json=test_user)
+    response = client.put('/api/v1/users/1', json=test_user)
     assert response.status_code == 200
     assert response.is_json
     assert response.json['username'] == 'changed'
@@ -231,7 +231,7 @@ def test_updating_user_with_more_permissions(client, app, test_user):
 
 def test_updating_user_unauthenticated(client, app, test_user):
     test_user['password'] = '123456'
-    response = client.put('/users/1', json=test_user)
+    response = client.put('/api/v1/users/1', json=test_user)
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'authentication_required'
@@ -244,7 +244,7 @@ def test_updating_user_unauthenticated(client, app, test_user):
 def test_updating_user_with_insufficient_permissions(client, app, test_user):
     authenticate_user(client, 'min_permissions_user')
     test_user['password'] = '123456'
-    response = client.put('/users/1', json=test_user)
+    response = client.put('/api/v1/users/1', json=test_user)
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'insufficient_permissions'
@@ -257,7 +257,7 @@ def test_updating_user_with_insufficient_permissions(client, app, test_user):
 def test_updating_user_with_incorrect_id(client, app, test_user):
     authenticate_user(client, 'test')
     test_user.update({'id': 2, 'username': 'a_new_user', 'password': '123456'})
-    response = client.put('/users/1', json=test_user)
+    response = client.put('/api/v1/users/1', json=test_user)
     assert response.status_code == 400
     assert response.is_json
     assert response.json['reason'] == 'incorrect_id'
@@ -269,7 +269,7 @@ def test_updating_user_with_incorrect_id(client, app, test_user):
 def test_updating_nonexistant_user(client, app, test_user):
     authenticate_user(client, 'test')
     test_user.update({'id': 3, 'username': 'a_new_user', 'password': '123456'})
-    response = client.put('/users/3', json=test_user)
+    response = client.put('/api/v1/users/3', json=test_user)
     assert response.status_code == 400
     assert response.is_json
     assert response.json['reason'] == 'no_such_user'
@@ -294,7 +294,7 @@ def test_updating_unqualified_users_without_edit_qualifications(client, app, tes
         'edit_qualifications': False,
         'qualifications': [],
     })
-    response = client.put('/users/2', json=test_user)
+    response = client.put('/api/v1/users/2', json=test_user)
     assert response.status_code == 200
     assert response.is_json
     assert response.json['username'] == 'changed'
@@ -323,7 +323,7 @@ def test_updating_qualified_users_without_edit_qualifications(client, app, test_
         'update_users': False,
         'edit_qualifications': False,
     })
-    response = client.put('/users/2', json=test_user)
+    response = client.put('/api/v1/users/2', json=test_user)
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'insufficient_permissions'
@@ -344,7 +344,7 @@ def test_updating_qualified_users_with_edit_qualifications(client, app, test_use
         'edit_qualifications': False,
         'qualifications': [{'id': 1, 'name': "Driver's License"}],
     })
-    response = client.put('/users/2', json=test_user)
+    response = client.put('/api/v1/users/2', json=test_user)
     assert response.status_code == 200
     assert response.is_json
     assert response.json['username'] == 'changed'
@@ -362,7 +362,7 @@ def test_updating_qualified_users_with_edit_qualifications(client, app, test_use
 
 def test_list_users(client):
     authenticate_user(client, 'test')
-    response = client.get('/users')
+    response = client.get('/api/v1/users')
     assert response.status_code == 200
     assert response.is_json
     usernames = {u['username'] for u in response.json['users']}
@@ -371,7 +371,7 @@ def test_list_users(client):
 
 
 def test_list_users_unauthenticated(client):
-    response = client.get('/users')
+    response = client.get('/api/v1/users')
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'authentication_required'
@@ -379,14 +379,14 @@ def test_list_users_unauthenticated(client):
 
 def test_list_users_with_insufficient_permissions(client):
     authenticate_user(client, 'min_permissions_user')
-    response = client.get('/users')
+    response = client.get('/api/v1/users')
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'insufficient_permissions'
 
 
 def test_delete_user_unauthenticated(client, app):
-    response = client.delete('/users/2')
+    response = client.delete('/api/v1/users/2')
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'authentication_required'
@@ -397,7 +397,7 @@ def test_delete_user_unauthenticated(client, app):
 
 def test_delete_user_with_insufficient_permissions(client, app):
     authenticate_user(client, 'min_permissions_user')
-    response = client.delete('/users/1')
+    response = client.delete('/api/v1/users/1')
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'insufficient_permissions'
@@ -408,7 +408,7 @@ def test_delete_user_with_insufficient_permissions(client, app):
 
 def test_delete_user(client, app):
     authenticate_user(client, 'test')
-    response = client.delete('/users/2')
+    response = client.delete('/api/v1/users/2')
     assert response.status_code == 200
 
     with app.app_context():
@@ -417,7 +417,7 @@ def test_delete_user(client, app):
 
 def test_delete_user_but_user_does_not_exist(client, app):
     authenticate_user(client, 'test')
-    response = client.delete('/users/3')
+    response = client.delete('/api/v1/users/3')
     assert response.status_code == 200
 
     with app.app_context():

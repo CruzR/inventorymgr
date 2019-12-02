@@ -27,7 +27,7 @@ from .db import db
 from .db.models import User, Qualification
 
 
-bp = Blueprint('users', __name__, url_prefix='/users')
+bp = Blueprint('users', __name__, url_prefix='/api/v1/users')
 
 
 @bp.route('', methods=('POST',))
