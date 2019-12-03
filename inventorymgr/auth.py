@@ -16,7 +16,7 @@ from .api import APIError, UserSchema
 from .db.models import User
 
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+bp = Blueprint('auth', __name__, url_prefix='/api/v1/auth')
 
 _CHECK_HASH_ANYWAY = 'pbkdf2:sha256:150000$tRQtwnYW$80442246fe5dbd649c8a90cd0209f7a3751e8a0ec1327f88f6b331f929642050' # pylint: disable=line-too-long
 

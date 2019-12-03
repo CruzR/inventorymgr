@@ -64,7 +64,7 @@ class AuthenticationManager:
 
     def login(self, username):
         user = {'username': username, 'password': 'test'}
-        self.client.post('/auth/login', json=user)
+        self.client.post('/api/v1/auth/login', json=user)
 
 
 @pytest.fixture

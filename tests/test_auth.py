@@ -6,11 +6,11 @@ def test_login_invalid_user_and_password(client):
     invalid_password_user = {'username': 'test', 'password': '123456'}
 
     with client:
-        invalid_user_response = client.post('/auth/login', json=invalid_user)
+        invalid_user_response = client.post('/api/v1/auth/login', json=invalid_user)
         assert session.get('user') is None
 
     with client:
-        invalid_pw_response = client.post('/auth/login', json=invalid_password_user)
+        invalid_pw_response = client.post('/api/v1/auth/login', json=invalid_password_user)
         assert session.get('user') is None
 
     assert invalid_user_response.status_code == 403
@@ -24,7 +24,7 @@ def test_login_valid_user_and_password(client):
     user = {'username': 'test', 'password': 'test'}
 
     with client:
-        response = client.post('/auth/login', json=user)
+        response = client.post('/api/v1/auth/login', json=user)
         assert session.get('user') is not None
         assert session['user']['username'] == user['username']
 
@@ -35,15 +35,15 @@ def test_login_valid_user_and_password(client):
 
 def test_logout_when_not_logged_in(client):
     with client:
-        response = client.post('/auth/logout')
+        response = client.post('/api/v1/auth/logout')
         assert response.status_code == 200
         assert session.get('user') is None
 
 
 def test_logout_when_logged_in(client):
-    client.post('/auth/login', json={'username': 'test', 'password': 'test'})
+    client.post('/api/v1/auth/login', json={'username': 'test', 'password': 'test'})
 
     with client:
-        response = client.post('/auth/logout')
+        response = client.post('/api/v1/auth/logout')
         assert response.status_code == 200
         assert session.get('user') is None
