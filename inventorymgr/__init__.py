@@ -59,4 +59,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     db.init_app(app)
     app.cli.add_command(init_db_command)
 
+    from .app import bp
+    app.register_blueprint(bp)
+
     return app
