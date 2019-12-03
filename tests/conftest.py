@@ -56,3 +56,17 @@ def client(app):
 @pytest.fixture
 def runner(app):
     return app.test_cli_runner()
+
+
+class AuthenticationManager:
+    def __init__(self, client):
+        self.client = client
+
+    def login(self, username):
+        user = {'username': username, 'password': 'test'}
+        self.client.post('/auth/login', json=user)
+
+
+@pytest.fixture
+def auth(client):
+    return AuthenticationManager(client)
