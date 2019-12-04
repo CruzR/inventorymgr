@@ -8,7 +8,7 @@ login()
 import functools
 from typing import Any, Callable, cast, Dict
 
-from flask import Blueprint, request, session
+from flask import Blueprint, make_response, request, session
 from werkzeug.security import check_password_hash as _check_password_hash
 
 from .accesscontrol import PERMISSIONS
@@ -24,7 +24,7 @@ check_password_hash: Callable[[str, str], bool] = cast(Callable[[str, str], bool
 
 
 @bp.route('/login', methods=('POST',))
-def login() -> Dict[str, bool]:
+def login() -> Any:
     """Flask view for logging a user in."""
     user_dict = UserSchema().load(
         request.json,
@@ -35,7 +35,9 @@ def login() -> Dict[str, bool]:
 
     if is_password_correct(username, password):
         session['user'] = fetch_user(username)
-        return {'success': True}
+        response = make_response({'success': True})
+        response.set_cookie('is_authenticated', '1')
+        return response
 
     raise APIError(
         'Invalid username or password',
@@ -45,11 +47,13 @@ def login() -> Dict[str, bool]:
 
 
 @bp.route('/logout', methods=('POST',))
-def logout() -> Dict[str, bool]:
+def logout() -> Any:
     """Flask view to log a user out."""
     if 'user' in session:
         del session['user']
-    return {'success': True}
+    response = make_response({'success': True})
+    response.set_cookie('is_authenticated', max_age=0, expires=0)
+    return response
 
 
 def is_password_correct(username: str, password: str) -> bool:
