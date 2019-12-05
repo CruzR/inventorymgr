@@ -17,9 +17,8 @@
       import VueRouter from '/static/vue-router.esm.browser.js'
       import LoginView from '/static/views/login.js'
 
-      function is_authenticated() {
-        return true;
-      }
+      window.is_authenticated = document.cookie == 'is_authenticated=1';
+
       const DashboardView = { template: '<div>Dashboard</div>' };
       const UsersView = { template: '<div>Users</div>' };
 
@@ -35,7 +34,7 @@
       });
 
       router.beforeEach((to, from, next) => {
-        if (!is_authenticated() && to.path !== '/login') {
+        if (!window.is_authenticated && to.path !== '/login') {
           next({ path: '/login', query: { next: to.path } });
         } else {
           next();
