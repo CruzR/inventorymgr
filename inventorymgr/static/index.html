@@ -12,12 +12,14 @@
         <router-view></router-view>
       </div>
     </div>
-    <script src="/static/vue.js"></script>
     <script type="module">
+      import Vue from '/static/vue.esm.browser.js'
       import VueRouter from '/static/vue-router.esm.browser.js'
       import LoginView from '/static/views/login.js'
       import CreateUserView from '/static/views/createuser.js'
       import CreateQualificationView from '/static/views/createqualification.js'
+
+      Vue.use(VueRouter);
 
       window.is_authenticated = document.cookie == 'is_authenticated=1';
 
