@@ -52,6 +52,7 @@ function sendLoginRequest() {
     fetch('/api/v1/auth/login', params).then((response) => {
         if (response.status == 200) {
             window.is_authenticated = true;
+            this.$store.commit('login');
             this.$router.push('/');
         } else {
             response.json().then((json) => {

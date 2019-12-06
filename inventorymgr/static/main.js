@@ -1,12 +1,12 @@
 import Vue from '/static/vue.esm.browser.js'
+import Vuex from '/static/vuex.esm.browser.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
 import CreateQualificationView from '/static/views/createqualification.js'
 
 Vue.use(VueRouter);
-
-window.is_authenticated = document.cookie == 'is_authenticated=1';
+Vue.use(Vuex);
 
 const DashboardView = { template: '<div>Dashboard</div>' };
 const UsersView = { template: '<div>Users</div>' };
@@ -24,8 +24,17 @@ const router = new VueRouter({
     routes
 });
 
+const store = new Vuex.Store({
+    state: {
+        isAuthenticated: document.cookie == 'is_authenticated=1',
+    },
+    mutations: {
+        login: state => { state.isAuthenticated = true },
+    }
+});
+
 router.beforeEach((to, from, next) => {
-    if (!window.is_authenticated && to.path !== '/login') {
+    if (!store.state.isAuthenticated && to.path !== '/login') {
         next({ path: '/login', query: { next: to.path } });
     } else {
         next();
@@ -33,6 +42,7 @@ router.beforeEach((to, from, next) => {
 });
 
 const vm = new Vue({
+    store,
     router,
     el: '#app'
 });
