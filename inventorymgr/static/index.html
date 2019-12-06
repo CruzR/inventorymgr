@@ -17,6 +17,7 @@
       import VueRouter from '/static/vue-router.esm.browser.js'
       import LoginView from '/static/views/login.js'
       import CreateUserView from '/static/views/createuser.js'
+      import CreateQualificationView from '/static/views/createqualification.js'
 
       window.is_authenticated = document.cookie == 'is_authenticated=1';
 
@@ -28,6 +29,7 @@
         { path: '/', component: DashboardView },
         { path: '/users/new', component: CreateUserView },
         { path: '/users', component: UsersView },
+        { path: '/qualifications/new', component: CreateQualificationView },
       ];
 
       const router = new VueRouter({
