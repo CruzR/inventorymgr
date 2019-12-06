@@ -6,6 +6,7 @@ import CreateUserView from '/static/views/createuser.js'
 import CreateQualificationView from '/static/views/createqualification.js'
 import UsersView from '/static/views/users.js'
 import QualificationsView from '/static/views/qualifications.js'
+import NavigationBar from '/static/views/navigation.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -73,5 +74,8 @@ router.beforeEach((to, from, next) => {
 const vm = new Vue({
     store,
     router,
-    el: '#app'
+    el: '#app',
+    components: {
+        NavigationBar
+    }
 });
