@@ -19,8 +19,24 @@ const template = `
             <router-link to="/qualifications">Qualifications</router-link>
           </div>
         </div>
+        <div class="navbar-end">
+          <a class="navbar-item" @click="sendLogoutRequest">
+            Logout
+          </a>
+        </div>
       </div>
     </nav>`
+
+function sendLogoutRequest() {
+    fetch('/api/v1/auth/logout', { method: 'POST' }).then(response => {
+        if (response.status === 200) {
+            this.$store.commit('logout');
+            this.$router.push('/login');
+        } else {
+            console.error(response);
+        }
+    });
+}
 
 export default {
     template,
@@ -29,4 +45,7 @@ export default {
             showMenu: false,
         }
     },
+    methods: {
+        sendLogoutRequest
+    }
 }

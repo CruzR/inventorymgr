@@ -35,6 +35,7 @@ const store = new Vuex.Store({
     },
     mutations: {
         login: state => { state.isAuthenticated = true },
+        logout: state => { state.isAuthenticated = false },
         setUsers: (state, users) => { state.users = users },
         setQualifications: (state, qualifications) => { state.qualifications = qualifications },
     }
