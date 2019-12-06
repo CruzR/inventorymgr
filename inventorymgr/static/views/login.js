@@ -53,7 +53,8 @@ function sendLoginRequest() {
         if (response.status == 200) {
             window.is_authenticated = true;
             this.$store.commit('login');
-            this.$router.push('/');
+            const nextRoute = this.$route.query['next'] || '/';
+            this.$router.push(nextRoute);
         } else {
             response.json().then((json) => {
                 this.errorMessage = json.message;
