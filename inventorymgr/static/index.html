@@ -16,6 +16,7 @@
     <script type="module">
       import VueRouter from '/static/vue-router.esm.browser.js'
       import LoginView from '/static/views/login.js'
+      import CreateUserView from '/static/views/createuser.js'
 
       window.is_authenticated = document.cookie == 'is_authenticated=1';
 
@@ -25,6 +26,7 @@
       const routes = [
         { path: '/login', component: LoginView },
         { path: '/', component: DashboardView },
+        { path: '/users/new', component: CreateUserView },
         { path: '/users', component: UsersView },
       ];
 
