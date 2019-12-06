@@ -27,9 +27,11 @@ const router = new VueRouter({
 const store = new Vuex.Store({
     state: {
         isAuthenticated: document.cookie == 'is_authenticated=1',
+        users: []
     },
     mutations: {
         login: state => { state.isAuthenticated = true },
+        setUsers: (state, users) => { state.users = users },
     }
 });
 
@@ -37,6 +39,18 @@ router.beforeEach((to, from, next) => {
     if (!store.state.isAuthenticated && to.path !== '/login') {
         next({ path: '/login', query: { next: to.path } });
     } else {
+        if (!store.state.users.length) {
+            fetch('/api/v1/users')
+                .then(response => {
+                    if (response.status === 500) {
+                        console.error(response);
+                    } else {
+                        response.json().then(users => {
+                            store.commit('setUsers', users)
+                        })
+                    }
+                })
+        }
         next();
     }
 });
