@@ -7,14 +7,14 @@ from marshmallow import Schema, fields
 class QualificationSchema(Schema):
     """Marshmallow schema to validate qualification JSON objects."""
     id = fields.Integer(required=True)
-    name = fields.Str(required=True)
+    name = fields.Str(required=True, validate=bool)
 
 
 class UserSchema(Schema):
     """Marshmallow schema to validate user JSON objects."""
     id = fields.Integer(required=True)
-    username = fields.Str(required=True)
-    password = fields.Str(required=True, load_only=True)
+    username = fields.Str(required=True, validate=bool)
+    password = fields.Str(required=True, load_only=True, validate=bool)
     create_users = fields.Bool(required=True)
     view_users = fields.Bool(required=True)
     update_users = fields.Bool(required=True)
