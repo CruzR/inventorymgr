@@ -4,12 +4,12 @@ import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
 import CreateQualificationView from '/static/views/createqualification.js'
+import UsersView from '/static/views/users.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
 
 const DashboardView = { template: '<div>Dashboard</div>' };
-const UsersView = { template: '<div>Users</div>' };
 
 const routes = [
     { path: '/login', component: LoginView },
@@ -45,8 +45,8 @@ router.beforeEach((to, from, next) => {
                     if (response.status === 500) {
                         console.error(response);
                     } else {
-                        response.json().then(users => {
-                            store.commit('setUsers', users)
+                        response.json().then(json => {
+                            store.commit('setUsers', json.users)
                         })
                     }
                 })
