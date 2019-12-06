@@ -5,6 +5,7 @@ import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
 import CreateQualificationView from '/static/views/createqualification.js'
 import UsersView from '/static/views/users.js'
+import QualificationsView from '/static/views/qualifications.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -17,6 +18,7 @@ const routes = [
     { path: '/users/new', component: CreateUserView },
     { path: '/users', component: UsersView },
     { path: '/qualifications/new', component: CreateQualificationView },
+    { path: '/qualifications', component: QualificationsView },
 ];
 
 const router = new VueRouter({
@@ -27,11 +29,13 @@ const router = new VueRouter({
 const store = new Vuex.Store({
     state: {
         isAuthenticated: document.cookie == 'is_authenticated=1',
-        users: []
+        users: [],
+        qualifications: []
     },
     mutations: {
         login: state => { state.isAuthenticated = true },
         setUsers: (state, users) => { state.users = users },
+        setQualifications: (state, qualifications) => { state.qualifications = qualifications },
     }
 });
 
@@ -50,6 +54,17 @@ router.beforeEach((to, from, next) => {
                         })
                     }
                 })
+        }
+        if (!store.state.users.length) {
+            fetch('/api/v1/qualifications').then(response => {
+                if (response.status === 500) {
+                    console.error(response);
+                } else {
+                    response.json().then(qualifications => {
+                        store.commit('setQualifications', qualifications)
+                    })
+                }
+            })
         }
         next();
     }
