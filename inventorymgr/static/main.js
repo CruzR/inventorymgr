@@ -7,11 +7,10 @@ import CreateQualificationView from '/static/views/createqualification.js'
 import UsersView from '/static/views/users.js'
 import QualificationsView from '/static/views/qualifications.js'
 import NavigationBar from '/static/views/navigation.js'
+import DashboardView from '/static/views/dashboard.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
-
-const DashboardView = { template: '<div>Dashboard</div>' };
 
 const routes = [
     { path: '/login', component: LoginView },
