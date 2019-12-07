@@ -1,8 +1,8 @@
 const template = `
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <router-link to="/" v-slot="{ href, navigate }">
-          <a class="navbar-item" :href="href" @click="navigate">
+        <router-link to="/" v-slot="{ href, navigate, isExactActive }">
+          <a :class="{ 'navbar-item': true, 'is-active': isExactActive }" :href="href" @click="navigate">
             inventorymgr
           </a>
         </router-link>
@@ -14,13 +14,13 @@ const template = `
       </div>
       <div :class="{ 'navbar-menu': true, 'is-active': showMenu }">
         <div class="navbar-start">
-          <router-link to="/users" v-slot="{ href, navigate }">
-            <a class="navbar-item" :href="href" @click="navigate">
+          <router-link to="/users" v-slot="{ href, navigate, isActive }">
+            <a :class="{ 'navbar-item': true, 'is-active': isActive }" :href="href" @click="navigate">
               Users
             </a>
           </router-link>
-          <router-link to="/qualifications" v-slot="{ href, navigate }">
-            <a class="navbar-item" :href="href" @click="navigate">
+          <router-link to="/qualifications" v-slot="{ href, navigate, isActive }">
+            <a :class="{ 'navbar-item': true, 'is-active': isActive }" :href="href" @click="navigate">
               Qualifications
             </a>
           </router-link>
