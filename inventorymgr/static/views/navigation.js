@@ -1,9 +1,11 @@
 const template = `
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <div class="navbar-item">
-          <router-link to="/">inventorymgr</router-link>
-        </div>
+        <router-link to="/" v-slot="{ href, navigate }">
+          <a class="navbar-item" :href="href" @click="navigate">
+            inventorymgr
+          </a>
+        </router-link>
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" @click="showMenu = !showMenu">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
@@ -12,12 +14,16 @@ const template = `
       </div>
       <div :class="{ 'navbar-menu': true, 'is-active': showMenu }">
         <div class="navbar-start">
-          <div class="navbar-item">
-            <router-link to="/users">Users</router-link>
-          </div>
-          <div class="navbar-item">
-            <router-link to="/qualifications">Qualifications</router-link>
-          </div>
+          <router-link to="/users" v-slot="{ href, navigate }">
+            <a class="navbar-item" :href="href" @click="navigate">
+              Users
+            </a>
+          </router-link>
+          <router-link to="/qualifications" v-slot="{ href, navigate }">
+            <a class="navbar-item" :href="href" @click="navigate">
+              Qualifications
+            </a>
+          </router-link>
         </div>
         <div class="navbar-end">
           <a class="navbar-item" @click="sendLogoutRequest">
