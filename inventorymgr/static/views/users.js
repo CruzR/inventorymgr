@@ -14,10 +14,10 @@ const template = `
       <tbody>
         <tr v-for="user in $store.state.users">
           <td>{{ user.username }}</td>
-          <td><input type="checkbox" checked="user.create_users" disabled></td>
-          <td><input type="checkbox" checked="user.view_users" disabled></td>
-          <td><input type="checkbox" checked="user.update_users" disabled></td>
-          <td><input type="checkbox" checked="user.edit_qualifications" disabled></td>
+          <td><input type="checkbox" :checked="user.create_users" disabled></td>
+          <td><input type="checkbox" :checked="user.view_users" disabled></td>
+          <td><input type="checkbox" :checked="user.update_users" disabled></td>
+          <td><input type="checkbox" :checked="user.edit_qualifications" disabled></td>
           <td>{{ user.qualifications.map(q => q.name).join(", ") }}</td>
           <th>
             <div class="control">
