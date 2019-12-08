@@ -41,29 +41,40 @@ const store = new Vuex.Store({
 });
 
 router.beforeEach((to, from, next) => {
-    if (!store.state.isAuthenticated && to.path !== '/login') {
-        next({ path: '/login', query: { next: to.path } });
+    if (!store.state.isAuthenticated) {
+        if (to.path !== '/login') {
+            next({ path: '/login', query: { next: to.path } });
+        } else {
+            next();
+        }
     } else {
         if (!store.state.users.length) {
-            fetch('/api/v1/users')
-                .then(response => {
-                    if (response.status === 500) {
-                        console.error(response);
-                    } else {
-                        response.json().then(json => {
-                            store.commit('setUsers', json.users)
-                        })
-                    }
-                })
-        }
-        if (!store.state.users.length) {
-            fetch('/api/v1/qualifications').then(response => {
-                if (response.status === 500) {
-                    console.error(response);
+            fetch('/api/v1/users').then(response => {
+                if (response.ok) {
+                    response.json().then(json => {
+                        store.commit('setUsers', json.users)
+                    })
                 } else {
+                    if (response.headers.get('Content-Type').startsWith('application/json')) {
+                        response.json().then(console.error);
+                    } else {
+                        console.error(response);
+                    }
+                }
+            })
+        }
+        if (!store.state.qualifications.length) {
+            fetch('/api/v1/qualifications').then(response => {
+                if (response.ok) {
                     response.json().then(qualifications => {
                         store.commit('setQualifications', qualifications)
                     })
+                } else {
+                    if (response.headers.get('Content-Type').startsWith('application/json')) {
+                        response.json().then(console.error);
+                    } else {
+                        console.error(response);
+                    }
                 }
             })
         }
