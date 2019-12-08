@@ -1,5 +1,5 @@
 const template = `
-    <div class="columns is-centered">
+    <div class="columns is-centered section">
       <div class="column is-narrow">
         <h1 class="title">Login</h1>
         <div v-if="errorMessage" class="message is-danger">
