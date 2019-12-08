@@ -8,6 +8,7 @@ const template = `
           <th><abbr title="Update Users">UU</abbr></th>
           <th><abbr title="Edit Qualifications">EQ</abbr></th>
           <th>Qualifications</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -18,6 +19,17 @@ const template = `
           <td><input type="checkbox" checked="user.update_users" disabled></td>
           <td><input type="checkbox" checked="user.edit_qualifications" disabled></td>
           <td>{{ user.qualifications.map(q => q.name).join(", ") }}</td>
+          <th>
+            <div class="control">
+              <router-link
+                :to="'/users/' + user.id + '/edit'"
+                v-slots="{ href, navigate }">
+                <a class="button is-primary is-small" :href="href" @click="navigate">
+                  Edit
+                </a>
+              </router-link>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>`

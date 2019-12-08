@@ -8,6 +8,7 @@ import UsersView from '/static/views/users.js'
 import QualificationsView from '/static/views/qualifications.js'
 import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
+import EditUserView from '/static/views/edituser.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -16,6 +17,7 @@ const routes = [
     { path: '/login', component: LoginView },
     { path: '/', component: DashboardView },
     { path: '/users/new', component: CreateUserView },
+    { path: '/users/:id/edit', component: EditUserView },
     { path: '/users', component: UsersView },
     { path: '/qualifications/new', component: CreateQualificationView },
     { path: '/qualifications', component: QualificationsView },
