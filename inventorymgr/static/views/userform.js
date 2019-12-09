@@ -11,14 +11,17 @@ const template = `
         <div class="control">
           <input
             type="text" placeholder="Username"
+            :readonly="isViewContext"
+            :class="{ 'input': true, 'is-static': isViewContext }"
             v-model="user.username">
         </div>
       </div>
-      <div class="field">
+      <div v-if="!isViewContext" class="field">
         <label class="label">Password</label>
         <div class="control">
           <input
             type="password" placeholder="Password"
+            class="input"
             v-model="user.password">
         </div>
       </div>
@@ -26,25 +29,37 @@ const template = `
         <legend class="label">Permissions</legend>
         <div class="field">
           <label class="checkbox">
-            <input type="checkbox" v-model="user.create_users">
+            <input
+              type="checkbox"
+              :disabled="isViewContext"
+              v-model="user.create_users">
             Create Users
           </label>
         </div>
         <div class="field">
           <label class="checkbox">
-            <input type="checkbox" v-model="user.view_users">
+            <input
+              type="checkbox"
+              :disabled="isViewContext"
+              v-model="user.view_users">
             View Users
           </label>
         </div>
         <div class="field">
           <label class="checkbox">
-            <input type="checkbox" v-model="user.update_users">
+            <input
+              type="checkbox"
+              :disabled="isViewContext"
+              v-model="user.update_users">
             Update Users
           </label>
         </div>
         <div class="field">
           <label class="checkbox">
-            <input type="checkbox" v-model="user.edit_qualifications">
+            <input
+              type="checkbox"
+              :disabled="isViewContext"
+              v-model="user.edit_qualifications">
             Edit Qualifications
           </label>
         </div>
@@ -52,7 +67,10 @@ const template = `
       <div class="field">
         <label class="label">Qualifications</label>
         <div class="control">
-          <input type="text" placeholder="Qualifications">
+          <input
+            type="text" placeholder="Qualifications"
+            :readonly="isViewContext"
+            :class="{ 'input': true, 'is-static': isViewContext }">
         </div>
       </div>
       <div class="field" v-if="context == 'create'">
@@ -70,6 +88,17 @@ const template = `
             @click="$emit('cancel-user-change')">
             Cancel
           </button>
+        </div>
+      </div>
+      <div class="field" v-else-if="isViewContext">
+        <div class="control">
+          <router-link
+            :to="'/users/' + current.id + '/edit'"
+            v-slots="{ href, navigate }">
+            <a class="button is-primary" :href="href" @click="navigate">
+              Edit
+            </a>
+          </router-link>
         </div>
       </div>
     </form>
@@ -94,6 +123,11 @@ export default {
         return {
             user,
             errorMessage: ''
+        }
+    },
+    computed: {
+        isViewContext: function() {
+            return this.context === 'view';
         }
     }
 }

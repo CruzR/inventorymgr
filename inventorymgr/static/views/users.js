@@ -28,6 +28,13 @@ const template = `
                   Edit
                 </a>
               </router-link>
+              <router-link
+                :to="'/users/' + user.id"
+                v-slots="{ href, navigate }">
+                <a class="button is-primary is-small" :href="href" @click="navigate">
+                  View
+                </a>
+              </router-link>
             </div>
           </td>
         </tr>

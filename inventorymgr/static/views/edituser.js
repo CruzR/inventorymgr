@@ -34,7 +34,7 @@ function sendUpdateUserRequest(user) {
 }
 
 function returnToUsers() {
-    this.$router.push('/users');
+    this.$router.push('/users/' + this.$route.params.id);
 }
 
 export default {
