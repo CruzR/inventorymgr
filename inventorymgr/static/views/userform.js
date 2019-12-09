@@ -94,7 +94,7 @@ const template = `
         <div class="control">
           <router-link
             :to="'/users/' + current.id + '/edit'"
-            v-slots="{ href, navigate }">
+            v-slot="{ href, navigate }">
             <a class="button is-primary" :href="href" @click="navigate">
               Edit
             </a>

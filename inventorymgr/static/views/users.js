@@ -19,18 +19,18 @@ const template = `
           <td><input type="checkbox" :checked="user.update_users" disabled></td>
           <td><input type="checkbox" :checked="user.edit_qualifications" disabled></td>
           <td>{{ user.qualifications.map(q => q.name).join(", ") }}</td>
-          <th>
+          <td>
             <div class="control">
               <router-link
                 :to="'/users/' + user.id + '/edit'"
-                v-slots="{ href, navigate }">
+                v-slot="{ href, navigate }">
                 <a class="button is-primary is-small" :href="href" @click="navigate">
                   Edit
                 </a>
               </router-link>
               <router-link
                 :to="'/users/' + user.id"
-                v-slots="{ href, navigate }">
+                v-slot="{ href, navigate }">
                 <a class="button is-primary is-small" :href="href" @click="navigate">
                   View
                 </a>
