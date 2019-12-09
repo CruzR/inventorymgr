@@ -10,6 +10,7 @@ import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
 import EditUserView from '/static/views/edituser.js'
 import UserDetailView from '/static/views/viewuser.js'
+import QualificationDetailView from '/static/views/viewqualification.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -22,6 +23,7 @@ const routes = [
     { path: '/users/:id/edit', component: EditUserView },
     { path: '/users', component: UsersView },
     { path: '/qualifications/new', component: CreateQualificationView },
+    { path: '/qualifications/:id', component: QualificationDetailView },
     { path: '/qualifications', component: QualificationsView },
 ];
 
