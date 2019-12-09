@@ -11,6 +11,7 @@ import DashboardView from '/static/views/dashboard.js'
 import EditUserView from '/static/views/edituser.js'
 import UserDetailView from '/static/views/viewuser.js'
 import QualificationDetailView from '/static/views/viewqualification.js'
+import EditQualificationView from '/static/views/editqualification.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -24,6 +25,7 @@ const routes = [
     { path: '/users', component: UsersView },
     { path: '/qualifications/new', component: CreateQualificationView },
     { path: '/qualifications/:id', component: QualificationDetailView },
+    { path: '/qualifications/:id/edit', component: EditQualificationView },
     { path: '/qualifications', component: QualificationsView },
 ];
 

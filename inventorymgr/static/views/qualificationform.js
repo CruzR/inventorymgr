@@ -23,6 +23,21 @@ const template = `
             </button>
           </div>
         </div>
+        <div class="field is-grouped" v-else-if="context === 'edit'">
+          <div class="control">
+            <button class="button is-primary" type="submit">
+              Save
+            </button>
+          </div>
+          <div class="control">
+            <button
+              type="button"
+              class="button"
+              @click="$emit('cancel-qualification-change')">
+              Cancel
+            </button>
+          </div>
+        </div>
         <div class="field" v-else-if="isViewContext">
           <div class="control">
            <router-link
