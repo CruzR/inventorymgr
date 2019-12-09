@@ -1,36 +1,18 @@
-const template = `
-    <div>
-      <div v-if="errorMessage" class="message is-danger">
-        <div class="message-body">
-          {{ errorMessage }}
-        </div>
-      </div>
-      <form @submit.prevent="sendCreateQualificationRequest">
-        <div class="field">
-          <label class="label">Name</label>
-          <div class="control">
-            <input
-              type="text" placeholder="Name"
-              v-model="qualification.name">
-          </div>
-        </div>
-        <div class="field">
-          <div class="control">
-            <button class="button is-primary" type="submit">
-              Create
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>`
+import QualificationForm from '/static/views/qualificationform.js'
 
-function sendCreateQualificationRequest() {
+const template = `
+    <qualification-form
+      context='create'
+      @commit-qualification-change="sendCreateQualificationRequest">
+    </qualification-form>`
+
+function sendCreateQualificationRequest(qualification) {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json;charset=UTF-8');
     const params = {
         method: 'POST',
         headers,
-        body: JSON.stringify(this.qualification)
+        body: JSON.stringify(qualification)
     };
 
     fetch('/api/v1/qualifications', params).then((response) => {
@@ -50,13 +32,13 @@ export default {
     template,
     data: () => {
         return {
-            qualification: {
-                name: ''
-            },
             errorMessage: ''
         }
     },
     methods: {
         sendCreateQualificationRequest
+    },
+    components: {
+        QualificationForm
     }
 }
