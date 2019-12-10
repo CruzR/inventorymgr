@@ -2,7 +2,8 @@ import QualificationForm from '/static/views/qualificationform.js'
 
 const template = `
     <qualification-form
-      context='create'
+      context="create"
+      :error="errorMessage"
       @commit-qualification-change="sendCreateQualificationRequest">
     </qualification-form>`
 

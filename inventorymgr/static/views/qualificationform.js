@@ -1,8 +1,8 @@
 const template = `
     <div>
-      <div v-if="errorMessage" class="message is-danger">
+      <div v-if="error" class="message is-danger">
         <div class="message-body">
-          {{ errorMessage }}
+          {{ error }}
         </div>
       </div>
       <form @submit.prevent="$emit('commit-qualification-change', qualification)">
@@ -54,7 +54,7 @@ const template = `
 
 export default {
     template,
-    props: ['context', 'current'],
+    props: ['context', 'current', 'error'],
     data: function() {
         const qualification = (typeof(this.current) !== 'undefined')
             ? JSON.parse(JSON.stringify(this.current))
@@ -62,7 +62,6 @@ export default {
 
         return {
             qualification,
-            errorMessage: ''
         }
     },
     computed: {

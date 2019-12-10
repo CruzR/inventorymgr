@@ -5,6 +5,7 @@ const template = `
       v-if="$store.state.qualifications.length"
       context="edit"
       :current="currentQualification"
+      :error="errorMessage"
       @commit-qualification-change="sendUpdateQualificationRequest"
       @cancel-qualification-change="returnToView">
     </qualification-form>`
@@ -44,6 +45,9 @@ function currentQualification() {
 
 export default {
     template,
+    data: () => {
+        return { errorMessage: '' }
+    },
     computed: {
         currentQualification
     },
