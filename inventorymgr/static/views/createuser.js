@@ -3,6 +3,7 @@ import UserForm from '/static/views/userform.js'
 const template = `
     <user-form
       context="create"
+      :error="errorMessage"
       @commit-user-change="sendCreateUserRequest">
     </user-form>`
 
@@ -30,6 +31,9 @@ function sendCreateUserRequest(user) {
 
 export default {
     template,
+    data: () => {
+        return { errorMessage: '' }
+    },
     methods: {
         sendCreateUserRequest 
     },

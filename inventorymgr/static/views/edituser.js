@@ -4,6 +4,7 @@ const template = `
     <user-form
       v-if="$store.state.users.length"
       :current="currentUser"
+      :error="errorMessage"
       context="edit"
       @commit-user-change="sendUpdateUserRequest"
       @cancel-user-change="returnToUsers">
@@ -39,6 +40,9 @@ function returnToUsers() {
 
 export default {
     template,
+    data: () => {
+        return { errorMessage: '' }
+    },
     computed: {
         currentUser: function() {
             const id = parseInt(this.$route.params.id);
