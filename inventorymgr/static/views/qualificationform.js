@@ -43,7 +43,7 @@ const template = `
            <router-link
              :to="'/qualifications/' + current.id + '/edit'"
              v-slot="{ href, navigate }">
-             <a :href="href" class="button is-primary">
+             <a :href="href" class="button is-primary" @click="navigate">
                Edit
              </a>
            </router-link>
