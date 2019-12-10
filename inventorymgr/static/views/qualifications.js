@@ -11,6 +11,13 @@ const template = `
           <td>{{ qualification.name }}</td>
           <td>
             <router-link
+              :to="'/qualifications/' + qualification.id + '/edit'"
+              v-slot="{ href, navigate }">
+              <a :href="href" class="button is-primary is-small" @click="navigate">
+                Edit
+              </a>
+            </router-link>
+            <router-link
               :to="'/qualifications/' + qualification.id"
               v-slot="{ href, navigate }">
               <a :href="href" class="button is-primary is-small" @click="navigate">
