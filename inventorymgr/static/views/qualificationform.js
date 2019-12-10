@@ -38,7 +38,7 @@ const template = `
             </button>
           </div>
         </div>
-        <div class="field" v-else-if="isViewContext">
+        <div class="field is-grouped" v-else-if="isViewContext">
           <div class="control">
            <router-link
              :to="'/qualifications/' + current.id + '/edit'"
@@ -47,6 +47,12 @@ const template = `
                Edit
              </a>
            </router-link>
+          </div>
+          <div class="control">
+            <button type="button" class="button is-danger"
+              @click="$emit('delete-qualification', current)">
+              Delete
+            </button>
           </div>
         </div>
       </form>
