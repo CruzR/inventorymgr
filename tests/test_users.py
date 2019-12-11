@@ -446,5 +446,32 @@ def test_create_user_command(runner, app):
         assert not user.edit_qualifications
 
 
+def test_get_me_unauthenticated(client):
+    response = client.get('/api/v1/users/me')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+
+def test_get_me_with_nonexistant_user(client, auth, app):
+    auth.login('test')
+    with app.app_context():
+        db.session.delete(User.query.get(1))
+        db.session.commit()
+    response = client.get('/api/v1/users/me')
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'no_such_user'
+
+
+def test_get_me(client, auth):
+    auth.login('test')
+    response = client.get('/api/v1/users/me')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['username'] == 'test'
+    assert response.json['id'] == 1
+
+
 def count_users_with_name(username):
     return User.query.filter_by(username=username).count()

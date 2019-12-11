@@ -14,7 +14,7 @@ list_users()
 from typing import Any, Dict, List, cast
 
 import click
-from flask import Blueprint, request
+from flask import Blueprint, request, session
 from flask.cli import with_appcontext
 from sqlalchemy.exc import IntegrityError # type: ignore
 from werkzeug.security import generate_password_hash
@@ -131,6 +131,17 @@ def delete_user(user_id: int) -> str:
         db.session.commit()
 
     return str(user_id)
+
+
+@bp.route('/me', methods=('GET',))
+@authentication_required
+def get_self() -> Any:
+    """Flask view to get the current session's user as JSON."""
+    self_id = session['user']['id']
+    self_user = User.query.get(self_id)
+    if self_user is None:
+        raise APIError('No such user', reason='no_such_user', status_code=400)
+    return UserSchema().dump(self_user)
 
 
 @bp.route('', methods=('GET',))
