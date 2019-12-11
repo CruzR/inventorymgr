@@ -38,13 +38,15 @@ const store = new Vuex.Store({
     state: {
         isAuthenticated: document.cookie == 'is_authenticated=1',
         users: [],
-        qualifications: []
+        qualifications: [],
+        sessionUser: null,
     },
     mutations: {
         login: state => { state.isAuthenticated = true },
         logout: state => { state.isAuthenticated = false },
         setUsers: (state, users) => { state.users = users },
         setQualifications: (state, qualifications) => { state.qualifications = qualifications },
+        setSessionUser: (state, user) => { state.sessionUser = user },
     }
 });
 
@@ -56,6 +58,21 @@ router.beforeEach((to, from, next) => {
             next();
         }
     } else {
+        if (store.state.sessionUser === null) {
+            fetch('/api/v1/users/me').then(response => {
+                if (response.ok) {
+                    response.json().then(user => {
+                        store.commit('setSessionUser', user)
+                    })
+                } else {
+                    if (response.headers.get('Content-Type').startsWith('application/json')) {
+                        response.json().then(console.error);
+                    } else {
+                        console.error(response);
+                    }
+                }
+            })
+        }
         if (!store.state.users.length) {
             fetch('/api/v1/users').then(response => {
                 if (response.ok) {
