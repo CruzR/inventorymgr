@@ -34,7 +34,7 @@ def test_login_valid_user_and_password(client):
 
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == {'success': True}
+    assert response.json['username'] == 'test'
     cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
     assert cookies.get('is_authenticated') == '1'
 

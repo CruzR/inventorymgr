@@ -34,8 +34,8 @@ def login() -> Any:
     password = user_dict['password']
 
     if is_password_correct(username, password):
-        session['user'] = fetch_user(username)
-        response = make_response({'success': True})
+        session['user'] = user = fetch_user(username)
+        response = make_response(user)
         response.set_cookie('is_authenticated', '1')
         return response
 
