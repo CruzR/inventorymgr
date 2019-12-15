@@ -26,6 +26,17 @@ const template = `
           </router-link>
         </div>
         <div class="navbar-end">
+          <router-link
+            v-if="$store.state.sessionUser"
+            to="/users/me"
+            v-slot="{ href, navigate, isActive }">
+            <a
+              :href="href"
+              :class="{ 'navbar-item': true, 'is-active': isActive }"
+              @click="navigate">
+              {{ $store.state.sessionUser.username }}
+            </a>
+          </router-link>
           <a class="navbar-item" @click="sendLogoutRequest">
             Logout
           </a>

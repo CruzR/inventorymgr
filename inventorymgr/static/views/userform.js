@@ -93,7 +93,7 @@ const template = `
       <div class="field is-grouped" v-else-if="isViewContext">
         <div class="control">
           <router-link
-            :to="'/users/' + current.id + '/edit'"
+            :to="editUserUrl"
             v-slot="{ href, navigate }">
             <a class="button is-primary" :href="href" @click="navigate">
               Edit
@@ -102,13 +102,20 @@ const template = `
         </div>
         <div class="control">
           <button type="button" class="button is-danger"
-	    @click="$emit('delete-user', current)">
+            @click="$emit('delete-user', current)">
             Delete
           </button>
         </div>
       </div>
     </form>
     </div>`
+
+function editUserUrl() {
+    if (this.current.id === this.$store.state.sessionUser.id) {
+        return '/users/me/edit';
+    }
+    return '/users/' + this.current.id + '/edit';
+}
 
 export default {
     template,
@@ -133,6 +140,7 @@ export default {
     computed: {
         isViewContext: function() {
             return this.context === 'view';
-        }
+        },
+        editUserUrl
     }
 }

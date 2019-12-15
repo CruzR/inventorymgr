@@ -9,6 +9,9 @@ const template = `
     </user-form>`
 
 function currentUser() {
+    if (this.$route.params.id === 'me') {
+        return this.$store.state.sessionUser;
+    }
     const id = parseInt(this.$route.params.id);
     return this.$store.state.users.find(u => u.id === id);
 }
