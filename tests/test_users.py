@@ -157,6 +157,24 @@ def test_updating_user(client, app, test_user, auth):
         assert is_password_correct(test_user['username'], test_user['password'])
 
 
+def test_updating_user(client, app, test_user, auth):
+    auth.login('test')
+    test_user['username'] = 'test_1'
+    del test_user['password']
+    response = client.put('/api/v1/users/1', json=test_user)
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['username'] == 'test_1'
+    assert response.json['qualifications'] == [{'id': 1, 'name': "Driver's License"}]
+    assert response.json['view_users']
+    assert 'password' not in response.json
+
+    with app.app_context():
+        assert count_users_with_name('test') == 0
+        assert count_users_with_name(test_user['username']) == 1
+        assert is_password_correct(test_user['username'], 'test')
+
+
 def test_updating_user_permissions_not_subset(client, app, test_user, auth):
     with app.app_context():
         user = User.query.get(1)

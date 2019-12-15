@@ -79,7 +79,7 @@ def new_user() -> Dict[str, Any]:
 def update_user(user_id: int) -> Dict[str, Any]:
     """Flask view to update a user using PUT."""
     user_schema = UserSchema()
-    user_dict = user_schema.load(request.json)
+    user_dict = user_schema.load(request.json, partial=('password',))
 
     if user_dict['id'] != user_id:
         raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
@@ -112,7 +112,8 @@ def update_user(user_id: int) -> Dict[str, Any]:
             setattr(user, perm, user_dict[perm])
 
     user.username = user_dict['username']
-    user.password = generate_password_hash(user_dict['password'])
+    if 'password' in user_dict:
+        user.password = generate_password_hash(user_dict['password'])
 
     db.session.commit()
 
