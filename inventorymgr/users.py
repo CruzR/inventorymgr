@@ -88,6 +88,18 @@ def update_user(user_id: int) -> Dict[str, Any]:
     if user is None:
         raise APIError('No such user', reason='no_such_user', status_code=400)
 
+    update_user_qualifications(user, user_dict)
+    update_user_permissions(user, user_dict)
+    update_user_username(user, user_dict)
+    update_user_password(user, user_dict)
+
+    db.session.commit()
+
+    return cast(Dict[str, Any], user_schema.dump(user))
+
+
+def update_user_qualifications(user: User, user_dict: Dict[str, Any]) -> None:
+    """Update user qualifications."""
     current_qualifications = {q.id for q in user.qualifications}
     new_qualifications = {q['id'] for q in user_dict['qualifications']}
 
@@ -101,6 +113,9 @@ def update_user(user_id: int) -> Dict[str, Any]:
         qualifications = [Qualification.query.get(q_id) for q_id in new_qualifications]
         user.qualifications = qualifications
 
+
+def update_user_permissions(user: User, user_dict: Dict[str, Any]) -> None:
+    """Update user permissions."""
     if any(user_dict[p] != getattr(user, p) for p in PERMISSIONS):
         if not can_set_permissions(user_dict):
             raise APIError(
@@ -111,13 +126,16 @@ def update_user(user_id: int) -> Dict[str, Any]:
         for perm in PERMISSIONS:
             setattr(user, perm, user_dict[perm])
 
+
+def update_user_username(user: User, user_dict: Dict[str, Any]) -> None:
+    """Update username."""
     user.username = user_dict['username']
+
+
+def update_user_password(user: User, user_dict: Dict[str, Any]) -> None:
+    """Update user password."""
     if 'password' in user_dict:
         user.password = generate_password_hash(user_dict['password'])
-
-    db.session.commit()
-
-    return cast(Dict[str, Any], user_schema.dump(user))
 
 
 @bp.route('/<int:user_id>', methods=('DELETE',))
