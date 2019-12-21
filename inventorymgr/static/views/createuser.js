@@ -7,7 +7,17 @@ const template = `
       @commit-user-change="sendCreateUserRequest">
     </user-form>`
 
-function sendCreateUserRequest(user) {
+function sendCreateUserRequest(user, repeatedPassword) {
+    if (user.password !== repeatedPassword) {
+        this.errorMessage = 'Passwords do not match';
+        return;
+    }
+
+    if (!user.password) {
+        this.errorMessage = 'Password is empty';
+        return;
+    }
+
     const headers = new Headers();
     headers.append('Content-Type', 'application/json;charset=UTF-8');
     const params = {

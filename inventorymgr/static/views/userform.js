@@ -5,7 +5,7 @@ const template = `
         {{ error }}
       </div>
     </div>
-    <form @submit.prevent="$emit('commit-user-change', user)">
+    <form @submit.prevent="$emit('commit-user-change', user, repeatedPassword)">
       <div class="field">
         <label class="label">Username</label>
         <div class="control">
@@ -16,15 +16,39 @@ const template = `
             v-model="user.username">
         </div>
       </div>
-      <div v-if="!isViewContext" class="field">
-        <label class="label">Password</label>
-        <div class="control">
-          <input
-            type="password" placeholder="Password"
-            class="input"
-            v-model="user.password">
+      <template v-if="isEditContext && !changePassword">
+        <div class="field">
+          <label class="label">Password</label>
+          <div class="control">
+            <button
+              type="button"
+              class="button"
+              @click="changePassword = true">
+              Change password
+            </button>
+          </div>
         </div>
-      </div>
+      </template>
+      <template v-else-if="isCreateContext || (!isViewContext && changePassword)">
+        <div class="field">
+          <label class="label">New password</label>
+          <div class="control">
+            <input
+              type="password"
+              class="input"
+              v-model="user.password">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Repeat new password</label>
+          <div class="control">
+            <input
+              type="password"
+              class="input"
+              v-model="repeatedPassword">
+          </div>
+        </div>
+      </template>
       <fieldset class="field">
         <legend class="label">Permissions</legend>
         <div class="field">
@@ -135,11 +159,19 @@ export default {
 
         return {
             user,
+            changePassword: false,
+            repeatedPassword: '',
         }
     },
     computed: {
         isViewContext: function() {
             return this.context === 'view';
+        },
+        isEditContext: function() {
+            return this.context === 'edit';
+        },
+        isCreateContext: function() {
+            return this.context === 'create';
         },
         editUserUrl
     }

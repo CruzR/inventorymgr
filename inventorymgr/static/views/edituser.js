@@ -10,7 +10,16 @@ const template = `
       @cancel-user-change="returnToUsers">
     </user-form>`
 
-function sendUpdateUserRequest(user) {
+function sendUpdateUserRequest(user, repeatedPassword) {
+    if ((user.password || repeatedPassword) && user.password !== repeatedPassword) {
+        this.errorMessage = 'Passwords do not match';
+        return;
+    }
+
+    if (!user.password) {
+        delete user.password;
+    }
+
     const headers = new Headers();
     headers.append('Content-Type', 'application/json;charset=UTF-8');
     const params = {
