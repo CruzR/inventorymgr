@@ -22,7 +22,7 @@ from werkzeug.security import generate_password_hash
 from .accesscontrol import (PERMISSIONS, can_set_permissions,
                             can_set_qualifications, requires_permissions)
 from .api import APIError, UserSchema
-from .auth import authentication_required
+from .auth import authentication_required, logout
 from .db import db
 from .db.models import User, Qualification
 
@@ -213,6 +213,19 @@ def wants_to_update_qualifications(user: User, user_dict: Dict[str, Any]) -> boo
 def wants_to_update_permissions(user: User, user_dict: Dict[str, Any]) -> bool:
     """Check if permissions need updating."""
     return any(user_dict[p] != getattr(user, p) for p in PERMISSIONS)
+
+
+@bp.route('/me', methods=('DELETE',))
+@authentication_required
+def delete_self() -> Any:
+    """Flask view to delete current session's user."""
+    user_id = session['user']['id']
+    user = User.query.get(user_id)
+    if user is not None:
+        db.session.delete(User.query.get(user_id))
+        db.session.commit()
+
+    return logout()
 
 
 @bp.route('', methods=('GET',))

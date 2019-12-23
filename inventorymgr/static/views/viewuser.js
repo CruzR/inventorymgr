@@ -17,11 +17,16 @@ function currentUser() {
 }
 
 function sendDeleteUserRequest(user) {
-    const id = parseInt(this.$route.params.id);
+    const id = this.$route.params.id;
     fetch('/api/v1/users/' + id, { method: 'DELETE' }).then(response => {
         if (response.ok) {
             this.$store.commit('deleteUser', user);
-            this.$router.push('/users');
+            if (id === 'me') {
+                this.$store.commit('logout');
+                this.$router.push('/login');
+            } else {
+                this.$router.push('/users');
+            }
         } else {
             if (response.headers.get('Content-Type').startsWith('application/json')) {
                 response.json().then(error => {

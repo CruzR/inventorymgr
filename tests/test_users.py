@@ -651,5 +651,48 @@ def test_update_self_with_deleted_user(client, app, auth):
         assert User.query.filter_by(username='min_permissions_user').count() == 0
 
 
+def test_delete_self_unauthenticated(client, app):
+    response = client.delete('/api/v1/users/me')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+
+def test_delete_self(client, app, auth):
+    auth.login('min_permissions_user')
+    response = client.delete('/api/v1/users/me')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['success']
+
+    with app.app_context():
+        assert User.query.filter_by(username='min_permissions_user').count() == 0
+
+    # Deleting yourself should log yourself out
+    cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
+    assert cookies.get('session') is None
+    assert cookies.get('is_authenticated') is None
+
+
+def test_delete_self_already_deleted(client, app, auth):
+    auth.login('min_permissions_user')
+    with app.app_context():
+        user = User.query.get(2)
+        db.session.delete(user)
+        db.session.commit()
+    response = client.delete('/api/v1/users/me')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['success']
+
+    with app.app_context():
+        assert User.query.filter_by(username='min_permissions_user').count() == 0
+
+    # Deleting yourself should log yourself out
+    cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
+    assert cookies.get('session') is None
+    assert cookies.get('is_authenticated') is None
+
+
 def count_users_with_name(username):
     return User.query.filter_by(username=username).count()
