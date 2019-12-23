@@ -27,8 +27,11 @@ function sendCreateUserRequest(user, repeatedPassword) {
     };
 
     fetch('/api/v1/users', params).then((response) => {
-        if (response.status === 200) {
-            this.$router.push('/');
+        if (response.ok) {
+            response.json().then(user => {
+                this.$store.commit('updateUser', user);
+                this.$router.push('/users');
+            });
         } else if (response.status === 500) {
             this.errorMessage = 'An error occurred during processing.'
         } else {
