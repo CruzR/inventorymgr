@@ -30,7 +30,13 @@ function sendUpdateUserRequest(user, repeatedPassword) {
 
     fetch('/api/v1/users/' + this.$route.params.id, params).then(response => {
         if (response.ok) {
-            this.$router.push('/users');
+            response.json().then(user => {
+                this.$store.commit('updateUser', user);
+                if (this.$route.params.id === 'me') {
+                    this.$store.commit('setSessionUser', user);
+                }
+                this.$router.push('/users');
+            });
         } else if (response.headers.get('Content-Type').startsWith('application/json')) {
             response.json().then(error => {
                 this.errorMessage = error.message;

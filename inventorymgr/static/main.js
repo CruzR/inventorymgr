@@ -52,6 +52,14 @@ const store = new Vuex.Store({
         setUsers: (state, users) => { state.users = users },
         setQualifications: (state, qualifications) => { state.qualifications = qualifications },
         setSessionUser: (state, user) => { state.sessionUser = user },
+        updateUser: (state, user) => {
+            const index = state.users.findIndex(u => u.id === user.id);
+            if (index !== -1) {
+                state.users.splice(index, 1, user);
+            } else {
+                state.users.push(user);
+            }
+        },
     }
 });
 
