@@ -491,5 +491,165 @@ def test_get_me(client, auth):
     assert response.json['id'] == 1
 
 
+def test_update_self_unauthenticated(client, app):
+    response = client.put('/api/v1/users/me', json={
+        'id': 1,
+        'username': 'other_user',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+        'qualifications': []
+    })
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+
+def test_abuse_update_self_to_update_other_user(client, app, auth):
+    auth.login('min_permissions_user')
+    response = client.put('/api/v1/users/me', json={
+        'id': 1,
+        'username': 'other_user',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+        'qualifications': []
+    })
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'incorrect_id'
+
+    with app.app_context():
+        assert User.query.filter_by(username='test').count() == 1
+        assert User.query.filter_by(username='other_user').count() == 0
+
+
+def test_update_self_username(client, app, auth):
+    auth.login('min_permissions_user')
+    response = client.put('/api/v1/users/me', json={
+        'id': 2,
+        'username': 'other_user',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+        'qualifications': []
+    })
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['username'] == 'other_user'
+
+    with app.app_context():
+        assert User.query.filter_by(username='min_permissions_user').count() == 0
+        assert User.query.filter_by(username='other_user').count() == 1
+
+
+def test_update_self_password(client, app, auth):
+    auth.login('min_permissions_user')
+    response = client.put('/api/v1/users/me', json={
+        'id': 2,
+        'username': 'min_permissions_user',
+        'password': 'a_new_password',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+        'qualifications': []
+    })
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['username'] == 'min_permissions_user'
+    assert 'password' not in response.json
+
+    with app.app_context():
+        assert is_password_correct('min_permissions_user', 'a_new_password')
+
+
+def test_update_self_set_permissions_fail(client, app, auth):
+    auth.login('min_permissions_user')
+    response = client.put('/api/v1/users/me', json={
+        'id': 2,
+        'username': 'min_permissions_user',
+        'create_users': False,
+        'view_users': False,
+        'update_users': True,
+        'edit_qualifications': False,
+        'qualifications': []
+    })
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+    with app.app_context():
+        assert not User.query.get(2).update_users
+
+
+def test_update_self_set_permissions_and_qualifications(client, app, auth):
+    auth.login('test')
+    response = client.put('/api/v1/users/me', json={
+        'id': 1,
+        'username': 'test',
+        'create_users': True,
+        'view_users': True,
+        'update_users': True,
+        'edit_qualifications': False,
+        'qualifications': [{'id': 1, 'name': "Driver's License"}]
+    })
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['username'] == 'test'
+    assert not response.json['edit_qualifications']
+
+    with app.app_context():
+        assert not User.query.get(2).edit_qualifications
+
+
+def test_update_self_give_more_qualifications_fail(client, app, auth):
+    auth.login('min_permissions_user')
+    response = client.put('/api/v1/users/me', json={
+        'id': 2,
+        'username': 'min_permissions_user',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+        'qualifications': [{'id': 1, 'name': "Driver's License"}]
+    })
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+    with app.app_context():
+        assert User.query.get(2).qualifications == []
+
+
+def test_update_self_with_deleted_user(client, app, auth):
+    auth.login('min_permissions_user')
+
+    with app.app_context():
+        user = User.query.get(2)
+        db.session.delete(user)
+        db.session.commit()
+
+    response = client.put('/api/v1/users/me', json={
+        'id': 2,
+        'username': 'min_permissions_user',
+        'create_users': False,
+        'view_users': False,
+        'update_users': False,
+        'edit_qualifications': False,
+        'qualifications': []
+    })
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'no_such_user'
+
+    with app.app_context():
+        assert User.query.get(2) is None
+        assert User.query.filter_by(username='min_permissions_user').count() == 0
+
+
 def count_users_with_name(username):
     return User.query.filter_by(username=username).count()

@@ -116,7 +116,7 @@ def update_user_qualifications(user: User, user_dict: Dict[str, Any]) -> None:
 
 def update_user_permissions(user: User, user_dict: Dict[str, Any]) -> None:
     """Update user permissions."""
-    if any(user_dict[p] != getattr(user, p) for p in PERMISSIONS):
+    if wants_to_update_permissions(user, user_dict):
         if not can_set_permissions(user_dict):
             raise APIError(
                 "Cannot set permissions",
@@ -161,6 +161,58 @@ def get_self() -> Any:
     if self_user is None:
         raise APIError('No such user', reason='no_such_user', status_code=400)
     return UserSchema().dump(self_user)
+
+
+@bp.route('/me', methods=('PUT',))
+@authentication_required
+def update_self() -> Any:
+    """Flask view to update current session's user as JSON."""
+    user_schema = UserSchema()
+    user_dict = user_schema.load(request.json, partial=('password',))
+
+    if user_dict['id'] != session['user']['id']:
+        raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
+
+    user = User.query.get(user_dict['id'])
+    if user is None:
+        raise APIError('No such user', reason='no_such_user', status_code=400)
+
+    if user.edit_qualifications:
+        update_user_qualifications(user, user_dict)
+    elif wants_to_update_qualifications(user, user_dict):
+        raise insufficient_permissions()
+
+    if user.update_users:
+        update_user_permissions(user, user_dict)
+    elif wants_to_update_permissions(user, user_dict):
+        raise insufficient_permissions()
+
+    update_user_username(user, user_dict)
+    update_user_password(user, user_dict)
+
+    db.session.commit()
+
+    return cast(Dict[str, Any], user_schema.dump(user))
+
+
+def insufficient_permissions() -> APIError:
+    """Return an API error for insufficient permissions."""
+    return APIError(
+        'Insufficient permissions',
+        reason='insufficient_permissions',
+        status_code=403)
+
+
+def wants_to_update_qualifications(user: User, user_dict: Dict[str, Any]) -> bool:
+    """Check if qualifications need updating."""
+    current_qualifications = {q.id for q in user.qualifications}
+    new_qualifications = {q['id'] for q in user_dict['qualifications']}
+    return current_qualifications != new_qualifications
+
+
+def wants_to_update_permissions(user: User, user_dict: Dict[str, Any]) -> bool:
+    """Check if permissions need updating."""
+    return any(user_dict[p] != getattr(user, p) for p in PERMISSIONS)
 
 
 @bp.route('', methods=('GET',))
