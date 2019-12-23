@@ -60,6 +60,12 @@ const store = new Vuex.Store({
                 state.users.push(user);
             }
         },
+        deleteUser: (state, user) => {
+            const index = state.users.findIndex(u => u.id === user.id);
+            if (index !== -1) {
+                state.users.splice(index, 1);
+            }
+        },
     }
 });
 
