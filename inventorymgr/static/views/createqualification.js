@@ -17,8 +17,11 @@ function sendCreateQualificationRequest(qualification) {
     };
 
     fetch('/api/v1/qualifications', params).then((response) => {
-        if (response.status === 200) {
-            this.$router.push('/');
+        if (response.ok) {
+            response.json().then(qualification => {
+                this.$store.commit('updateQualification', qualification);
+                this.$router.push('/qualifications');
+            });
         } else if (response.status === 500) {
             this.errorMessage = 'An error occurred during processing.'
         } else {
