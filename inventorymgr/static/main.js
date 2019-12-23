@@ -66,6 +66,14 @@ const store = new Vuex.Store({
                 state.users.splice(index, 1);
             }
         },
+        updateQualification: (state, qualification) => {
+            const index = state.qualifications.findIndex(q => q.id === qualification.id);
+            if (index !== -1) {
+                state.qualifications.splice(index, 1, qualification);
+            } else {
+                state.qualifications.push(qualification);
+            }
+        },
     }
 });
 

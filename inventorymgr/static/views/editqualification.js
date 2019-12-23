@@ -21,7 +21,10 @@ function sendUpdateQualificationRequest(qualification) {
 
     fetch('/api/v1/qualifications/' + this.$route.params.id, params).then(response => {
         if (response.ok) {
-            this.$router.push('/qualifications');
+            response.json().then(qualification => {
+                this.$store.commit('updateQualification', qualification);
+                this.$router.push('/qualifications');
+            });
         } else if (response.headers.get('Content-Type').startsWith('application/json')) {
             response.json().then(error => {
                 this.errorMessage = error.message;
