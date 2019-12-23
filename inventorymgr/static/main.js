@@ -74,6 +74,12 @@ const store = new Vuex.Store({
                 state.qualifications.push(qualification);
             }
         },
+        deleteQualification: (state, qualification) => {
+            const index = state.qualifications.findIndex(q => q.id === qualification.id);
+            if (index !== -1) {
+                state.qualifications.splice(index, 1);
+            }
+        },
     }
 });
 

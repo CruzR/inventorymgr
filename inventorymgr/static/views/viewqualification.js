@@ -24,6 +24,7 @@ function sendDeleteQualificationRequest(qualification) {
     };
     fetch('/api/v1/qualifications/' + id, params).then(response => {
         if (response.ok) {
+            this.$store.commit('deleteQualification', qualification);
             this.$router.push('/qualifications');
         } else {
             if (response.headers.get('Content-Type').startsWith('application/json')) {
