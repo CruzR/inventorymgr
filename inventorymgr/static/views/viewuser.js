@@ -2,7 +2,7 @@ import UserForm from '/static/views/userform.js'
 
 const template = `
     <user-form
-      v-if="$store.state.users.length"
+      v-if="currentUser"
       :current="currentUser"
       context="view"
       @delete-user="sendDeleteUserRequest">
