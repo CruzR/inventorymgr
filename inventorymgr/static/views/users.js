@@ -1,5 +1,5 @@
 const template = `
-    <table class="table">
+    <table class="table is-fullwidth responsive-table">
       <thead>
         <tr>
           <th>Username</th>
@@ -8,18 +8,18 @@ const template = `
           <th><abbr title="Update Users">UU</abbr></th>
           <th><abbr title="Edit Qualifications">EQ</abbr></th>
           <th>Qualifications</th>
-          <th></th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="user in $store.state.users">
-          <td>{{ user.username }}</td>
-          <td><input type="checkbox" :checked="user.create_users" disabled></td>
-          <td><input type="checkbox" :checked="user.view_users" disabled></td>
-          <td><input type="checkbox" :checked="user.update_users" disabled></td>
-          <td><input type="checkbox" :checked="user.edit_qualifications" disabled></td>
-          <td>{{ user.qualifications.map(q => q.name).join(", ") }}</td>
-          <td>
+          <td data-label="Username">{{ user.username }}</td>
+          <td data-label="Create Users"><input type="checkbox" :checked="user.create_users" disabled></td>
+          <td data-label="View Users"><input type="checkbox" :checked="user.view_users" disabled></td>
+          <td data-label="Update Users"><input type="checkbox" :checked="user.update_users" disabled></td>
+          <td data-label="Edit Qualifications"><input type="checkbox" :checked="user.edit_qualifications" disabled></td>
+          <td data-label="Qualifications"><span>{{ user.qualifications.map(q => q.name).join(", ") }}</span></td>
+          <td data-label="Actions">
             <div class="control">
               <router-link
                 :to="'/users/' + user.id + '/edit'"

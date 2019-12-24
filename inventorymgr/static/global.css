@@ -1,0 +1,34 @@
+@media screen and (max-width: 768px) {
+
+    .responsive-table {
+        display: block;
+    }
+
+    .responsive-table thead {
+        display: none;
+    }
+
+    .responsive-table tbody {
+        display: block;
+    }
+
+    .responsive-table tr {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        border: 1px solid black;
+        margin-bottom: 1rem;
+        align-items: baseline;
+    }
+
+    .responsive-table td {
+        display: contents;
+    }
+
+    .responsive-table td::before {
+        content: attr(data-label);
+        text-transform: uppercase;
+        font-size: smaller;
+        color: #777;
+        margin: 0.5rem;
+    }
+}
