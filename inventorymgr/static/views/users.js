@@ -18,7 +18,15 @@ const template = `
           <td data-label="View Users"><input type="checkbox" :checked="user.view_users" disabled></td>
           <td data-label="Update Users"><input type="checkbox" :checked="user.update_users" disabled></td>
           <td data-label="Edit Qualifications"><input type="checkbox" :checked="user.edit_qualifications" disabled></td>
-          <td data-label="Qualifications"><span>{{ user.qualifications.map(q => q.name).join(", ") }}</span></td>
+          <td data-label="Qualifications">
+            <div class="tags">
+              <span
+                v-for="qualification in user.qualifications"
+                class="tag">
+                {{ qualification.name }}
+              </span>
+            </div>
+          </td>
           <td data-label="Actions">
             <div class="control">
               <router-link
