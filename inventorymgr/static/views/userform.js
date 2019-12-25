@@ -1,3 +1,5 @@
+import TagSelectBox from '/static/views/tagselectbox.js'
+
 const template = `
     <div>
     <div v-if="error" class="message is-danger">
@@ -91,10 +93,11 @@ const template = `
       <div class="field">
         <label class="label">Qualifications</label>
         <div class="control">
-          <input
-            type="text" placeholder="Qualifications"
+          <tag-select-box
+            :items.sync="user.qualifications"
             :readonly="isViewContext"
-            :class="{ 'input': true, 'is-static': isViewContext }">
+            :choices="$store.state.qualifications">
+          </tag-select-box>
         </div>
       </div>
       <div class="field" v-if="context == 'create'">
@@ -174,5 +177,6 @@ export default {
             return this.context === 'create';
         },
         editUserUrl
-    }
+    },
+    components: { TagSelectBox }
 }
