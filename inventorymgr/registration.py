@@ -70,6 +70,16 @@ def get_tokens() -> Tuple[Dict[str, Any], int]:
     return {'tokens': token_schema.dump(tokens)}, 200
 
 
+@bp.route('/tokens', methods=('POST',))
+@authentication_required
+@requires_permissions('create_users')
+def create_token() -> Tuple[Dict[str, Any], int]:
+    """Create a new registration token."""
+    token_schema = RegistrationTokenSchema()
+    token = generate_registration_token()
+    return token_schema.dump(token), 200
+
+
 @click.command('generate-registration-token')
 @with_appcontext
 def generate_registration_token_command() -> None:

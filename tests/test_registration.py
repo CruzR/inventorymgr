@@ -130,3 +130,35 @@ def test_get_tokens_success(client, auth):
         {'id': 1, 'token': 'expired', 'expires': '2019-11-11T00:00:00'},
         {'id': 2, 'token': 'valid', 'expires': '2049-11-11T00:00:00'},
     ]
+
+
+def test_create_token_unauthenticated(client):
+    response = client.post('/api/v1/registration/tokens')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+
+def test_create_token_insufficient_permissions(client, auth, app):
+    auth.login('min_permissions_user')
+    response = client.post('/api/v1/registration/tokens')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+    with app.app_context():
+        assert RegistrationToken.query.count() == 2
+
+
+def test_create_token_success(client, auth, app, monkeypatch):
+    monkeypatch.setattr('secrets.token_hex', lambda: 'test')
+    auth.login('test')
+    response = client.post('/api/v1/registration/tokens')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['id'] == 3
+    assert response.json['token'] == 'test'
+    assert 'expires' in response.json
+
+    with app.app_context():
+        assert RegistrationToken.query.filter_by(token='test').count() == 1
