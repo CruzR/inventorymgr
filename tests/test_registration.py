@@ -104,3 +104,29 @@ def test_handle_registration_with_existing_user(client, app):
         assert User.query.filter_by(username='test').count() == 1
         assert RegistrationToken.query.filter_by(token='valid').count() == 0
         assert not is_password_correct('test', 'abc')
+
+
+def test_get_tokens_unauthenticated(client):
+    response = client.get('/api/v1/registration/tokens')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+
+def test_get_tokens_with_insufficient_permissions(client, auth):
+    auth.login('min_permissions_user')
+    response = client.get('/api/v1/registration/tokens')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+
+def test_get_tokens_success(client, auth):
+    auth.login('test')
+    response = client.get('/api/v1/registration/tokens')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['tokens'] == [
+        {'id': 1, 'token': 'expired', 'expires': '2019-11-11T00:00:00'},
+        {'id': 2, 'token': 'valid', 'expires': '2049-11-11T00:00:00'},
+    ]

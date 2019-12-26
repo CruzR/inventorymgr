@@ -20,3 +20,10 @@ class UserSchema(Schema):
     update_users = fields.Bool(required=True)
     edit_qualifications = fields.Bool(required=True)
     qualifications = fields.Nested(QualificationSchema, required=True, many=True)
+
+
+class RegistrationTokenSchema(Schema):
+    """Marshmallow schema to validate registration tokens."""
+    id = fields.Integer(required=True)
+    token = fields.Str(required=True, validate=bool)
+    expires = fields.DateTime(required=True)

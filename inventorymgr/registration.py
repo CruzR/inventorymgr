@@ -11,6 +11,9 @@ from flask.cli import with_appcontext
 from sqlalchemy.exc import IntegrityError # type: ignore
 from werkzeug.security import generate_password_hash
 
+from .accesscontrol import requires_permissions
+from .api.models import RegistrationTokenSchema
+from .auth import authentication_required
 from .db import db
 from .db.models import RegistrationToken, User
 
@@ -55,6 +58,16 @@ def handle_registration_request(token: str) -> Tuple[Dict[str, Any], int]:
         db.session.rollback()
 
     return {'success': True}, 200
+
+
+@bp.route('/tokens', methods=('GET',))
+@authentication_required
+@requires_permissions('create_users')
+def get_tokens() -> Tuple[Dict[str, Any], int]:
+    """Fetch a list of current registration tokens."""
+    token_schema = RegistrationTokenSchema(many=True)
+    tokens = RegistrationToken.query.all()
+    return {'tokens': token_schema.dump(tokens)}, 200
 
 
 @click.command('generate-registration-token')
