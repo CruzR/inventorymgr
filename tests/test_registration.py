@@ -162,3 +162,30 @@ def test_create_token_success(client, auth, app, monkeypatch):
 
     with app.app_context():
         assert RegistrationToken.query.filter_by(token='test').count() == 1
+
+
+def test_delete_token_unauthenticated(client):
+    response = client.delete('/api/v1/registration/tokens/1')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+
+def test_delete_token_insufficient_permissions(client, auth):
+    auth.login('min_permissions_user')
+    response = client.delete('/api/v1/registration/tokens/1')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+
+def test_delete_token_success(client, auth, app):
+    auth.login('test')
+    response = client.delete('/api/v1/registration/tokens/1')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['success']
+
+    with app.app_context():
+        assert RegistrationToken.query.get(1) is None
+        assert RegistrationToken.query.count() == 1

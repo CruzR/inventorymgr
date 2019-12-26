@@ -80,6 +80,18 @@ def create_token() -> Tuple[Dict[str, Any], int]:
     return token_schema.dump(token), 200
 
 
+@bp.route('/tokens/<int:token_id>', methods=('DELETE',))
+@authentication_required
+@requires_permissions('create_users')
+def delete_token(token_id: int) -> Tuple[Dict[str, Any], int]:
+    """Delete a registration token."""
+    token = RegistrationToken.query.get(token_id)
+    if token is not None:
+        db.session.delete(token)
+        db.session.commit()
+    return {'success': True}, 200
+
+
 @click.command('generate-registration-token')
 @with_appcontext
 def generate_registration_token_command() -> None:
