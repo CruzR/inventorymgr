@@ -95,6 +95,12 @@ const store = new Vuex.Store({
                 state.tokens.splice(index, 1);
             }
         },
+        addToken: (state, token) => {
+            const index = state.tokens.findIndex(t => t.id === token.id);
+            if (index === -1) {
+                state.tokens.push(token);
+            }
+        },
     }
 });
 
