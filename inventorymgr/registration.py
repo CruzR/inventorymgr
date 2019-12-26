@@ -3,14 +3,13 @@
 
 import datetime
 import secrets
-from typing import cast, Tuple, Union
+from typing import Any, Dict, Tuple
 
 import click
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, request
 from flask.cli import with_appcontext
 from sqlalchemy.exc import IntegrityError # type: ignore
 from werkzeug.security import generate_password_hash
-from werkzeug.wrappers import Response
 
 from .db import db
 from .db.models import RegistrationToken, User
@@ -19,50 +18,31 @@ from .db.models import RegistrationToken, User
 bp = Blueprint('registration', __name__)
 
 
-@bp.route('/register/<token>', methods=('GET',))
-def register(token: str) -> str:
-    """Flask view that returns a registration form."""
-    # pylint: disable=unused-argument
-    return render_template('registration/register.html')
-
-
 @bp.route('/register/<token>', methods=('POST',))
-def handle_registration_request(token: str) -> Union[Response, Tuple[str, int]]:
+def handle_registration_request(token: str) -> Tuple[Dict[str, Any], int]:
     """Flask view that handles submits of the registration form."""
-    errors = []
+    missing_fields = []
     for field in ('username', 'password', 'repeat_password'):
-        if not request.form.get(field):
-            errors.append('Field "{}" is required'.format(field))
-    if errors:
-        return render_template('registration/register.html', errors=errors), 400
+        if not request.json.get(field):
+            missing_fields.append(field)
+    if missing_fields:
+        return {'reason': 'missing_fields', 'missing': missing_fields}, 400
 
-    username = request.form['username']
-    password = request.form['password']
-    repeat_password = request.form['repeat_password']
+    username = request.json['username']
+    password = request.json['password']
+    repeat_password = request.json['repeat_password']
 
     if password != repeat_password:
-        return render_template(
-            'registration/register.html',
-            errors=['Passwords do not match'],
-            username=username
-        ), 400
+        return {'reason': 'password_mismatch'}, 400
 
     token_obj = RegistrationToken.query.filter_by(token=token).first()
     if token_obj is None:
-        return render_template(
-            'registration/register.html',
-            errors=['Invalid registration token'],
-            username=username
-        ), 400
+        return {'reason': 'invalid_token'}, 400
 
     if token_obj.expires < datetime.datetime.now():
         db.session.delete(token_obj)
         db.session.commit()
-        return render_template(
-            'registration/register.html',
-            errors=['Registration token has expired.'],
-            username=username
-        ), 400
+        return {'reason': 'expired_token'}, 400
 
     db.session.delete(token_obj)
     db.session.commit()
@@ -74,13 +54,7 @@ def handle_registration_request(token: str) -> Union[Response, Tuple[str, int]]:
     except IntegrityError:
         db.session.rollback()
 
-    return redirect(url_for('registration.success_or_user_exists'))
-
-
-@bp.route('/register/success')
-def success_or_user_exists() -> str:
-    """Flask view that is rendered when registration appeared successfull."""
-    return render_template('registration/success_or_user_exists.html')
+    return {'success': True}, 200
 
 
 @click.command('generate-registration-token')
@@ -88,7 +62,7 @@ def success_or_user_exists() -> str:
 def generate_registration_token_command() -> None:
     """CLI command to generate a registration token and print it."""
     token = generate_registration_token()
-    click.echo(registration_url(token))
+    click.echo(token.token)
 
 
 def generate_registration_token() -> RegistrationToken:
@@ -106,8 +80,3 @@ def generate_registration_token() -> RegistrationToken:
         except IntegrityError:
             db.session.rollback()
     raise RuntimeError('Failed to generate a unique token in 3 tries.')
-
-
-def registration_url(token: RegistrationToken) -> str:
-    """Build a registration URL from a registration token."""
-    return cast(str, url_for('registration.register', token=token.token))
