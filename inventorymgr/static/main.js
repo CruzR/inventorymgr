@@ -13,6 +13,7 @@ import UserDetailView from '/static/views/viewuser.js'
 import QualificationDetailView from '/static/views/viewqualification.js'
 import EditQualificationView from '/static/views/editqualification.js'
 import RegistrationView from '/static/views/registration.js'
+import RegistrationTokensView from '/static/views/tokens.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -29,6 +30,7 @@ const routes = [
     { path: '/qualifications/:id', component: QualificationDetailView },
     { path: '/qualifications/:id/edit', component: EditQualificationView },
     { path: '/qualifications', component: QualificationsView },
+    { path: '/tokens', component: RegistrationTokensView },
 ];
 
 const router = new VueRouter({
@@ -42,6 +44,7 @@ const store = new Vuex.Store({
         users: [],
         qualifications: [],
         sessionUser: null,
+        tokens: [],
     },
     mutations: {
         login: state => { state.isAuthenticated = true },
@@ -50,6 +53,7 @@ const store = new Vuex.Store({
             state.users = [];
             state.qualifications = [];
             state.sessionUser = null;
+            state.tokens = [];
         },
         setUsers: (state, users) => { state.users = users },
         setQualifications: (state, qualifications) => { state.qualifications = qualifications },
@@ -80,6 +84,15 @@ const store = new Vuex.Store({
             const index = state.qualifications.findIndex(q => q.id === qualification.id);
             if (index !== -1) {
                 state.qualifications.splice(index, 1);
+            }
+        },
+        setTokens: (state, tokens) => {
+            state.tokens = tokens;
+        },
+        deleteToken: (state, token) => {
+            const index = state.tokens.findIndex(t => t.id === token.id);
+            if (index !== -1) {
+                state.tokens.splice(index, 1);
             }
         },
     }
@@ -135,6 +148,19 @@ router.beforeEach((to, from, next) => {
                     } else {
                         console.error(response);
                     }
+                }
+            })
+        }
+        if (!store.state.tokens.length) {
+            fetch('/api/v1/registration/tokens').then(response => {
+                if (response.ok) {
+                    response.json().then(json => {
+                        store.commit('setTokens', json.tokens)
+                    })
+                } else if (response.headers.get('Content-Type').startsWith('application/json')) {
+                    response.json().then(console.error);
+                } else {
+                    console.error(response);
                 }
             })
         }

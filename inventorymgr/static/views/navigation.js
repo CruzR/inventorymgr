@@ -24,6 +24,11 @@ const template = `
               Qualifications
             </a>
           </router-link>
+          <router-link to="/tokens" v-slot="{ href, navigate, isActive }">
+            <a
+              :class="{ 'navbar-item': true, 'is-active': isActive }"
+              :href="href" @click="navigate">Invites</a>
+          </router-link>
         </div>
         <div class="navbar-end">
           <router-link
