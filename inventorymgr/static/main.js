@@ -12,12 +12,14 @@ import EditUserView from '/static/views/edituser.js'
 import UserDetailView from '/static/views/viewuser.js'
 import QualificationDetailView from '/static/views/viewqualification.js'
 import EditQualificationView from '/static/views/editqualification.js'
+import RegistrationView from '/static/views/registration.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
 
 const routes = [
     { path: '/login', component: LoginView },
+    { path: '/register/:token', component: RegistrationView },
     { path: '/', component: DashboardView },
     { path: '/users/new', component: CreateUserView },
     { path: '/users/:id', component: UserDetailView },
@@ -85,7 +87,7 @@ const store = new Vuex.Store({
 
 router.beforeEach((to, from, next) => {
     if (!store.state.isAuthenticated) {
-        if (to.path !== '/login') {
+        if (to.path !== '/login' && !to.path.startsWith('/register')) {
             next({ path: '/login', query: { next: to.path } });
         } else {
             next();
