@@ -37,7 +37,7 @@ def test_generate_registration_token_command(app, runner, monkeypatch):
     ({'username': 'test', 'repeat_password': 'test'}, 'password'),
     ({'username': 'test', 'password': 'test'}, 'repeat_password')))
 def test_handle_registration_request_missing_field(client, json, field):
-    response = client.post('/register/test', json=json)
+    response = client.post('/api/v1/registration/test', json=json)
     assert response.status_code == 400
     assert response.is_json
     assert response.json['reason'] == 'missing_fields'
@@ -46,7 +46,7 @@ def test_handle_registration_request_missing_field(client, json, field):
 
 def test_handle_registration_request_password_mismatch(client):
     response = client.post(
-        '/register/test',
+        '/api/v1/registration/test',
         json={'username': 'test', 'password': 'test', 'repeat_password': 'tes'}
     )
     assert response.status_code == 400
@@ -56,7 +56,7 @@ def test_handle_registration_request_password_mismatch(client):
 
 def test_handle_registration_invalid_token(client):
     response = client.post(
-        '/register/test',
+        '/api/v1/registration/test',
         json={'username': 'test', 'password': 'test', 'repeat_password': 'test'}
     )
     assert response.status_code == 400
@@ -66,7 +66,7 @@ def test_handle_registration_invalid_token(client):
 
 def test_handle_registration_with_expired_token(client):
     response = client.post(
-        '/register/expired',
+        '/api/v1/registration/expired',
         json={'username': 'test', 'password': 'test', 'repeat_password': 'test'}
     )
     assert response.status_code == 400
@@ -76,7 +76,7 @@ def test_handle_registration_with_expired_token(client):
 
 def test_handle_registration_with_valid_toke(client, app):
     response = client.post(
-        '/register/valid',
+        '/api/v1/registration/valid',
         json={'username': 'new_user', 'password': 'abc', 'repeat_password': 'abc'}
     )
     assert response.status_code == 200
@@ -91,7 +91,7 @@ def test_handle_registration_with_valid_toke(client, app):
 
 def test_handle_registration_with_existing_user(client, app):
     response = client.post(
-        '/register/valid',
+        '/api/v1/registration/valid',
         json={'username': 'test', 'password': 'abc', 'repeat_password': 'abc'}
     )
 

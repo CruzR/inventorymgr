@@ -15,10 +15,10 @@ from .db import db
 from .db.models import RegistrationToken, User
 
 
-bp = Blueprint('registration', __name__)
+bp = Blueprint('registration', __name__, url_prefix='/api/v1/registration')
 
 
-@bp.route('/register/<token>', methods=('POST',))
+@bp.route('/<token>', methods=('POST',))
 def handle_registration_request(token: str) -> Tuple[Dict[str, Any], int]:
     """Flask view that handles submits of the registration form."""
     missing_fields = []
