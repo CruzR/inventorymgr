@@ -15,6 +15,7 @@ def test_user():
         'view_users': True,
         'update_users': True,
         'edit_qualifications': True,
+        'create_items': True,
         'qualifications': [{'id': 1, 'name': "Driver's License"}],
     }
 
@@ -451,6 +452,7 @@ def test_create_user_command(runner, app):
         '--view-users', 'yes',
         '--update-users=1',
         '--edit-qualifications', 'false',
+        '--create-items=0',
     ])
     assert 'Created user' in result.output
 
@@ -462,6 +464,7 @@ def test_create_user_command(runner, app):
         assert user.view_users
         assert user.update_users
         assert not user.edit_qualifications
+        assert not user.create_items
 
 
 def test_get_me_unauthenticated(client):
@@ -499,6 +502,7 @@ def test_update_self_unauthenticated(client, app):
         'view_users': False,
         'update_users': False,
         'edit_qualifications': False,
+        'create_items': False,
         'qualifications': []
     })
     assert response.status_code == 403
@@ -515,6 +519,7 @@ def test_abuse_update_self_to_update_other_user(client, app, auth):
         'view_users': False,
         'update_users': False,
         'edit_qualifications': False,
+        'create_items': False,
         'qualifications': []
     })
     assert response.status_code == 400
@@ -535,6 +540,7 @@ def test_update_self_username(client, app, auth):
         'view_users': False,
         'update_users': False,
         'edit_qualifications': False,
+        'create_items': False,
         'qualifications': []
     })
     assert response.status_code == 200
@@ -556,6 +562,7 @@ def test_update_self_password(client, app, auth):
         'view_users': False,
         'update_users': False,
         'edit_qualifications': False,
+        'create_items': False,
         'qualifications': []
     })
     assert response.status_code == 200
@@ -576,6 +583,7 @@ def test_update_self_set_permissions_fail(client, app, auth):
         'view_users': False,
         'update_users': True,
         'edit_qualifications': False,
+        'create_items': False,
         'qualifications': []
     })
     assert response.status_code == 403
@@ -595,6 +603,7 @@ def test_update_self_set_permissions_and_qualifications(client, app, auth):
         'view_users': True,
         'update_users': True,
         'edit_qualifications': False,
+        'create_items': False,
         'qualifications': [{'id': 1, 'name': "Driver's License"}]
     })
     assert response.status_code == 200
@@ -615,6 +624,7 @@ def test_update_self_give_more_qualifications_fail(client, app, auth):
         'view_users': False,
         'update_users': False,
         'edit_qualifications': False,
+        'create_items': False,
         'qualifications': [{'id': 1, 'name': "Driver's License"}]
     })
     assert response.status_code == 403
@@ -640,6 +650,7 @@ def test_update_self_with_deleted_user(client, app, auth):
         'view_users': False,
         'update_users': False,
         'edit_qualifications': False,
+        'create_items': False,
         'qualifications': []
     })
     assert response.status_code == 400

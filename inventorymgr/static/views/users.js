@@ -7,6 +7,7 @@ const template = `
           <th><abbr title="View Users">VU</abbr></th>
           <th><abbr title="Update Users">UU</abbr></th>
           <th><abbr title="Edit Qualifications">EQ</abbr></th>
+          <th><abbr title="Create Items">CI</abbr></th>
           <th>Qualifications</th>
           <th>Actions</th>
         </tr>
@@ -18,6 +19,9 @@ const template = `
           <td data-label="View Users"><input type="checkbox" :checked="user.view_users" disabled></td>
           <td data-label="Update Users"><input type="checkbox" :checked="user.update_users" disabled></td>
           <td data-label="Edit Qualifications"><input type="checkbox" :checked="user.edit_qualifications" disabled></td>
+          <td data-label="Create Items">
+            <input type="checkbox" :checked="user.create_items" disabled>
+          </td>
           <td data-label="Qualifications">
             <div class="tags">
               <span

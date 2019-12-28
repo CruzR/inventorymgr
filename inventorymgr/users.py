@@ -244,6 +244,7 @@ def list_users() -> Dict[str, List[str]]:
 @click.option('--view-users', prompt="Permission view_users [y/n]", type=bool)
 @click.option('--update-users', prompt="Permission update_users [y/n]", type=bool)
 @click.option('--edit-qualifications', prompt="Permission edit_qualifications [y/n]", type=bool)
+@click.option('--create-items', prompt="Permission create_items [y/n]", type=bool)
 @with_appcontext
 def create_user_command(**args: Any) -> None:
     """CLI command to create a new user."""

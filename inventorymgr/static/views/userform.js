@@ -89,6 +89,15 @@ const template = `
             Edit Qualifications
           </label>
         </div>
+        <div class="field">
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              :disabled="isViewContext"
+              v-model="user.create_items">
+            Create Items
+          </label>
+        </div>
       </fieldset>
       <div class="field">
         <label class="label">Qualifications</label>

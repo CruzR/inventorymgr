@@ -27,7 +27,8 @@ def app():
             create_users=True,
             view_users=True,
             update_users=True,
-            edit_qualifications=True
+            edit_qualifications=True,
+            create_items=True,
         )
         db.session.add(all_permissions_user)
         min_permissions_user = User(
