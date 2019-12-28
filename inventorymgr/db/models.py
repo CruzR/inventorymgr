@@ -49,3 +49,11 @@ class Qualification(db.Model): # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
+
+
+class BorrowableItem(db.Model): # type: ignore
+
+    """ORM model for borrowable items (tools, vehicles, ...)."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True, nullable=False)

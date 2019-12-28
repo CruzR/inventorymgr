@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 
 from inventorymgr import create_app
 from inventorymgr.db import db
-from inventorymgr.db.models import User, Qualification, RegistrationToken
+from inventorymgr.db.models import User, Qualification, RegistrationToken, BorrowableItem
 
 
 @pytest.fixture
@@ -41,6 +41,7 @@ def app():
         drivers_license = Qualification(name="Driver's License")
         all_permissions_user.qualifications = [drivers_license]
         db.session.add(drivers_license)
+        db.session.add(BorrowableItem(name='existing_item'))
         db.session.commit()
 
     yield app

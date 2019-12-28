@@ -62,4 +62,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     from .app import bp
     app.register_blueprint(bp)
 
+    from . import items
+    app.register_blueprint(items.bp)
+
     return app
