@@ -37,3 +37,19 @@ def test_create_item_success(client, auth, app):
         assert BorrowableItem.query.count() == 2
         item = BorrowableItem.query.get(2)
         assert item.name == 'new_item'
+
+
+def test_list_items_unauthenticated(client):
+    response = client.get('/api/v1/items')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+
+def test_list_items_success(client, auth):
+    auth.login('min_permissions_user')
+    response = client.get('/api/v1/items')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['items'] == [
+        {'id': 1, 'name': 'existing_item', 'barcode': '0000000000001'}]

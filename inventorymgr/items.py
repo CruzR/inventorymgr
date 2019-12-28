@@ -32,3 +32,11 @@ def create_item() -> Tuple[Dict[str, Any], int]:
             'Item already exists',
             reason='item_exists',
             status_code=400) from exc
+
+
+@bp.route('', methods=('GET',))
+@authentication_required
+def list_items() -> Dict[str, Any]:
+    """JSON endpoint for getting all borrowable items."""
+    items = BorrowableItemSchema(many=True).dump(BorrowableItem.query.all())
+    return {'items': items}
