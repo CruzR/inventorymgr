@@ -1,7 +1,7 @@
 """API endpoints for dealing with borrowable items."""
 
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, cast
 from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError # type: ignore
 
@@ -40,3 +40,24 @@ def list_items() -> Dict[str, Any]:
     """JSON endpoint for getting all borrowable items."""
     items = BorrowableItemSchema(many=True).dump(BorrowableItem.query.all())
     return {'items': items}
+
+
+@bp.route('/<int:item_id>', methods=('PUT',))
+@authentication_required
+@requires_permissions('create_items')
+def update_item(item_id: int) -> Dict[str, Any]:
+    """JSON endpoint for updating borrowable item."""
+    schema = BorrowableItemSchema()
+    received_item = schema.load(request.json, partial=('barcode',))
+
+    if received_item['id'] != item_id:
+        raise APIError('Item ids do not match', reason='id_mismatch', status_code=400)
+
+    item = BorrowableItem.query.get(item_id)
+    if item is None:
+        raise APIError('Item does not exist', reason='nonexistent_item', status_code=400)
+
+    item.name = received_item['name']
+    db.session.commit()
+
+    return cast(Dict[str, Any], schema.dump(item))
