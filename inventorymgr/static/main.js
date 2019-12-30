@@ -14,6 +14,7 @@ import QualificationDetailView from '/static/views/viewqualification.js'
 import EditQualificationView from '/static/views/editqualification.js'
 import RegistrationView from '/static/views/registration.js'
 import RegistrationTokensView from '/static/views/tokens.js'
+import BorrowableItemsView from '/static/views/borrowableitems.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -31,6 +32,7 @@ const routes = [
     { path: '/qualifications/:id/edit', component: EditQualificationView },
     { path: '/qualifications', component: QualificationsView },
     { path: '/tokens', component: RegistrationTokensView },
+    { path: '/items', component: BorrowableItemsView },
 ];
 
 const router = new VueRouter({
@@ -45,6 +47,7 @@ const store = new Vuex.Store({
         qualifications: [],
         sessionUser: null,
         tokens: [],
+        items: [],
     },
     mutations: {
         login: state => { state.isAuthenticated = true },
@@ -54,6 +57,7 @@ const store = new Vuex.Store({
             state.qualifications = [];
             state.sessionUser = null;
             state.tokens = [];
+            state.items = [];
         },
         setUsers: (state, users) => { state.users = users },
         setQualifications: (state, qualifications) => { state.qualifications = qualifications },
@@ -101,6 +105,7 @@ const store = new Vuex.Store({
                 state.tokens.push(token);
             }
         },
+        setItems: (state, items) => { state.items = items },
     }
 });
 
@@ -167,6 +172,19 @@ router.beforeEach((to, from, next) => {
                     response.json().then(console.error);
                 } else {
                     console.error(response);
+                }
+            })
+        }
+        if (!store.state.items.length) {
+            fetch('/api/v1/items').then(response => {
+                if (response.ok) {
+                    response.json().then(json => {
+                        store.commit('setItems', json.items)
+                    })
+                } else if (response.headers.get('Content-Type').startsWith('application/json')) {
+                    response.json().then(console.error)
+                } else {
+                    console.error(response)
                 }
             })
         }
