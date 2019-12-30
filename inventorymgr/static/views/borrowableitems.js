@@ -14,6 +14,14 @@ const template = `
             <td data-label="Barcode">{{ item.barcode }}</td>
             <td data-label="Actions">
               <div class="field is-grouped">
+                <div class="control">
+                  <router-link :to="'/items/' + item.id" v-slot="{ href, navigate }">
+                    <a
+                      :href="href"
+                      class="button is-primary is-small"
+                      @click="navigate">Edit</a>
+                  </router-link>
+                </div>
               </div>
             </td>
           </tr>
