@@ -1,5 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
-import { generateRegistrationToken } from '/static/api.js'
+import { generateRegistrationToken, deleteRegistrationToken } from '/static/api.js'
 
 
 const template = `
@@ -48,7 +48,7 @@ function copyTokenUrl(token) {
 
 
 function deleteToken(token) {
-    fetch('/api/v1/registration/tokens/' + token.id, { method: 'DELETE' }).then(response => {
+    deleteRegistrationToken(token).then(response => {
         if (response.ok) {
             this.$store.commit('deleteToken', token);
         } else if (response.headers.get('Content-Type').startsWith('application/json')) {
