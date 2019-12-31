@@ -14,18 +14,23 @@ function createRequestParams(obj) {
     return params;
 }
 
+function updateRequestParams(obj) {
+    const headers = contentTypeJson();
+    const params = {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(obj),
+    };
+    return params;
+}
+
 export function createItem(item) {
     const params = createRequestParams(item);
     return fetch('/api/v1/items', params);
 }
 
 export function updateItem(item) {
-    const headers = contentTypeJson();
-    const params = {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(item),
-    };
+    const params = updateRequestParams(item);
     return fetch('/api/v1/items/' + item.id, params);
 }
 
@@ -41,4 +46,9 @@ export function fetchItems(item) {
 export function createUser(user) {
     const params = createRequestParams(item);
     return fetch('/api/v1/users', params);
+}
+
+export function updateUser(user_id, user) {
+    const params = updateRequestParams(user);
+    return fetch('/api/v1/users/' + user_id, params);
 }

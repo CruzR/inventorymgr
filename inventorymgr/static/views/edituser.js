@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import { updateUser } from '/static/api.js'
 import UserForm from '/static/views/userform.js'
 
 
@@ -22,15 +23,7 @@ function sendUpdateUserRequest(user, repeatedPassword) {
         delete user.password;
     }
 
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json;charset=UTF-8');
-    const params = {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(user)
-    };
-
-    fetch('/api/v1/users/' + this.$route.params.id, params).then(response => {
+    updateUser(this.$route.params.id, user).then(response => {
         if (response.ok) {
             response.json().then(user => {
                 this.$store.commit('updateUser', user);
