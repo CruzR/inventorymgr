@@ -61,3 +61,15 @@ def update_item(item_id: int) -> Dict[str, Any]:
     db.session.commit()
 
     return cast(Dict[str, Any], schema.dump(item))
+
+
+@bp.route('/<int:item_id>', methods=('DELETE',))
+@authentication_required
+@requires_permissions('create_items')
+def delete_item(item_id: int) -> Dict[str, Any]:
+    """API endpoint for deleting borrowable items."""
+    item = BorrowableItem.query.get(item_id)
+    if item is not None:
+        db.session.delete(item)
+        db.session.commit()
+    return {'success': True}

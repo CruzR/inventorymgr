@@ -98,3 +98,37 @@ def test_update_item_success(client, auth, app):
     with app.app_context():
         assert BorrowableItem.query.count() == 1
         assert BorrowableItem.query.filter_by(name='new_item_name').count() == 1
+
+
+def test_delete_item_unauthenticated(client):
+    response = client.delete('/api/v1/items/1');
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'authentication_required'
+
+
+def test_delete_item_insufficient_permissions(client, auth):
+    auth.login('min_permissions_user')
+    response = client.delete('/api/v1/items/1')
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json['reason'] == 'insufficient_permissions'
+
+
+def test_delete_nonexistent_item(client, auth):
+    auth.login('test')
+    response = client.delete('/api/v1/items/42')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['success']
+
+
+def test_delete_item_success(client, auth, app):
+    auth.login('test')
+    response = client.delete('/api/v1/items/1')
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json['success']
+
+    with app.app_context():
+        assert BorrowableItem.query.filter_by(name='existing_item').count() == 0
