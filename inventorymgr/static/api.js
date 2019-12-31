@@ -77,6 +77,10 @@ export function deleteRegistrationToken(token) {
     return fetch('/api/v1/registration/tokens/' + token.id, params);
 }
 
+export function fetchRegistrationTokens() {
+    return fetch('/api/v1/registration/tokens');
+}
+
 export function createUser(user) {
     const params = createRequestParams(item);
     return fetch('/api/v1/users', params);
