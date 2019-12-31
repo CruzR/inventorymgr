@@ -52,3 +52,8 @@ export function updateUser(user_id, user) {
     const params = updateRequestParams(user);
     return fetch('/api/v1/users/' + user_id, params);
 }
+
+export function deleteUser(user_id) {
+    const params = { method: 'DELETE' };
+    return fetch('/api/v1/users/' + user_id, params);
+}

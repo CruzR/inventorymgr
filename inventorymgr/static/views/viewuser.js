@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import { deleteUser } from '/static/api.js'
 import UserForm from '/static/views/userform.js'
 
 const template = `
@@ -19,7 +20,7 @@ function currentUser() {
 
 function sendDeleteUserRequest(user) {
     const id = this.$route.params.id;
-    fetch('/api/v1/users/' + id, { method: 'DELETE' }).then(response => {
+    deleteUser(id).then(response => {
         if (response.ok) {
             this.$store.commit('deleteUser', user);
             if (id === 'me') {
