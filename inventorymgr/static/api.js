@@ -43,6 +43,11 @@ export function fetchItems(item) {
     return fetch('/api/v1/items');
 }
 
+export function createQualification(qualification) {
+    const params = createRequestParams(qualification);
+    return fetch('/api/v1/qualifications', params);
+}
+
 export function createUser(user) {
     const params = createRequestParams(item);
     return fetch('/api/v1/users', params);
