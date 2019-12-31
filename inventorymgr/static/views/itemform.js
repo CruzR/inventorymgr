@@ -42,6 +42,11 @@ const template = `
                 @click="navigate">Edit</a>
             </router-link>
           </div>
+          <div class="control">
+            <button
+              type="button" class="button is-danger"
+              @click="$emit('delete-item', current)">Delete</button>
+          </div>
         </div>
         <div v-else-if="isCreateContext" class="field is-grouped">
           <div class="control">

@@ -120,6 +120,12 @@ const store = new Vuex.Store({
                 state.items.splice(index, 1, item);
             }
         },
+        deleteItem: (state, item) => {
+            const index = state.items.findIndex(i => i.id === item.id);
+            if (index !== -1) {
+                state.items.splice(index, 1);
+            }
+        },
     }
 });
 
