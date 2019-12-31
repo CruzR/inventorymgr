@@ -28,3 +28,7 @@ export function deleteItem(item) {
     const params = { method: 'DELETE' };
     return fetch('/api/v1/items/' + item.id, params);
 }
+
+export function fetchItems(item) {
+    return fetch('/api/v1/items');
+}
