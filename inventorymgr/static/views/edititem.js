@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import { updateItem } from '/static/api.js'
 import ItemForm from '/static/views/itemform.js'
 
 
@@ -20,14 +21,7 @@ function currentItem() {
 
 
 function sendUpdateItemRequest(item) {
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    const params = {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(item),
-    };
-    fetch('/api/v1/items/' + this.$route.params.id, params).then(response => {
+    updateItem(item).then(response => {
         if (response.ok) {
             response.json().then(item => {
                 this.$store.commit('addItem', item);
