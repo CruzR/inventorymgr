@@ -63,6 +63,10 @@ export function deleteQualification(qualification) {
     return fetch('/api/v1/qualifications/' + qualification.id, params);
 }
 
+export function fetchQualifications() {
+    return fetch('/api/v1/qualifications');
+}
+
 export function createUser(user) {
     const params = createRequestParams(item);
     return fetch('/api/v1/users', params);
