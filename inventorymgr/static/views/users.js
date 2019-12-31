@@ -1,3 +1,6 @@
+import { mapState } from '/static/vuex.esm.browser.js'
+
+
 const template = `
     <table class="table is-fullwidth responsive-table">
       <thead>
@@ -13,7 +16,7 @@ const template = `
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in $store.state.users">
+        <tr v-for="user in users">
           <td data-label="Username">{{ user.username }}</td>
           <td data-label="Create Users"><input type="checkbox" :checked="user.create_users" disabled></td>
           <td data-label="View Users"><input type="checkbox" :checked="user.view_users" disabled></td>
@@ -55,5 +58,6 @@ const template = `
 
 
 export default {
-    template
+    template,
+    computed: mapState(['users']),
 }

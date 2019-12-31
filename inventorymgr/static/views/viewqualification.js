@@ -1,8 +1,10 @@
+import { mapState } from '/static/vuex.esm.browser.js'
 import QualificationForm from '/static/views/qualificationform.js'
+
 
 const template = `
     <qualification-form
-      v-if="$store.state.qualifications.length"
+      v-if="currentQualification"
       context="view"
       :current="currentQualification"
       @delete-qualification="sendDeleteQualificationRequest">
@@ -10,7 +12,7 @@ const template = `
 
 function currentQualification() {
     const id = parseInt(this.$route.params.id);
-    return this.$store.state.qualifications.find(q => q.id === id);
+    return this.qualifications.find(q => q.id === id);
 }
 
 function sendDeleteQualificationRequest(qualification) {
@@ -46,7 +48,8 @@ export default {
         return { errorMessage: '' }
     },
     computed: {
-        currentQualification
+        currentQualification,
+        ...mapState(['qualifications']),
     },
     methods: {
         sendDeleteQualificationRequest

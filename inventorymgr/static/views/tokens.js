@@ -1,3 +1,6 @@
+import { mapState } from '/static/vuex.esm.browser.js'
+
+
 const template = `
     <div>
       <div v-if="error" class="message is-danger">
@@ -14,7 +17,7 @@ const template = `
           </tr>
         </thead>
         <tbody>
-          <tr v-for="token in $store.state.tokens">
+          <tr v-for="token in tokens">
             <td data-label="Token">{{ token.token }}</td>
             <td data-label="Expires">{{ token.expires }}</td>
             <td data-label="Actions">
@@ -80,5 +83,6 @@ export default {
     data: () => {
         return { error: '' }
     },
+    computed: mapState(['tokens']),
     methods: { copyTokenUrl, deleteToken, sendGenerateTokenRequest },
 }

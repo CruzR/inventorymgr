@@ -1,3 +1,6 @@
+import { mapState } from '/static/vuex.esm.browser.js'
+
+
 const template = `
     <div>
       <table class="table is-fullwidth responsive-table">
@@ -9,7 +12,7 @@ const template = `
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in $store.state.items">
+          <tr v-for="item in items">
             <td data-label="Item">{{ item.name }}</td>
             <td data-label="Barcode">{{ item.barcode }}</td>
             <td data-label="Actions">
@@ -35,5 +38,6 @@ const template = `
 
 
 export default {
-  template,
+    template,
+    computed: mapState(['items']),
 }

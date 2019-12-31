@@ -1,5 +1,6 @@
 import Vue from '/static/vue.esm.browser.js'
 import Vuex from '/static/vuex.esm.browser.js'
+import { mapState } from '/static/vuex.esm.browser.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
@@ -216,6 +217,7 @@ const vm = new Vue({
     store,
     router,
     el: '#app',
+    computed: mapState(['isAuthenticated']),
     components: {
         NavigationBar
     }

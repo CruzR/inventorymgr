@@ -9,7 +9,7 @@
   </head>
   <body>
     <div id="app">
-      <navigation-bar v-if="$store.state.isAuthenticated"></navigation-bar>
+      <navigation-bar v-if="isAuthenticated"></navigation-bar>
       <div class="container">
         <router-view></router-view>
       </div>

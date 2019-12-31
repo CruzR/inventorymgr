@@ -1,4 +1,6 @@
+import { mapState } from '/static/vuex.esm.browser.js'
 import UserForm from '/static/views/userform.js'
+
 
 const template = `
     <user-form
@@ -61,11 +63,12 @@ export default {
     computed: {
         currentUser: function() {
             if (this.$route.params.id === 'me') {
-                return this.$store.state.sessionUser;
+                return this.sessionUser;
             }
             const id = parseInt(this.$route.params.id);
-            return this.$store.state.users.find(u => u.id === id);
-        }
+            return this.users.find(u => u.id === id);
+        },
+        ...mapState(['users', 'sessionUser']),
     },
     methods: {
         sendUpdateUserRequest,

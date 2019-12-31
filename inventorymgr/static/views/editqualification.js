@@ -1,8 +1,10 @@
+import { mapState } from '/static/vuex.esm.browser.js'
 import QualificationForm from '/static/views/qualificationform.js'
+
 
 const template = `
     <qualification-form
-      v-if="$store.state.qualifications.length"
+      v-if="currentQualification"
       context="edit"
       :current="currentQualification"
       :error="errorMessage"
@@ -43,7 +45,7 @@ function returnToView() {
 
 function currentQualification() {
     const id = parseInt(this.$route.params.id);
-    return this.$store.state.qualifications.find(q => q.id === id);
+    return this.qualifications.find(q => q.id === id);
 }
 
 export default {
@@ -52,7 +54,8 @@ export default {
         return { errorMessage: '' }
     },
     computed: {
-        currentQualification
+        currentQualification,
+        ...mapState(['qualifications']),
     },
     methods: {
         sendUpdateQualificationRequest,

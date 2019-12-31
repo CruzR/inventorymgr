@@ -1,3 +1,4 @@
+import { mapState } from '/static/vuex.esm.browser.js'
 import ItemForm from '/static/views/itemform.js'
 
 const template = `
@@ -12,7 +13,7 @@ const template = `
 
 function currentItem() {
     const id = parseInt(this.$route.params.id);
-    return this.$store.state.items.find(i => i.id === id);
+    return this.items.find(i => i.id === id);
 }
 
 
@@ -38,7 +39,7 @@ function sendDeleteItemRequest(item) {
 export default {
     template,
     data: () => { return { errorMessage: '' } },
-    computed: { currentItem },
+    computed: { currentItem, ...mapState(['items']) },
     methods: { sendDeleteItemRequest },
     components: { ItemForm },
 }

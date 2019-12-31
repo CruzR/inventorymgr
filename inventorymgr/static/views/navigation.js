@@ -1,3 +1,6 @@
+import { mapState } from '/static/vuex.esm.browser.js'
+
+
 const template = `
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
@@ -37,14 +40,14 @@ const template = `
         </div>
         <div class="navbar-end">
           <router-link
-            v-if="$store.state.sessionUser"
+            v-if="sessionUser"
             to="/users/me"
             v-slot="{ href, navigate, isActive }">
             <a
               :href="href"
               :class="{ 'navbar-item': true, 'is-active': isActive }"
               @click="navigate">
-              {{ $store.state.sessionUser.username }}
+              {{ sessionUser.username }}
             </a>
           </router-link>
           <a class="navbar-item" @click="sendLogoutRequest">
@@ -72,6 +75,7 @@ export default {
             showMenu: false,
         }
     },
+    computed: mapState(['sessionUser']),
     methods: {
         sendLogoutRequest
     }

@@ -1,3 +1,4 @@
+import { mapState } from '/static/vuex.esm.browser.js'
 import TagSelectBox from '/static/views/tagselectbox.js'
 
 const template = `
@@ -105,7 +106,7 @@ const template = `
           <tag-select-box
             :items.sync="user.qualifications"
             :readonly="isViewContext"
-            :choices="$store.state.qualifications">
+            :choices="qualifications">
           </tag-select-box>
         </div>
       </div>
@@ -147,7 +148,7 @@ const template = `
     </div>`
 
 function editUserUrl() {
-    if (this.current.id === this.$store.state.sessionUser.id) {
+    if (this.current.id === this.sessionUser.id) {
         return '/users/me/edit';
     }
     return '/users/' + this.current.id + '/edit';
@@ -186,7 +187,8 @@ export default {
         isCreateContext: function() {
             return this.context === 'create';
         },
-        editUserUrl
+        editUserUrl,
+        ...mapState(['qualifications', 'sessionUser']),
     },
     components: { TagSelectBox }
 }

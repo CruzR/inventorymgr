@@ -1,3 +1,4 @@
+import { mapState } from '/static/vuex.esm.browser.js'
 import UserForm from '/static/views/userform.js'
 
 const template = `
@@ -10,10 +11,10 @@ const template = `
 
 function currentUser() {
     if (this.$route.params.id === 'me') {
-        return this.$store.state.sessionUser;
+        return this.sessionUser;
     }
     const id = parseInt(this.$route.params.id);
-    return this.$store.state.users.find(u => u.id === id);
+    return this.users.find(u => u.id === id);
 }
 
 function sendDeleteUserRequest(user) {
@@ -44,7 +45,8 @@ function sendDeleteUserRequest(user) {
 export default {
     template,
     computed: {
-        currentUser
+        currentUser,
+        ...mapState(['sessionUser', 'users']),
     },
     methods: {
         sendDeleteUserRequest
