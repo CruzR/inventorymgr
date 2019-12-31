@@ -15,6 +15,13 @@ const template = `
             </a>
           </router-link>
         </div>
+        <div class="tile is-parent is-2">
+          <router-link to="/items/new" v-slot="{ href, navigate }">
+            <a class="tile is-child box" :href="href" @click="navigate">
+              Add Item
+            </a>
+          </router-link>
+        </div>
       </nav>
     </section>`
 

@@ -15,7 +15,7 @@ const template = `
               v-model="item.name">
           </div>
         </div>
-        <div class="field">
+        <div v-if="!isCreateContext" class="field">
           <label class="label" for="item-barcode">Barcode</label>
           <div class="control">
             <input id="item-barcode" type="text" readonly
@@ -43,6 +43,16 @@ const template = `
             </router-link>
           </div>
         </div>
+        <div v-else-if="isCreateContext" class="field is-grouped">
+          <div class="control">
+            <button type="submit" class="button is-primary">Create</button>
+          </div>
+          <div class="control">
+            <button
+              class="button" type="button"
+              @click="$emit('cancel-item-change')">Cancel</button>
+          </div>
+        </div>
       </form>
     </div>`
 
@@ -62,6 +72,9 @@ export default {
         },
         isEditContext: function() {
             return this.context === 'edit';
+        },
+        isCreateContext: function() {
+            return this.context === 'create';
         },
     },
 }

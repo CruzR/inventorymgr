@@ -17,6 +17,7 @@ import RegistrationTokensView from '/static/views/tokens.js'
 import BorrowableItemsView from '/static/views/borrowableitems.js'
 import ItemDetailView from '/static/views/viewitem.js'
 import ItemEditView from '/static/views/edititem.js'
+import ItemCreateView from '/static/views/createitem.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -35,6 +36,7 @@ const routes = [
     { path: '/qualifications', component: QualificationsView },
     { path: '/tokens', component: RegistrationTokensView },
     { path: '/items', component: BorrowableItemsView },
+    { path: '/items/new', component: ItemCreateView },
     { path: '/items/:id', component: ItemDetailView },
     { path: '/items/:id/edit', component: ItemEditView },
 ];
