@@ -48,6 +48,11 @@ export function createQualification(qualification) {
     return fetch('/api/v1/qualifications', params);
 }
 
+export function updateQualification(qualification) {
+    const params = updateRequestParams(qualification);
+    return fetch('/api/v1/qualifications/' + qualification.id, params);
+}
+
 export function createUser(user) {
     const params = createRequestParams(item);
     return fetch('/api/v1/users', params);

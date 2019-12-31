@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import { updateQualification } from '/static/api.js'
 import QualificationForm from '/static/views/qualificationform.js'
 
 
@@ -13,15 +14,7 @@ const template = `
     </qualification-form>`
 
 function sendUpdateQualificationRequest(qualification) {
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json;charset=UTF-8');
-    const params = {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(qualification)
-    };
-
-    fetch('/api/v1/qualifications/' + this.$route.params.id, params).then(response => {
+    updateQualification(qualification).then(response => {
         if (response.ok) {
             response.json().then(qualification => {
                 this.$store.commit('updateQualification', qualification);
