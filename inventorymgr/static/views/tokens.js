@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import { generateRegistrationToken } from '/static/api.js'
 
 
 const template = `
@@ -64,7 +65,7 @@ function deleteToken(token) {
 
 
 function sendGenerateTokenRequest() {
-    fetch('/api/v1/registration/tokens', { method: 'POST' }).then(response => {
+    generateRegistrationToken().then(response => {
         if (response.ok) {
             response.json().then(token => {
                 this.$store.commit('addToken', token);

@@ -67,6 +67,11 @@ export function fetchQualifications() {
     return fetch('/api/v1/qualifications');
 }
 
+export function generateRegistrationToken() {
+    const params = { method: 'POST' };
+    return fetch('/api/v1/registration/tokens', params);
+}
+
 export function createUser(user) {
     const params = createRequestParams(item);
     return fetch('/api/v1/users', params);
