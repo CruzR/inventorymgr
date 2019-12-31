@@ -1,3 +1,4 @@
+import { createItem } from '/static/api.js'
 import ItemForm from '/static/views/itemform.js'
 
 
@@ -11,14 +12,7 @@ const template = `
 
 
 function sendCreateItemRequest(item) {
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    const params = {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(item)
-    };
-    fetch('/api/v1/items', params).then(response => {
+    createItem(item).then(response => {
         if (response.ok) {
             response.json().then(item => {
                 this.$store.commit('addItem', item);
