@@ -18,7 +18,7 @@ const template = `
         <div class="field">
           <label class="label" for="item-barcode">Barcode</label>
           <div class="control">
-            <input id="item-barcode" type="text"
+            <input id="item-barcode" type="text" readonly
               class="input is-static" :value="item.barcode">
           </div>
         </div>
