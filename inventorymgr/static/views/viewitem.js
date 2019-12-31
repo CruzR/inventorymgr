@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import { deleteItem } from '/static/api.js'
 import ItemForm from '/static/views/itemform.js'
 
 const template = `
@@ -18,8 +19,7 @@ function currentItem() {
 
 
 function sendDeleteItemRequest(item) {
-    const params = { method: 'DELETE' };
-    fetch('/api/v1/items/' + item.id, params).then(response => {
+    deleteItem(item).then(response => {
         if (response.ok) {
             this.$store.commit('deleteItem', item);
             this.$router.push('/items');

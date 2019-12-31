@@ -23,3 +23,8 @@ export function updateItem(item) {
     };
     return fetch('/api/v1/items/' + item.id, params);
 }
+
+export function deleteItem(item) {
+    const params = { method: 'DELETE' };
+    return fetch('/api/v1/items/' + item.id, params);
+}
