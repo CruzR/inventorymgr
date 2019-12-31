@@ -48,7 +48,7 @@ def list_items() -> Dict[str, Any]:
 def update_item(item_id: int) -> Dict[str, Any]:
     """JSON endpoint for updating borrowable item."""
     schema = BorrowableItemSchema()
-    received_item = schema.load(request.json, partial=('barcode',))
+    received_item = schema.load(request.json)
 
     if received_item['id'] != item_id:
         raise APIError('Item ids do not match', reason='id_mismatch', status_code=400)

@@ -1,9 +1,9 @@
 """Schemas for validating JSON objects."""
 
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable, TypeVar, cast
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_dump, pre_load
 
 
 class QualificationSchema(Schema):
@@ -32,18 +32,26 @@ class RegistrationTokenSchema(Schema):
     expires = fields.DateTime(required=True)
 
 
-class Gtin13IdField(fields.Field):
-    """Marshmallow field for serializing an integer to a GTIN-13 id."""
-    def serialize(self, attr: str, obj: Any,
-                  accessor: Optional[Callable[[Any, str, Any], Any]] = None,
-                  **kwargs: Any) -> Any:
-        """Serialize data to a GTIN-13 id."""
-        value = self.get_value(obj, attr, accessor) # type: ignore
-        return '{:013d}'.format(value)
-
+_T = TypeVar('_T')
+_post_dump = cast(Callable[[_T], _T], post_dump) # pylint: disable=invalid-name
+_pre_load = cast(Callable[[_T], _T], pre_load) # pylint: disable=invalid-name
 
 class BorrowableItemSchema(Schema):
     """Marshmallow schema to validate borrowable items."""
     id = fields.Integer(required=True)
     name = fields.Str(required=True, validate=bool)
-    barcode = Gtin13IdField(attribute='id', dump_only=True)
+
+    @_post_dump
+    def add_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
+        """Generate GTIN13 string from item id."""
+        # pylint: disable=no-self-use,unused-argument
+        data['barcode'] = '{:013d}'.format(data['id'])
+        return data
+
+    @_pre_load
+    def remove_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
+        """Remove GTIN13 string before deserializing."""
+        # pylint: disable=no-self-use,unused-argument
+        if 'barcode' in data:
+            del data['barcode']
+        return data
