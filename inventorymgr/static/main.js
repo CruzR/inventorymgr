@@ -1,7 +1,7 @@
 import Vue from '/static/vue.esm.browser.js'
 import Vuex from '/static/vuex.esm.browser.js'
 import { mapState } from '/static/vuex.esm.browser.js'
-import { fetchItems } from '/static/api.js'
+import { fetchItems, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
@@ -155,7 +155,7 @@ router.beforeEach((to, from, next) => {
             })
         }
         if (!store.state.users.length) {
-            fetch('/api/v1/users').then(response => {
+            fetchUsers().then(response => {
                 if (response.ok) {
                     response.json().then(json => {
                         store.commit('setUsers', json.users)

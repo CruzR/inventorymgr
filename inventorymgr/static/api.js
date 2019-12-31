@@ -57,3 +57,7 @@ export function deleteUser(user_id) {
     const params = { method: 'DELETE' };
     return fetch('/api/v1/users/' + user_id, params);
 }
+
+export function fetchUsers() {
+    return fetch('/api/v1/users');
+}
