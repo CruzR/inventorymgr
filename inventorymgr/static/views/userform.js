@@ -166,6 +166,7 @@ export default {
                 view_users: false,
                 update_users: false,
                 edit_qualifications: false,
+                create_items: false,
                 qualifications: []
             };
 
