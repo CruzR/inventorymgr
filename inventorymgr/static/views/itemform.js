@@ -22,6 +22,27 @@ const template = `
               class="input is-static" :value="item.barcode">
           </div>
         </div>
+        <div v-if="isEditContext" class="field is-grouped">
+          <div class="control">
+            <button type="submit" class="button is-primary">Save</button>
+          </div>
+          <div class="control">
+            <button
+              class="button" type="button"
+              @click="$emit('cancel-item-change')">Cancel</button>
+          </div>
+        </div>
+        <div v-else-if="isViewContext" class="field is-grouped">
+          <div class="control">
+            <router-link
+              :to="'/items/' + current.id + '/edit'" v-slot="{ href, navigate }">
+              <a
+                :href="href"
+                class="button is-primary" type="button"
+                @click="navigate">Edit</button>
+            </router-link>
+          </div>
+        </div>
       </form>
     </div>`
 
@@ -38,6 +59,9 @@ export default {
     computed: {
         isViewContext: function() {
             return this.context == 'view';
+        },
+        isEditContext: function() {
+            return this.context === 'edit';
         },
     },
 }

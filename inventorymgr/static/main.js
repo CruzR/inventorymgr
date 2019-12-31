@@ -16,6 +16,7 @@ import RegistrationView from '/static/views/registration.js'
 import RegistrationTokensView from '/static/views/tokens.js'
 import BorrowableItemsView from '/static/views/borrowableitems.js'
 import ItemDetailView from '/static/views/viewitem.js'
+import ItemEditView from '/static/views/edititem.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -35,6 +36,7 @@ const routes = [
     { path: '/tokens', component: RegistrationTokensView },
     { path: '/items', component: BorrowableItemsView },
     { path: '/items/:id', component: ItemDetailView },
+    { path: '/items/:id/edit', component: ItemEditView },
 ];
 
 const router = new VueRouter({
@@ -108,6 +110,14 @@ const store = new Vuex.Store({
             }
         },
         setItems: (state, items) => { state.items = items },
+        addItem: (state, item) => {
+            const index = state.items.findIndex(i => i.id === item.id);
+            if (index === -1) {
+                state.items.push(item);
+            } else {
+                state.items.splice(index, 1, item);
+            }
+        },
     }
 });
 
