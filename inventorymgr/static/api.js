@@ -53,6 +53,16 @@ export function updateQualification(qualification) {
     return fetch('/api/v1/qualifications/' + qualification.id, params);
 }
 
+export function deleteQualification(qualification) {
+    const headers = contentTypeJson();
+    const params = {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify(qualification),
+    };
+    return fetch('/api/v1/qualifications/' + qualification.id, params);
+}
+
 export function createUser(user) {
     const params = createRequestParams(item);
     return fetch('/api/v1/users', params);

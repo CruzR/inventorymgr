@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import { deleteQualification } from '/static/api.js'
 import QualificationForm from '/static/views/qualificationform.js'
 
 
@@ -16,15 +17,7 @@ function currentQualification() {
 }
 
 function sendDeleteQualificationRequest(qualification) {
-    const id = parseInt(this.$route.params.id);
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json;charset=UTF-8');
-    const params = {
-        method: 'DELETE',
-        headers,
-        body: JSON.stringify(qualification)
-    };
-    fetch('/api/v1/qualifications/' + id, params).then(response => {
+    deleteQualification(qualification).then(response => {
         if (response.ok) {
             this.$store.commit('deleteQualification', qualification);
             this.$router.push('/qualifications');
