@@ -38,8 +38,8 @@ const template = `
               :to="'/items/' + current.id + '/edit'" v-slot="{ href, navigate }">
               <a
                 :href="href"
-                class="button is-primary" type="button"
-                @click="navigate">Edit</button>
+                class="button is-primary"
+                @click="navigate">Edit</a>
             </router-link>
           </div>
         </div>
