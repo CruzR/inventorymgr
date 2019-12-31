@@ -1,3 +1,4 @@
+import { createUser } from '/static/api.js'
 import UserForm from '/static/views/userform.js'
 
 const template = `
@@ -18,15 +19,7 @@ function sendCreateUserRequest(user, repeatedPassword) {
         return;
     }
 
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json;charset=UTF-8');
-    const params = {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(user)
-    };
-
-    fetch('/api/v1/users', params).then((response) => {
+    createUser(user).then(response => {
         if (response.ok) {
             response.json().then(user => {
                 this.$store.commit('updateUser', user);

@@ -4,13 +4,18 @@ function contentTypeJson() {
     return headers;
 }
 
-export function createItem(item) {
+function createRequestParams(obj) {
     const headers = contentTypeJson();
     const params = {
         method: 'POST',
         headers,
-        body: JSON.stringify(item)
+        body: JSON.stringify(obj)
     };
+    return params;
+}
+
+export function createItem(item) {
+    const params = createRequestParams(item);
     return fetch('/api/v1/items', params);
 }
 
@@ -31,4 +36,9 @@ export function deleteItem(item) {
 
 export function fetchItems(item) {
     return fetch('/api/v1/items');
+}
+
+export function createUser(user) {
+    const params = createRequestParams(item);
+    return fetch('/api/v1/users', params);
 }
