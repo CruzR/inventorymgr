@@ -124,7 +124,7 @@ export function fetchUsers() {
 
 export function login(user) {
     const params = createRequestParams(user);
-    return fetch('/api/v1/auth/login', params);
+    return fetch('/api/v1/auth/login', params).then(unpackJson);
 }
 
 export function logout() {

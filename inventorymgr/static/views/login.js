@@ -44,14 +44,13 @@ function sendLoginRequest() {
     const user = { username: this.username, password: this.password };
 
     login(user).then(response => {
-        if (response.status === 200) {
+        if (response.success) {
             this.$store.commit('login');
             const nextRoute = this.$route.query['next'] || '/';
             this.$router.push(nextRoute);
         } else {
-            response.json().then((json) => {
-                this.errorMessage = json.message;
-            });
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     })
 }
