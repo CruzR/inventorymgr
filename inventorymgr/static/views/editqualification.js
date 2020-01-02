@@ -15,19 +15,12 @@ const template = `
 
 function sendUpdateQualificationRequest(qualification) {
     updateQualification(qualification).then(response => {
-        if (response.ok) {
-            response.json().then(qualification => {
-                this.$store.commit('updateQualification', qualification);
-                this.$router.push('/qualifications');
-            });
-        } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-            response.json().then(error => {
-                this.errorMessage = error.message;
-                console.error(error);
-            })
+        if (response.success) {
+            this.$store.commit('updateQualification', response.data);
+            this.$router.push('/qualifications');
         } else {
-            this.errorMessage = 'An error occurred during processing.';
-            console.error(response);
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     })
 }

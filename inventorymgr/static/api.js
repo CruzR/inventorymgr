@@ -68,7 +68,7 @@ export function createQualification(qualification) {
 
 export function updateQualification(qualification) {
     const params = updateRequestParams(qualification);
-    return fetch('/api/v1/qualifications/' + qualification.id, params);
+    return fetch('/api/v1/qualifications/' + qualification.id, params).then(unpackJson);
 }
 
 export function deleteQualification(qualification) {
