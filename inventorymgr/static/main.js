@@ -150,16 +150,10 @@ router.beforeEach((to, from, next) => {
         }
         if (!store.state.users.length) {
             fetchUsers().then(response => {
-                if (response.ok) {
-                    response.json().then(json => {
-                        store.commit('setUsers', json.users)
-                    })
+                if (response.success) {
+                    store.commit('setUsers', response.data.users)
                 } else {
-                    if (response.headers.get('Content-Type').startsWith('application/json')) {
-                        response.json().then(console.error);
-                    } else {
-                        console.error(response);
-                    }
+                    console.error(response.error);
                 }
             })
         }

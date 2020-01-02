@@ -119,7 +119,7 @@ export function deleteUser(user_id) {
 }
 
 export function fetchUsers() {
-    return fetch('/api/v1/users');
+    return fetch('/api/v1/users').then(unpackJson);
 }
 
 export function login(user) {
