@@ -18,19 +18,12 @@ function currentQualification() {
 
 function sendDeleteQualificationRequest(qualification) {
     deleteQualification(qualification).then(response => {
-        if (response.ok) {
+        if (response.success) {
             this.$store.commit('deleteQualification', qualification);
             this.$router.push('/qualifications');
         } else {
-            if (response.headers.get('Content-Type').startsWith('application/json')) {
-                response.json().then(error => {
-                    console.error(error);
-                    this.errorMessage = error.message;
-                })
-            } else {
-                console.error(response);
-                this.errorMessage = 'An error occurred during processing';
-            }
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     })
 }

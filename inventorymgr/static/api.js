@@ -78,7 +78,7 @@ export function deleteQualification(qualification) {
         headers,
         body: JSON.stringify(qualification),
     };
-    return fetch('/api/v1/qualifications/' + qualification.id, params);
+    return fetch('/api/v1/qualifications/' + qualification.id, params).then(unpackJson);
 }
 
 export function fetchQualifications() {
