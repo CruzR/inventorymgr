@@ -103,3 +103,8 @@ export function deleteUser(user_id) {
 export function fetchUsers() {
     return fetch('/api/v1/users');
 }
+
+export function login(user) {
+    const params = createRequestParams(user);
+    return fetch('/api/v1/auth/login', params);
+}

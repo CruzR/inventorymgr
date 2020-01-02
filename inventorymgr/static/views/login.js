@@ -1,3 +1,6 @@
+import { login } from '/static/api.js'
+
+
 const template = `
     <div class="columns is-centered section">
       <div class="column is-narrow">
@@ -38,18 +41,9 @@ const template = `
     </div>`
 
 function sendLoginRequest() {
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json;charset=UTF-8');
-    const params = {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-            username: this.username,
-            password: this.password
-        })
-    };
+    const user = { username: this.username, password: this.password };
 
-    fetch('/api/v1/auth/login', params).then((response) => {
+    login(user).then(response => {
         if (response.status === 200) {
             this.$store.commit('login');
             const nextRoute = this.$route.query['next'] || '/';
