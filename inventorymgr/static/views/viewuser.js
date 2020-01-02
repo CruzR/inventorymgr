@@ -21,7 +21,7 @@ function currentUser() {
 function sendDeleteUserRequest(user) {
     const id = this.$route.params.id;
     deleteUser(id).then(response => {
-        if (response.ok) {
+        if (response.success) {
             this.$store.commit('deleteUser', user);
             if (id === 'me') {
                 this.$store.commit('logout');
@@ -30,15 +30,8 @@ function sendDeleteUserRequest(user) {
                 this.$router.push('/users');
             }
         } else {
-            if (response.headers.get('Content-Type').startsWith('application/json')) {
-                response.json().then(error => {
-                    console.error(error);
-                    this.errorMessage = error.message;
-                })
-            } else {
-                console.error(response);
-                this.errorMessage = 'An error occurred during processing';
-            }
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     })
 }

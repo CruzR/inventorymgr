@@ -115,7 +115,7 @@ export function updateUser(user_id, user) {
 
 export function deleteUser(user_id) {
     const params = { method: 'DELETE' };
-    return fetch('/api/v1/users/' + user_id, params);
+    return fetch('/api/v1/users/' + user_id, params).then(unpackJson);
 }
 
 export function fetchUsers() {
