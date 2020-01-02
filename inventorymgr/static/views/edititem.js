@@ -22,19 +22,12 @@ function currentItem() {
 
 function sendUpdateItemRequest(item) {
     updateItem(item).then(response => {
-        if (response.ok) {
-            response.json().then(item => {
-                this.$store.commit('addItem', item);
-                this.$router.push('/items');
-            })
-        } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-            response.json().then(error => {
-                this.errorMessage = error.message;
-                console.error(error);
-            })
+        if (response.success) {
+            this.$store.commit('addItem', response.data);
+            this.$router.push('/items');
         } else {
-            this.errorMessage = 'An error occurred during processing';
-            console.error(response);
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     });
 }

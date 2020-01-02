@@ -49,7 +49,7 @@ export function createItem(item) {
 
 export function updateItem(item) {
     const params = updateRequestParams(item);
-    return fetch('/api/v1/items/' + item.id, params);
+    return fetch('/api/v1/items/' + item.id, params).then(unpackJson);
 }
 
 export function deleteItem(item) {
