@@ -54,7 +54,7 @@ export function updateItem(item) {
 
 export function deleteItem(item) {
     const params = { method: 'DELETE' };
-    return fetch('/api/v1/items/' + item.id, params);
+    return fetch('/api/v1/items/' + item.id, params).then(unpackJson);
 }
 
 export function fetchItems(item) {
