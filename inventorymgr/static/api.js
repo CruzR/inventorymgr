@@ -129,7 +129,7 @@ export function login(user) {
 
 export function logout() {
     const params = { method: 'POST' };
-    return fetch('/api/v1/auth/logout', params);
+    return fetch('/api/v1/auth/logout', params).then(unpackJson);
 }
 
 export function register(token, user) {

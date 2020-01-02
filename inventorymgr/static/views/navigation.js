@@ -60,11 +60,11 @@ const template = `
 
 function sendLogoutRequest() {
     logout().then(response => {
-        if (response.status === 200) {
+        if (response.success) {
             this.$store.commit('logout');
             this.$router.push('/login');
         } else {
-            console.error(response);
+            console.error(response.error);
         }
     });
 }
