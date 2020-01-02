@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import { logout } from '/static/api.js'
 
 
 const template = `
@@ -58,7 +59,7 @@ const template = `
     </nav>`
 
 function sendLogoutRequest() {
-    fetch('/api/v1/auth/logout', { method: 'POST' }).then(response => {
+    logout().then(response => {
         if (response.status === 200) {
             this.$store.commit('logout');
             this.$router.push('/login');
