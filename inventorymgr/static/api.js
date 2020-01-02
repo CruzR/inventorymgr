@@ -63,7 +63,7 @@ export function fetchItems(item) {
 
 export function createQualification(qualification) {
     const params = createRequestParams(qualification);
-    return fetch('/api/v1/qualifications', params);
+    return fetch('/api/v1/qualifications', params).then(unpackJson);
 }
 
 export function updateQualification(qualification) {

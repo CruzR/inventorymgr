@@ -9,18 +9,13 @@ const template = `
     </qualification-form>`
 
 function sendCreateQualificationRequest(qualification) {
-    createQualification(qualification).then((response) => {
-        if (response.ok) {
-            response.json().then(qualification => {
-                this.$store.commit('updateQualification', qualification);
-                this.$router.push('/qualifications');
-            });
-        } else if (response.status === 500) {
-            this.errorMessage = 'An error occurred during processing.'
+    createQualification(qualification).then(response => {
+        if (response.success) {
+            this.$store.commit('updateQualification', response.data);
+            this.$router.push('/qualifications');
         } else {
-            response.json().then((json) => {
-                this.errorMessage = json.message;
-            });
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     })
 }
