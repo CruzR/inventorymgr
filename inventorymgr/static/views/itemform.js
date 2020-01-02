@@ -68,7 +68,7 @@ export default {
     data: function() {
         const item = (typeof(this.current) !== 'undefined')
             ? JSON.parse(JSON.stringify(this.current))
-            : { name: '', barcode: '' };
+            : { name: '', barcode: '', required_qualifications: [] };
         return { item };
     },
     computed: {

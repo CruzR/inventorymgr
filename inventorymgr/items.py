@@ -10,7 +10,7 @@ from inventorymgr.api import APIError
 from inventorymgr.api.models import BorrowableItemSchema
 from inventorymgr.auth import authentication_required
 from inventorymgr.db import db
-from inventorymgr.db.models import BorrowableItem
+from inventorymgr.db.models import BorrowableItem, Qualification
 
 
 bp = Blueprint('items', __name__, url_prefix='/api/v1/items')
@@ -21,9 +21,13 @@ bp = Blueprint('items', __name__, url_prefix='/api/v1/items')
 @requires_permissions('create_items')
 def create_item() -> Tuple[Dict[str, Any], int]:
     """JSON endpoint for creating borrowable items."""
-    received_item = BorrowableItemSchema(only=('name',)).load(request.json)
+    received_item = BorrowableItemSchema(
+        only=('name', 'required_qualifications')).load(request.json)
     try:
-        item = BorrowableItem(name=received_item['name'])
+        qual_ids = [q['id'] for q in received_item['required_qualifications']]
+        qualifications = [Qualification.query.get(q_id) for q_id in qual_ids]
+        item = BorrowableItem(
+            name=received_item['name'], required_qualifications=qualifications)
         db.session.add(item)
         db.session.commit()
         return BorrowableItemSchema().dump(item), 200
@@ -58,6 +62,8 @@ def update_item(item_id: int) -> Dict[str, Any]:
         raise APIError('Item does not exist', reason='nonexistent_item', status_code=400)
 
     item.name = received_item['name']
+    qual_ids = [q['id'] for q in received_item['required_qualifications']]
+    item.required_qualifications = [Qualification.query.get(q_id) for q_id in qual_ids]
     db.session.commit()
 
     return cast(Dict[str, Any], schema.dump(item))

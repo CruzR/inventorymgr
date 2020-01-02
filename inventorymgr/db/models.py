@@ -15,6 +15,13 @@ _USER_QUALIFICATIONS_TABLE = db.Table(
     db.Column('qualification_id', db.Integer, db.ForeignKey('qualification.id'))
 )
 
+_REQUIRED_QUALIFICATIONS_TABLE = db.Table(
+    'required_qualifications',
+    db.Model.metadata,
+    db.Column('item_id', db.Integer, db.ForeignKey('borrowable_item.id')),
+    db.Column('qualification_id', db.Integer, db.ForeignKey('qualification.id'))
+)
+
 
 class User(db.Model): # type: ignore
 
@@ -57,3 +64,7 @@ class BorrowableItem(db.Model): # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
+    required_qualifications = db.relationship(
+        'Qualification',
+        secondary=_REQUIRED_QUALIFICATIONS_TABLE
+    )

@@ -41,7 +41,7 @@ def app():
         drivers_license = Qualification(name="Driver's License")
         all_permissions_user.qualifications = [drivers_license]
         db.session.add(drivers_license)
-        db.session.add(BorrowableItem(name='existing_item'))
+        db.session.add(BorrowableItem(name='existing_item', required_qualifications=[drivers_license]))
         db.session.commit()
 
     yield app

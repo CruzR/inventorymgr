@@ -40,6 +40,7 @@ class BorrowableItemSchema(Schema):
     """Marshmallow schema to validate borrowable items."""
     id = fields.Integer(required=True)
     name = fields.Str(required=True, validate=bool)
+    required_qualifications = fields.Nested(QualificationSchema, required=True, many=True)
 
     @_post_dump
     def add_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
