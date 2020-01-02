@@ -82,7 +82,7 @@ export function deleteQualification(qualification) {
 }
 
 export function fetchQualifications() {
-    return fetch('/api/v1/qualifications');
+    return fetch('/api/v1/qualifications').then(unpackJson);
 }
 
 export function generateRegistrationToken() {

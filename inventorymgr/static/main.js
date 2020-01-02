@@ -159,16 +159,10 @@ router.beforeEach((to, from, next) => {
         }
         if (!store.state.qualifications.length) {
             fetchQualifications().then(response => {
-                if (response.ok) {
-                    response.json().then(qualifications => {
-                        store.commit('setQualifications', qualifications)
-                    })
+                if (response.success) {
+                    store.commit('setQualifications', response.data)
                 } else {
-                    if (response.headers.get('Content-Type').startsWith('application/json')) {
-                        response.json().then(console.error);
-                    } else {
-                        console.error(response);
-                    }
+                    console.error(response.error);
                 }
             })
         }
