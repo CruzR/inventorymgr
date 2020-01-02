@@ -87,7 +87,7 @@ export function fetchQualifications() {
 
 export function generateRegistrationToken() {
     const params = { method: 'POST' };
-    return fetch('/api/v1/registration/tokens', params);
+    return fetch('/api/v1/registration/tokens', params).then(unpackJson);
 }
 
 export function deleteRegistrationToken(token) {

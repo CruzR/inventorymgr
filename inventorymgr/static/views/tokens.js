@@ -66,14 +66,10 @@ function deleteToken(token) {
 
 function sendGenerateTokenRequest() {
     generateRegistrationToken().then(response => {
-        if (response.ok) {
-            response.json().then(token => {
-                this.$store.commit('addToken', token);
-            });
-        } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-            response.json().then(console.error);
+        if (response.success) {
+            this.$store.commit('addToken', response.data);
         } else {
-            console.error(response);
+            console.error(response.error);
         }
     });
 }
