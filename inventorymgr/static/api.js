@@ -113,3 +113,8 @@ export function logout() {
     const params = { method: 'POST' };
     return fetch('/api/v1/auth/logout', params);
 }
+
+export function register(token, user) {
+    const params = createRequestParams(user);
+    return fetch('/api/v1/auth/registration/' + token, params);
+}

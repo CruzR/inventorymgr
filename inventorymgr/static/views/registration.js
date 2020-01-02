@@ -1,3 +1,6 @@
+import { register } from '/static/api.js'
+
+
 const template = `
     <div class="columns is-centered section">
       <div class="column is-narrow">
@@ -61,17 +64,9 @@ function formatError(error) {
 }
 
 function sendRegistrationRequest() {
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    const params = {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(this.newuser),
-    };
-
     const token = this.$route.params.token;
 
-    fetch('/api/v1/registration/' + token, params).then(response => {
+    register(token, this.newuser).then(response => {
         if (response.ok) {
             this.$router.push('/login');
         } else if (response.headers.get('Content-Type').startsWith('application/json')) {
