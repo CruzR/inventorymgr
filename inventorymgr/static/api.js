@@ -92,7 +92,7 @@ export function generateRegistrationToken() {
 
 export function deleteRegistrationToken(token) {
     const params = { method: 'DELETE' };
-    return fetch('/api/v1/registration/tokens/' + token.id, params);
+    return fetch('/api/v1/registration/tokens/' + token.id, params).then(unpackJson);
 }
 
 export function fetchRegistrationTokens() {

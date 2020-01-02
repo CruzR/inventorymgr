@@ -49,16 +49,11 @@ function copyTokenUrl(token) {
 
 function deleteToken(token) {
     deleteRegistrationToken(token).then(response => {
-        if (response.ok) {
+        if (response.success) {
             this.$store.commit('deleteToken', token);
-        } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-            response.json().then(error => {
-                this.error = 'Error: ' + error.reason;
-                console.error(error);
-            });
         } else {
-            this.error = "An error occured during processing.";
-            console.error(response);
+            console.error(response.error);
+            this.error = response.error.message;
         }
     });
 }
