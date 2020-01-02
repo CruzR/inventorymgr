@@ -96,7 +96,7 @@ export function deleteRegistrationToken(token) {
 }
 
 export function fetchRegistrationTokens() {
-    return fetch('/api/v1/registration/tokens');
+    return fetch('/api/v1/registration/tokens').then(unpackJson);
 }
 
 export function fetchSessionUser() {

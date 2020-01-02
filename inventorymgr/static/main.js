@@ -168,14 +168,10 @@ router.beforeEach((to, from, next) => {
         }
         if (!store.state.tokens.length) {
             fetchRegistrationTokens().then(response => {
-                if (response.ok) {
-                    response.json().then(json => {
-                        store.commit('setTokens', json.tokens)
-                    })
-                } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-                    response.json().then(console.error);
+                if (response.success) {
+                    store.commit('setTokens', response.data.tokens)
                 } else {
-                    console.error(response);
+                    console.error(response.error);
                 }
             })
         }
