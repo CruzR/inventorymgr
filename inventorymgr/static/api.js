@@ -100,7 +100,7 @@ export function fetchRegistrationTokens() {
 }
 
 export function fetchSessionUser() {
-    return fetch('/api/v1/users/me');
+    return fetch('/api/v1/users/me').then(unpackJson);
 }
 
 export function createUser(user) {

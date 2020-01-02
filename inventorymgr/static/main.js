@@ -141,16 +141,10 @@ router.beforeEach((to, from, next) => {
     } else {
         if (store.state.sessionUser === null) {
             fetchSessionUser().then(response => {
-                if (response.ok) {
-                    response.json().then(user => {
-                        store.commit('setSessionUser', user)
-                    })
+                if (response.success) {
+                    store.commit('setSessionUser', response.data)
                 } else {
-                    if (response.headers.get('Content-Type').startsWith('application/json')) {
-                        response.json().then(console.error);
-                    } else {
-                        console.error(response);
-                    }
+                    console.error(response.error);
                 }
             })
         }
