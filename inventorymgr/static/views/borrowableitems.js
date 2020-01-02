@@ -8,6 +8,7 @@ const template = `
           <tr>
             <th>Item</th>
             <th>Barcode</th>
+            <th>Required Qualifications</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -15,6 +16,15 @@ const template = `
           <tr v-for="item in items">
             <td data-label="Item">{{ item.name }}</td>
             <td data-label="Barcode">{{ item.barcode }}</td>
+            <td data-label="Required Qualifications">
+              <div class="tags">
+                <span
+                  v-for="qualification in item.required_qualifications"
+                  class="tag">
+                  {{ qualification.name }}
+                </span>
+              </div>
+            </td>
             <td data-label="Actions">
               <div class="buttons">
                 <router-link :to="'/items/' + item.id + '/edit'" v-slot="{ href, navigate }">
