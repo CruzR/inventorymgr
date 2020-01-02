@@ -110,7 +110,7 @@ export function createUser(user) {
 
 export function updateUser(user_id, user) {
     const params = updateRequestParams(user);
-    return fetch('/api/v1/users/' + user_id, params);
+    return fetch('/api/v1/users/' + user_id, params).then(unpackJson);
 }
 
 export function deleteUser(user_id) {

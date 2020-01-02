@@ -24,22 +24,15 @@ function sendUpdateUserRequest(user, repeatedPassword) {
     }
 
     updateUser(this.$route.params.id, user).then(response => {
-        if (response.ok) {
-            response.json().then(user => {
-                this.$store.commit('updateUser', user);
-                if (this.$route.params.id === 'me') {
-                    this.$store.commit('setSessionUser', user);
-                }
-                this.$router.push('/users');
-            });
-        } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-            response.json().then(error => {
-                this.errorMessage = error.message;
-                console.error(error);
-            })
+        if (response.success) {
+            this.$store.commit('updateUser', response.data);
+            if (this.$route.params.id === 'me') {
+                this.$store.commit('setSessionUser', response.data);
+            }
+            this.$router.push('/users');
         } else {
-            this.errorMessage = 'An error occurred during processing.';
-            console.error(response);
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     })
 }
