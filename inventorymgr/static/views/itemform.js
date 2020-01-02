@@ -1,3 +1,6 @@
+import { mapState } from '/static/vuex.esm.browser.js'
+import TagSelectBox from '/static/views/tagselectbox.js'
+
 const template = `
     <div>
       <div v-if="error" class="message is-danger">
@@ -20,6 +23,16 @@ const template = `
           <div class="control">
             <input id="item-barcode" type="text" readonly
               class="input is-static" :value="item.barcode">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Required Qualifications</label>
+          <div class="control">
+            <tag-select-box
+              :items.sync="item.required_qualifications"
+              :readonly="isViewContext"
+              :choices="qualifications">
+            </tag-select-box>
           </div>
         </div>
         <div v-if="isEditContext" class="field is-grouped">
@@ -81,5 +94,7 @@ export default {
         isCreateContext: function() {
             return this.context === 'create';
         },
+        ...mapState(['qualifications']),
     },
+    components: { TagSelectBox },
 }
