@@ -81,6 +81,10 @@ export function fetchRegistrationTokens() {
     return fetch('/api/v1/registration/tokens');
 }
 
+export function fetchSessionUser() {
+    return fetch('/api/v1/users/me');
+}
+
 export function createUser(user) {
     const params = createRequestParams(item);
     return fetch('/api/v1/users', params);
