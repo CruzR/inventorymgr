@@ -177,14 +177,10 @@ router.beforeEach((to, from, next) => {
         }
         if (!store.state.items.length) {
             fetchItems().then(response => {
-                if (response.ok) {
-                    response.json().then(json => {
-                        store.commit('setItems', json.items)
-                    })
-                } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-                    response.json().then(console.error)
+                if (response.success) {
+                    store.commit('setItems', response.data.items)
                 } else {
-                    console.error(response)
+                    console.error(response.error)
                 }
             })
         }

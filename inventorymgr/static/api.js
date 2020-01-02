@@ -58,7 +58,7 @@ export function deleteItem(item) {
 }
 
 export function fetchItems(item) {
-    return fetch('/api/v1/items');
+    return fetch('/api/v1/items').then(unpackJson);
 }
 
 export function createQualification(qualification) {
