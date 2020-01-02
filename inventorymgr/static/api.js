@@ -104,8 +104,8 @@ export function fetchSessionUser() {
 }
 
 export function createUser(user) {
-    const params = createRequestParams(item);
-    return fetch('/api/v1/users', params);
+    const params = createRequestParams(user);
+    return fetch('/api/v1/users', params).then(unpackJson);
 }
 
 export function updateUser(user_id, user) {

@@ -20,17 +20,12 @@ function sendCreateUserRequest(user, repeatedPassword) {
     }
 
     createUser(user).then(response => {
-        if (response.ok) {
-            response.json().then(user => {
-                this.$store.commit('updateUser', user);
-                this.$router.push('/users');
-            });
-        } else if (response.status === 500) {
-            this.errorMessage = 'An error occurred during processing.'
+        if (response.success) {
+            this.$store.commit('updateUser', response.data);
+            this.$router.push('/users');
         } else {
-            response.json().then((json) => {
-                this.errorMessage = json.message;
-            });
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     })
 }
