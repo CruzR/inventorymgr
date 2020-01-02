@@ -24,9 +24,27 @@ function updateRequestParams(obj) {
     return params;
 }
 
+function isJsonResponse(response) {
+    const contentType = response.headers.get('Content-Type');
+    return contentType.split(';')[0].trim() === 'application/json';
+}
+
+function unpackJson(response) {
+    if (response.ok) {
+        return response.json().then(json => { return { success: true, data: json }; });
+    } else if (isJsonResponse(response)) {
+        return response.json().then(json => { return { success: false, error: json }; });
+    } else {
+        return {
+            success: false,
+            error: { reason: 'unknown', message: 'Error occurred during processing' }
+        };
+    }
+}
+
 export function createItem(item) {
     const params = createRequestParams(item);
-    return fetch('/api/v1/items', params);
+    return fetch('/api/v1/items', params).then(unpackJson);
 }
 
 export function updateItem(item) {

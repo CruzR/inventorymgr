@@ -13,19 +13,12 @@ const template = `
 
 function sendCreateItemRequest(item) {
     createItem(item).then(response => {
-        if (response.ok) {
-            response.json().then(item => {
-                this.$store.commit('addItem', item);
-                this.$router.push('/items');
-            });
-        } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-            response.json().then(error => {
-                console.error(error);
-                this.errorMessage = error.message;
-            });
+        if (response.success) {
+            this.$store.commit('addItem', response.data);
+            this.$router.push('/items');
         } else {
-            console.error(response);
-            this.errorMessage = "Error occurred during processing.";
+            console.error(response.error);
+            this.errorMessage = response.error.message;
         }
     });
 }
