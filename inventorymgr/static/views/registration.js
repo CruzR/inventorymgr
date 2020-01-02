@@ -67,15 +67,11 @@ function sendRegistrationRequest() {
     const token = this.$route.params.token;
 
     register(token, this.newuser).then(response => {
-        if (response.ok) {
+        if (response.success) {
             this.$router.push('/login');
-        } else if (response.headers.get('Content-Type').startsWith('application/json')) {
-            response.json().then(formatError).then(error => {
-                this.error = error;
-            });
         } else {
-            console.error(response);
-            this.error = "An error occured during processing.";
+            console.error(response.error);
+            this.error = response.error.message;
         }
     });
 }

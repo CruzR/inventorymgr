@@ -134,5 +134,5 @@ export function logout() {
 
 export function register(token, user) {
     const params = createRequestParams(user);
-    return fetch('/api/v1/auth/registration/' + token, params);
+    return fetch('/api/v1/registration/' + token, params).then(unpackJson);
 }
