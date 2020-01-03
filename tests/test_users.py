@@ -16,6 +16,7 @@ def test_user():
         'update_users': True,
         'edit_qualifications': True,
         'create_items': True,
+        'manage_checkouts': True,
         'qualifications': [{'id': 1, 'name': "Driver's License"}],
     }
 
@@ -503,6 +504,7 @@ def test_update_self_unauthenticated(client, app):
         'update_users': False,
         'edit_qualifications': False,
         'create_items': False,
+        'manage_checkouts': False,
         'qualifications': []
     })
     assert response.status_code == 403
@@ -520,6 +522,7 @@ def test_abuse_update_self_to_update_other_user(client, app, auth):
         'update_users': False,
         'edit_qualifications': False,
         'create_items': False,
+        'manage_checkouts': False,
         'qualifications': []
     })
     assert response.status_code == 400
@@ -541,6 +544,7 @@ def test_update_self_username(client, app, auth):
         'update_users': False,
         'edit_qualifications': False,
         'create_items': False,
+        'manage_checkouts': False,
         'qualifications': []
     })
     assert response.status_code == 200
@@ -563,6 +567,7 @@ def test_update_self_password(client, app, auth):
         'update_users': False,
         'edit_qualifications': False,
         'create_items': False,
+        'manage_checkouts': False,
         'qualifications': []
     })
     assert response.status_code == 200
@@ -584,6 +589,7 @@ def test_update_self_set_permissions_fail(client, app, auth):
         'update_users': True,
         'edit_qualifications': False,
         'create_items': False,
+        'manage_checkouts': False,
         'qualifications': []
     })
     assert response.status_code == 403
@@ -604,6 +610,7 @@ def test_update_self_set_permissions_and_qualifications(client, app, auth):
         'update_users': True,
         'edit_qualifications': False,
         'create_items': False,
+        'manage_checkouts': False,
         'qualifications': [{'id': 1, 'name': "Driver's License"}]
     })
     assert response.status_code == 200
@@ -625,6 +632,7 @@ def test_update_self_give_more_qualifications_fail(client, app, auth):
         'update_users': False,
         'edit_qualifications': False,
         'create_items': False,
+        'manage_checkouts': False,
         'qualifications': [{'id': 1, 'name': "Driver's License"}]
     })
     assert response.status_code == 403
@@ -651,6 +659,7 @@ def test_update_self_with_deleted_user(client, app, auth):
         'update_users': False,
         'edit_qualifications': False,
         'create_items': False,
+        'manage_checkouts': False,
         'qualifications': []
     })
     assert response.status_code == 400

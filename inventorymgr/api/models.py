@@ -22,6 +22,7 @@ class UserSchema(Schema):
     update_users = fields.Bool(required=True)
     edit_qualifications = fields.Bool(required=True)
     create_items = fields.Bool(required=True)
+    manage_checkouts = fields.Bool(required=True)
     qualifications = fields.Nested(QualificationSchema, required=True, many=True)
 
 

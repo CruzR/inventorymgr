@@ -29,6 +29,7 @@ def app():
             update_users=True,
             edit_qualifications=True,
             create_items=True,
+            manage_checkouts=True,
         )
         db.session.add(all_permissions_user)
         min_permissions_user = User(

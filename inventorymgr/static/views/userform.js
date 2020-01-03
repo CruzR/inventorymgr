@@ -99,6 +99,15 @@ const template = `
             Create Items
           </label>
         </div>
+        <div class="field">
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              :disabled="isViewContext"
+              v-model="user.manage_checkouts">
+            Manage Checkouts
+          </label>
+        </div>
       </fieldset>
       <div class="field">
         <label class="label">Qualifications</label>
@@ -168,6 +177,7 @@ export default {
                 update_users: false,
                 edit_qualifications: false,
                 create_items: false,
+                manage_checkouts: false,
                 qualifications: []
             };
 

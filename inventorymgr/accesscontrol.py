@@ -16,6 +16,7 @@ PERMISSIONS = (
     'update_users',
     'edit_qualifications',
     'create_items',
+    'manage_checkouts',
 )
 
 def can_set_permissions(user_dict: Dict[str, Any]) -> bool:

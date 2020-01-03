@@ -11,6 +11,7 @@ const template = `
           <th><abbr title="Update Users">UU</abbr></th>
           <th><abbr title="Edit Qualifications">EQ</abbr></th>
           <th><abbr title="Create Items">CI</abbr></th>
+          <th><abbr title="Manage Checkouts">MC</abbr></th>
           <th>Qualifications</th>
           <th>Actions</th>
         </tr>
@@ -24,6 +25,9 @@ const template = `
           <td data-label="Edit Qualifications"><input type="checkbox" :checked="user.edit_qualifications" disabled></td>
           <td data-label="Create Items">
             <input type="checkbox" :checked="user.create_items" disabled>
+          </td>
+          <td data-label="Manage Checkouts">
+            <input type="checkbox" :checked="user.manage_checkouts" disabled>
           </td>
           <td data-label="Qualifications">
             <div class="tags">

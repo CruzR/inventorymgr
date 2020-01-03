@@ -35,6 +35,7 @@ class User(db.Model): # type: ignore
     update_users = db.Column(db.Boolean, nullable=False, default=False)
     edit_qualifications = db.Column(db.Boolean, nullable=False, default=False)
     create_items = db.Column(db.Boolean, nullable=False, default=False)
+    manage_checkouts = db.Column(db.Boolean, nullable=False, default=False)
     qualifications = db.relationship(
         'Qualification',
         secondary=_USER_QUALIFICATIONS_TABLE
