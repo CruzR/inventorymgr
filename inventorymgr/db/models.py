@@ -68,3 +68,15 @@ class BorrowableItem(db.Model): # type: ignore
         'Qualification',
         secondary=_REQUIRED_QUALIFICATIONS_TABLE
     )
+
+
+class BorrowState(db.Model): # type: ignore
+    """ORM model for borrow state of items."""
+    id = db.Column(db.Integer, primary_key=True)
+    borrowing_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    borrowing_user = db.relationship('User')
+    borrowed_item_id = db.Column(
+        db.Integer, db.ForeignKey('borrowable_item.id'), nullable=False)
+    borrowed_item = db.relationship('BorrowableItem')
+    received_at = db.Column(db.DateTime, nullable=False)
+    returned_at = db.Column(db.DateTime)
