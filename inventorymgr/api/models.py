@@ -57,3 +57,12 @@ class BorrowableItemSchema(Schema):
         if 'barcode' in data:
             del data['barcode']
         return data
+
+
+class BorrowStateSchema(Schema):
+    """Marshmallow schema for borrow state objects."""
+    id = fields.Integer(required=True)
+    borrowing_user = fields.Nested(UserSchema, required=True, only=('id', 'username'))
+    borrowed_item = fields.Nested(BorrowableItemSchema, required=True, only=('id', 'name'))
+    received_at = fields.DateTime(required=True)
+    returned_at = fields.DateTime(required=True, allow_none=True)

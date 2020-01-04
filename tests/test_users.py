@@ -454,6 +454,7 @@ def test_create_user_command(runner, app):
         '--update-users=1',
         '--edit-qualifications', 'false',
         '--create-items=0',
+        '--manage-checkouts=1',
     ])
     assert 'Created user' in result.output
 
@@ -466,6 +467,7 @@ def test_create_user_command(runner, app):
         assert user.update_users
         assert not user.edit_qualifications
         assert not user.create_items
+        assert user.manage_checkouts
 
 
 def test_get_me_unauthenticated(client):
