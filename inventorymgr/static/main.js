@@ -1,7 +1,7 @@
 import Vue from '/static/vue.esm.browser.js'
 import Vuex from '/static/vuex.esm.browser.js'
 import { mapState } from '/static/vuex.esm.browser.js'
-import { fetchItems, fetchQualifications, fetchRegistrationTokens, fetchSessionUser, fetchUsers } from '/static/api.js'
+import { fetchBorrowStates, fetchItems, fetchQualifications, fetchRegistrationTokens, fetchSessionUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
@@ -20,6 +20,7 @@ import BorrowableItemsView from '/static/views/borrowableitems.js'
 import ItemDetailView from '/static/views/viewitem.js'
 import ItemEditView from '/static/views/edititem.js'
 import ItemCreateView from '/static/views/createitem.js'
+import BorrowStatesList from '/static/views/borrowstates.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -41,6 +42,7 @@ const routes = [
     { path: '/items/new', component: ItemCreateView },
     { path: '/items/:id', component: ItemDetailView },
     { path: '/items/:id/edit', component: ItemEditView },
+    { path: '/borrowstates', component: BorrowStatesList },
 ];
 
 const router = new VueRouter({
@@ -56,6 +58,7 @@ const store = new Vuex.Store({
         sessionUser: null,
         tokens: [],
         items: [],
+        borrowstates: [],
     },
     mutations: {
         login: state => { state.isAuthenticated = true },
@@ -66,6 +69,7 @@ const store = new Vuex.Store({
             state.sessionUser = null;
             state.tokens = [];
             state.items = [];
+            state.borrowstates = [];
         },
         setUsers: (state, users) => { state.users = users },
         setQualifications: (state, qualifications) => { state.qualifications = qualifications },
@@ -128,6 +132,7 @@ const store = new Vuex.Store({
                 state.items.splice(index, 1);
             }
         },
+        setBorrowStates: (state, borrowstates) => { state.borrowstates = borrowstates },
     }
 });
 
@@ -183,6 +188,15 @@ router.beforeEach((to, from, next) => {
                     console.error(response.error)
                 }
             })
+        }
+        if (!store.state.borrowstates.length) {
+            fetchBorrowStates().then(response => {
+                if (response.success) {
+                    store.commit('setBorrowStates', response.data.borrowstates);
+                } else {
+                    console.error(response.error);
+                }
+            });
         }
         next();
     }

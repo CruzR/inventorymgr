@@ -136,3 +136,7 @@ export function register(token, user) {
     const params = createRequestParams(user);
     return fetch('/api/v1/registration/' + token, params).then(unpackJson);
 }
+
+export function fetchBorrowStates() {
+    return fetch('/api/v1/borrowstates').then(unpackJson);
+}
