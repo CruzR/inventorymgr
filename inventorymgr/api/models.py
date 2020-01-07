@@ -66,3 +66,9 @@ class BorrowStateSchema(Schema):
     borrowed_item = fields.Nested(BorrowableItemSchema, required=True, only=('id', 'name'))
     received_at = fields.DateTime(required=True)
     returned_at = fields.DateTime(required=True, allow_none=True)
+
+
+class CheckoutRequestSchema(Schema):
+    """Marshmallow schema for checkout requests."""
+    borrowing_user_id = fields.Integer(required=True)
+    borrowed_item_ids = fields.List(fields.Integer, required=True)
