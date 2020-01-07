@@ -1,12 +1,13 @@
 """API endpoints for handling borrow states."""
 
 import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Iterable, cast
 
 from flask import Blueprint, request
 
 from inventorymgr.accesscontrol import requires_permissions
-from inventorymgr.api.models import BorrowStateSchema, CheckoutRequestSchema
+from inventorymgr.api.models import (BorrowStateSchema, CheckinRequestSchema,
+                                     CheckoutRequestSchema)
 from inventorymgr.auth import authentication_required
 from inventorymgr.db import db
 from inventorymgr.db.models import BorrowState
@@ -48,3 +49,26 @@ def checkout() -> Dict[str, Any]:
     db.session.commit()
 
     return {'borrowstates': BorrowStateSchema(many=True).dump(borrowstates)}
+
+
+@bp.route('/checkin', methods=('POST',))
+@authentication_required
+@requires_permissions('manage_checkouts')
+def checkin() -> Dict[str, Any]:
+    """API endpoint for checkin of borrowed items."""
+    checkin_request = CheckinRequestSchema().load(request.json)
+    now = _utcnow()
+    borrowstates = []
+    for item_id in checkin_request['item_ids']:
+        for borrow_state in open_borrowstates_for_item(item_id):
+            borrow_state.returned_at = now
+            borrowstates.append(borrow_state)
+    db.session.commit()
+    return {'borrowstates': BorrowStateSchema(many=True).dump(borrowstates)}
+
+
+def open_borrowstates_for_item(item_id: int) -> Iterable[BorrowState]:
+    """Return all borrow states for an item without a return date."""
+    return cast(
+        Iterable[BorrowState],
+        BorrowState.query.filter_by(borrowed_item_id=item_id, returned_at=None))

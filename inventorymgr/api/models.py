@@ -72,3 +72,8 @@ class CheckoutRequestSchema(Schema):
     """Marshmallow schema for checkout requests."""
     borrowing_user_id = fields.Integer(required=True)
     borrowed_item_ids = fields.List(fields.Integer, required=True)
+
+
+class CheckinRequestSchema(Schema):
+    """Marshmallow schema for checkin requests."""
+    item_ids = fields.List(fields.Integer, required=True)
