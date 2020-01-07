@@ -21,6 +21,7 @@ import ItemDetailView from '/static/views/viewitem.js'
 import ItemEditView from '/static/views/edititem.js'
 import ItemCreateView from '/static/views/createitem.js'
 import BorrowStatesList from '/static/views/borrowstates.js'
+import CheckoutView from '/static/views/checkout.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -43,6 +44,7 @@ const routes = [
     { path: '/items/:id', component: ItemDetailView },
     { path: '/items/:id/edit', component: ItemEditView },
     { path: '/borrowstates', component: BorrowStatesList },
+    { path: '/checkout', component: CheckoutView },
 ];
 
 const router = new VueRouter({

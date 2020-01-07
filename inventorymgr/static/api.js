@@ -140,3 +140,8 @@ export function register(token, user) {
 export function fetchBorrowStates() {
     return fetch('/api/v1/borrowstates').then(unpackJson);
 }
+
+export function checkout(checkoutRequest) {
+    const params = createRequestParams(checkoutRequest);
+    return fetch('/api/v1/borrowstates/checkout', params).then(unpackJson);
+}
