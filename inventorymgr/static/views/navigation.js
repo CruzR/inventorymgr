@@ -37,6 +37,8 @@ const template = `
           <navbar-link href="/qualifications">Qualifications</navbar-link>
           <navbar-link href="/tokens">Invites</navbar-link>
           <navbar-link href="/items">Inventory</navbar-link>
+          <navbar-link href="/checkout">Checkout</navbar-link>
+          <navbar-link href="/borrowstates">Borrowed Items</navbar-link>
         </div>
         <div class="navbar-end">
           <navbar-link
