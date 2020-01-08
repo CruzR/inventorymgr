@@ -9,13 +9,15 @@ from inventorymgr.registration import generate_registration_token
 
 
 def test_generate_registration_token(app, monkeypatch):
-    now = datetime.datetime.now()
+    def fake_utcnow():
+        return datetime.datetime(2020, 1, 7, 13, 37, 42)
     monkeypatch.setattr('secrets.token_hex', lambda: 'test')
+    monkeypatch.setattr('inventorymgr.registration._utcnow', fake_utcnow)
     with app.app_context():
         token_obj = generate_registration_token()
         token, expires = token_obj.token, token_obj.expires
     assert token == 'test'
-    assert (expires - (now + datetime.timedelta(days=7))) < datetime.timedelta(seconds=5)
+    assert expires == datetime.datetime(2020, 1, 14, 13, 37, 42)
 
 
 def test_generate_registration_token_failure(app, monkeypatch):

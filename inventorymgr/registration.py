@@ -42,7 +42,7 @@ def handle_registration_request(token: str) -> Tuple[Dict[str, Any], int]:
     if token_obj is None:
         return {'reason': 'invalid_token'}, 400
 
-    if token_obj.expires < datetime.datetime.now():
+    if token_obj.expires < _utcnow():
         db.session.delete(token_obj)
         db.session.commit()
         return {'reason': 'expired_token'}, 400
@@ -106,7 +106,7 @@ def generate_registration_token() -> RegistrationToken:
         token = secrets.token_hex()
         token_obj = RegistrationToken(
             token=token,
-            expires=datetime.datetime.now() + datetime.timedelta(days=7)
+            expires=_utcnow() + datetime.timedelta(days=7)
         )
         try:
             db.session.add(token_obj)
@@ -115,3 +115,8 @@ def generate_registration_token() -> RegistrationToken:
         except IntegrityError:
             db.session.rollback()
     raise RuntimeError('Failed to generate a unique token in 3 tries.')
+
+
+def _utcnow() -> datetime.datetime:
+    """Allow mocking datetime.datetime.utcnow()."""
+    return datetime.datetime.utcnow()
