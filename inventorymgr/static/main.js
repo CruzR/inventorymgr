@@ -22,6 +22,7 @@ import ItemEditView from '/static/views/edititem.js'
 import ItemCreateView from '/static/views/createitem.js'
 import BorrowStatesList from '/static/views/borrowstates.js'
 import CheckoutView from '/static/views/checkout.js'
+import CheckinView from '/static/views/checkin.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -45,6 +46,7 @@ const routes = [
     { path: '/items/:id/edit', component: ItemEditView },
     { path: '/borrowstates', component: BorrowStatesList },
     { path: '/checkout', component: CheckoutView },
+    { path: '/checkin', component: CheckinView },
 ];
 
 const router = new VueRouter({
@@ -135,6 +137,16 @@ const store = new Vuex.Store({
             }
         },
         setBorrowStates: (state, borrowstates) => { state.borrowstates = borrowstates },
+        addBorrowStates: (state, borrowstates) => {
+            for (let borrow_state of borrowstates) {
+                const index = state.borrowstates.findIndex(b => b.id === borrow_state.id);
+                if (index === -1) {
+                    state.borrowstates.push(borrow_state);
+                } else {
+                    state.borrowstates.splice(index, 1, borrow_state);
+                }
+            }
+        },
     }
 });
 

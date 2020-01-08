@@ -145,3 +145,8 @@ export function checkout(checkoutRequest) {
     const params = createRequestParams(checkoutRequest);
     return fetch('/api/v1/borrowstates/checkout', params).then(unpackJson);
 }
+
+export function checkin(checkinRequest) {
+    const params = createRequestParams(checkinRequest);
+    return fetch('/api/v1/borrowstates/checkin', params).then(unpackJson);
+}
