@@ -3,11 +3,12 @@ Utility functions for access control.
 """
 
 import functools
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, cast
 
 from flask import session
 
 from .api import APIError
+from .db.models import User
 
 
 PERMISSIONS = (
@@ -25,12 +26,13 @@ def can_set_permissions(user_dict: Dict[str, Any]) -> bool:
 
     A user can set permissions if they are a subset of their own permissions.
     """
-    return all(session['user'][k] or not user_dict[k] for k in PERMISSIONS)
+    user = get_session_user()
+    return all(getattr(user, k) or not user_dict[k] for k in PERMISSIONS)
 
 
 def can_set_qualifications() -> bool:
     """Check if the current session's user can set qualifications."""
-    return bool(session['user']['edit_qualifications'])
+    return cast(bool, get_session_user().edit_qualifications)
 
 
 def requires_permissions(*permissions: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
@@ -38,7 +40,8 @@ def requires_permissions(*permissions: str) -> Callable[[Callable[..., Any]], Ca
     def outer(to_be_wrapped: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(to_be_wrapped)
         def inner(*args: Any, **kwargs: Any) -> Any:
-            if not all(session['user'].get(p, False) for p in permissions):
+            user = get_session_user()
+            if not all(getattr(user, p, False) for p in permissions):
                 raise APIError(
                     'Insufficient permissions',
                     reason='insufficient_permissions',
@@ -47,3 +50,8 @@ def requires_permissions(*permissions: str) -> Callable[[Callable[..., Any]], Ca
             return to_be_wrapped(*args, **kwargs)
         return inner
     return outer
+
+
+def get_session_user() -> User:
+    """Get the current session user."""
+    return cast(User, User.query.get(session['user_id']))

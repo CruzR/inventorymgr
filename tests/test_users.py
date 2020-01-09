@@ -676,5 +676,24 @@ def test_deleted_user_logged_out_on_next_request(client, auth, app):
     assert cookies.get('is_authenticated') is None
 
 
+def test_accesscontrol_honors_changed_permissions(client, auth, app, test_user):
+    # User logs in
+    auth.login('min_permissions_user')
+
+    # Permissions are updated in the meantime
+    with app.app_context():
+        user = User.query.get(2)
+        user.view_users = True
+        user.update_users = True
+        user.edit_qualifications = True
+        db.session.commit()
+
+    # User makes a new request
+    test_user.update({'create_users': False, 'edit_qualifications': False, 'create_items': False, 'manage_checkouts': False, 'qualifications': []})
+    response = client.put('/api/v1/users/1', json=test_user)
+    assert response.status_code == 200
+    assert response.is_json
+
+
 def count_users_with_name(username):
     return User.query.filter_by(username=username).count()
