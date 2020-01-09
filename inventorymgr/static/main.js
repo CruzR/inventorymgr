@@ -1,6 +1,8 @@
 import Vue from '/static/vue.esm.browser.js'
 import Vuex from '/static/vuex.esm.browser.js'
 import { mapState } from '/static/vuex.esm.browser.js'
+import VueI18n from '/static/vue-i18n.esm.browser.js'
+import { messages } from '/static/messages.js'
 import { fetchBorrowStates, fetchItems, fetchQualifications, fetchRegistrationTokens, fetchSessionUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
@@ -26,6 +28,7 @@ import CheckinView from '/static/views/checkin.js'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
+Vue.use(VueI18n);
 
 const routes = [
     { path: '/login', component: LoginView },
@@ -216,9 +219,15 @@ router.beforeEach((to, from, next) => {
     }
 });
 
+const i18n = new VueI18n({
+    locale: navigator.language.slice(0, 2),
+    messages,
+});
+
 const vm = new Vue({
     store,
     router,
+    i18n,
     el: '#app',
     computed: mapState(['isAuthenticated']),
     components: {
