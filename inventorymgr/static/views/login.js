@@ -12,17 +12,19 @@ const template = `
         </div>
         <form class="box" @submit.prevent="sendLoginRequest">
           <div class="field">
-            <label class="label">Username</label>
+            <label class="label" for="login-username">Username</label>
             <div class="control">
               <input
+                id="login-username"
                 class="input" type="text" placeholder="Username"
                 v-model="username">
             </div>
           </div>
           <div class="field">
-            <label class="label">Password</label>
+            <label class="label" for="login-password">Password</label>
             <div class="control">
               <input
+                id="login-password"
                 class="input" type="password" placeholder="Password"
                 v-model="password">
             </div>

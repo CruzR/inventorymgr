@@ -10,9 +10,10 @@ const template = `
     </div>
     <form @submit.prevent="$emit('commit-user-change', user, repeatedPassword)">
       <div class="field">
-        <label class="label">Username</label>
+        <label class="label" for="userform-username">Username</label>
         <div class="control">
           <input
+            id="userform-username"
             type="text" placeholder="Username"
             :readonly="isViewContext"
             :class="{ 'input': true, 'is-static': isViewContext }"
@@ -34,18 +35,20 @@ const template = `
       </template>
       <template v-else-if="isCreateContext || (!isViewContext && changePassword)">
         <div class="field">
-          <label class="label">New password</label>
+          <label class="label" for="userform-password">New password</label>
           <div class="control">
             <input
+              id="userform-password"
               type="password"
               class="input"
               v-model="user.password">
           </div>
         </div>
         <div class="field">
-          <label class="label">Repeat new password</label>
+          <label class="label" for="userform-repeatpassword">Repeat new password</label>
           <div class="control">
             <input
+              id="userform-repeatpassword"
               type="password"
               class="input"
               v-model="repeatedPassword">

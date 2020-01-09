@@ -9,10 +9,11 @@ const template = `
       </div>
       <form @submit.prevent="selectItem">
         <div class="field">
-          <label class="label">Item Barcode</label>
+          <label class="label" for="checkin-item">Item Barcode</label>
           <div class="field has-addons">
             <div class="control is-expanded">
               <input
+                id="checkin-item"
                 placeholder="Item Barcode" autofocus
                 class="input"
                 v-model="item_barcode">

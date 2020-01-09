@@ -7,9 +7,10 @@ const template = `
       </div>
       <form @submit.prevent="$emit('commit-qualification-change', qualification)">
         <div class="field">
-          <label class="label">Name</label>
+          <label class="label" for="qualificationform-name">Name</label>
           <div class="control">
             <input
+              id="qualificationform-name"
               type="text" placeholder="Name"
               :readonly="isViewContext"
               :class="{ 'input': true, 'is-static': isViewContext }"

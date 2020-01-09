@@ -11,10 +11,11 @@ const template = `
         <div class="column">
           <form @submit.prevent="selectItem">
             <div class="field">
-              <label class="label">Item Barcode</label>
+              <label class="label" for="checkout-item">Item Barcode</label>
               <div class="field has-addons">
                 <div class="control is-expanded">
                   <input
+                    id="checkout-item"
                     placeholder="Item Barcode" autofocus
                     class="input"
                     v-model="item_barcode">
@@ -43,10 +44,14 @@ const template = `
         <div class="column">
           <form @submit.prevent="selectUser">
             <div class="field">
-              <label class="label">Username</label>
+              <label class="label" for="checkout-user">Username</label>
               <div class="field has-addons">
                 <div class="control is-expanded">
-                  <input placeholder="Username" class="input" v-model="username">
+                  <input
+                    id="checkout-user"
+                    placeholder="Username"
+                    class="input"
+                    v-model="username">
                 </div>
                 <div class="control">
                   <button class="button">Add</button>
