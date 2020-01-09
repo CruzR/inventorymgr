@@ -7,13 +7,13 @@ def test_login_invalid_user_and_password(client):
 
     with client:
         invalid_user_response = client.post('/api/v1/auth/login', json=invalid_user)
-        assert session.get('user') is None
+        assert session.get('user_id') is None
         cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
         assert cookies.get('is_authenticated') is None
 
     with client:
         invalid_pw_response = client.post('/api/v1/auth/login', json=invalid_password_user)
-        assert session.get('user') is None
+        assert session.get('user_id') is None
         cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
         assert cookies.get('is_authenticated') is None
 
@@ -29,8 +29,7 @@ def test_login_valid_user_and_password(client):
 
     with client:
         response = client.post('/api/v1/auth/login', json=user)
-        assert session.get('user') is not None
-        assert session['user']['username'] == user['username']
+        assert session.get('user_id') == 1
 
     assert response.status_code == 200
     assert response.is_json
@@ -43,7 +42,7 @@ def test_logout_when_not_logged_in(client):
     with client:
         response = client.post('/api/v1/auth/logout')
         assert response.status_code == 200
-        assert session.get('user') is None
+        assert session.get('user_id') is None
 
     cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
     assert cookies.get('is_authenticated') is None
@@ -55,7 +54,7 @@ def test_logout_when_logged_in(client):
     with client:
         response = client.post('/api/v1/auth/logout')
         assert response.status_code == 200
-        assert session.get('user') is None
+        assert session.get('user_id') is None
 
     cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
     assert cookies.get('is_authenticated') is None

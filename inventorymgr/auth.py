@@ -34,7 +34,7 @@ def login() -> Any:
     password = user_dict['password']
 
     if is_password_correct(username, password):
-        session['user'] = user = fetch_user(username)
+        user = fetch_user(username)
         session['user_id'] = user['id']
         response = make_response(user)
         response.set_cookie('is_authenticated', '1')
@@ -50,8 +50,6 @@ def login() -> Any:
 @bp.route('/logout', methods=('POST',))
 def logout() -> Any:
     """Flask view to log a user out."""
-    if 'user' in session:
-        del session['user']
     if 'user_id' in session:
         del session['user_id']
     response = make_response({'success': True})
@@ -84,8 +82,6 @@ def authentication_required(to_be_wrapped: Callable[..., Any]) -> Callable[..., 
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         user_id = session.get('user_id')
         if user_id is None or User.query.get(user_id) is None:
-            if 'user' in session:
-                del session['user']
             if 'user_id' in session:
                 del session['user_id']
             response = make_response(

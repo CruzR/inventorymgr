@@ -156,7 +156,7 @@ def delete_user(user_id: int) -> str:
 @authentication_required
 def get_self() -> Any:
     """Flask view to get the current session's user as JSON."""
-    self_id = session['user']['id']
+    self_id = session['user_id']
     self_user = User.query.get(self_id)
     if self_user is None:
         raise APIError('No such user', reason='no_such_user', status_code=400)
@@ -170,7 +170,7 @@ def update_self() -> Any:
     user_schema = UserSchema()
     user_dict = user_schema.load(request.json, partial=('password',))
 
-    if user_dict['id'] != session['user']['id']:
+    if user_dict['id'] != session['user_id']:
         raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
 
     user = User.query.get(user_dict['id'])
@@ -219,7 +219,7 @@ def wants_to_update_permissions(user: User, user_dict: Dict[str, Any]) -> bool:
 @authentication_required
 def delete_self() -> Any:
     """Flask view to delete current session's user."""
-    user_id = session['user']['id']
+    user_id = session['user_id']
     user = User.query.get(user_id)
     if user is not None:
         db.session.delete(User.query.get(user_id))
