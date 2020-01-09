@@ -35,6 +35,7 @@ def login() -> Any:
 
     if is_password_correct(username, password):
         session['user'] = user = fetch_user(username)
+        session['user_id'] = user['id']
         response = make_response(user)
         response.set_cookie('is_authenticated', '1')
         return response
@@ -51,6 +52,8 @@ def logout() -> Any:
     """Flask view to log a user out."""
     if 'user' in session:
         del session['user']
+    if 'user_id' in session:
+        del session['user_id']
     response = make_response({'success': True})
     response.set_cookie('is_authenticated', max_age=0, expires=0)
     return response
@@ -79,11 +82,16 @@ def authentication_required(to_be_wrapped: Callable[..., Any]) -> Callable[..., 
     """Wraps a view with a check for whether the user is authenticated."""
     @functools.wraps(to_be_wrapped)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
-        if session.get('user') is None:
-            raise APIError(
-                'Authentication required',
-                reason='authentication_required',
-                status_code=403
-            )
+        user_id = session.get('user_id')
+        if user_id is None or User.query.get(user_id) is None:
+            if 'user' in session:
+                del session['user']
+            if 'user_id' in session:
+                del session['user_id']
+            response = make_response(
+                {'message': 'Authentication required',
+                 'reason': 'authentication_required'}, 403)
+            response.set_cookie('is_authenticated', max_age=0, expires=0)
+            return response
         return to_be_wrapped(*args, **kwargs)
     return wrapper

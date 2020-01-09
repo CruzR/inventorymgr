@@ -477,17 +477,6 @@ def test_get_me_unauthenticated(client):
     assert response.json['reason'] == 'authentication_required'
 
 
-def test_get_me_with_nonexistant_user(client, auth, app):
-    auth.login('test')
-    with app.app_context():
-        db.session.delete(User.query.get(1))
-        db.session.commit()
-    response = client.get('/api/v1/users/me')
-    assert response.status_code == 400
-    assert response.is_json
-    assert response.json['reason'] == 'no_such_user'
-
-
 def test_get_me(client, auth):
     auth.login('test')
     response = client.get('/api/v1/users/me')
@@ -645,34 +634,6 @@ def test_update_self_give_more_qualifications_fail(client, app, auth):
         assert User.query.get(2).qualifications == []
 
 
-def test_update_self_with_deleted_user(client, app, auth):
-    auth.login('min_permissions_user')
-
-    with app.app_context():
-        user = User.query.get(2)
-        db.session.delete(user)
-        db.session.commit()
-
-    response = client.put('/api/v1/users/me', json={
-        'id': 2,
-        'username': 'min_permissions_user',
-        'create_users': False,
-        'view_users': False,
-        'update_users': False,
-        'edit_qualifications': False,
-        'create_items': False,
-        'manage_checkouts': False,
-        'qualifications': []
-    })
-    assert response.status_code == 400
-    assert response.is_json
-    assert response.json['reason'] == 'no_such_user'
-
-    with app.app_context():
-        assert User.query.get(2) is None
-        assert User.query.filter_by(username='min_permissions_user').count() == 0
-
-
 def test_delete_self_unauthenticated(client, app):
     response = client.delete('/api/v1/users/me')
     assert response.status_code == 403
@@ -696,21 +657,20 @@ def test_delete_self(client, app, auth):
     assert cookies.get('is_authenticated') is None
 
 
-def test_delete_self_already_deleted(client, app, auth):
+def test_deleted_user_logged_out_on_next_request(client, auth, app):
+    # User logs in
     auth.login('min_permissions_user')
+
     with app.app_context():
-        user = User.query.get(2)
-        db.session.delete(user)
+        # User is deleted in meantime
+        db.session.delete(User.query.get(2))
         db.session.commit()
-    response = client.delete('/api/v1/users/me')
-    assert response.status_code == 200
+
+    # User makes an request that requires authentication
+    response = client.get('/api/v1/users/me')
+    assert response.status_code == 403
     assert response.is_json
-    assert response.json['success']
-
-    with app.app_context():
-        assert User.query.filter_by(username='min_permissions_user').count() == 0
-
-    # Deleting yourself should log yourself out
+    assert response.json['reason'] == 'authentication_required'
     cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
     assert cookies.get('session') is None
     assert cookies.get('is_authenticated') is None
