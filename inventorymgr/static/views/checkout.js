@@ -11,17 +11,17 @@ const template = `
         <div class="column">
           <form @submit.prevent="selectItem">
             <div class="field">
-              <label class="label" for="checkout-item">Item Barcode</label>
+              <label class="label" for="checkout-item">{{ $t('fields.item_barcode') }}</label>
               <div class="field has-addons">
                 <div class="control is-expanded">
                   <input
                     id="checkout-item"
-                    placeholder="Item Barcode" autofocus
+                    autofocus
                     class="input"
                     v-model="item_barcode">
                 </div>
                 <div class="control">
-                  <button class="button">Add</button>
+                  <button class="button">{{ $t('actions.add') }}</button>
                 </div>
               </div>
             </div>
@@ -29,14 +29,14 @@ const template = `
           <table v-if="selected_items.length" class="table is-fullwidth responsive-table">
             <thead>
               <tr>
-                <th>Barcode</th>
-                <th>Item</th>
+                <th>{{ $t('fields.barcode') }}</th>
+                <th>{{ $t('fields.item') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="item in selected_items">
-                <td data-label="Barcode">{{ item.barcode }}</td>
-                <td data-label="Item">{{ item.name }}</td>
+                <td :data-label="$t('fields.barcode')">{{ item.barcode }}</td>
+                <td :data-label="$t('fields.item')">{{ item.name }}</td>
               </tr>
             </tbody>
           </table>
@@ -44,17 +44,16 @@ const template = `
         <div class="column">
           <form @submit.prevent="selectUser">
             <div class="field">
-              <label class="label" for="checkout-user">Username</label>
+              <label class="label" for="checkout-user">{{ $t('fields.username') }}</label>
               <div class="field has-addons">
                 <div class="control is-expanded">
                   <input
                     id="checkout-user"
-                    placeholder="Username"
                     class="input"
                     v-model="username">
                 </div>
                 <div class="control">
-                  <button class="button">Add</button>
+                  <button class="button">{{ $t('actions.add') }}</button>
                 </div>
               </div>
             </div>
@@ -62,12 +61,12 @@ const template = `
           <table v-if="selected_user" class="table is-fullwidth responsive-table">
             <thead>
               <tr>
-                <th>User</th>
+                <th>{{ $t('fields.user') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="selected_user">
-                <td data-label="User">{{ selected_user.username }}</td>
+                <td :data-label="$t('fields.user')">{{ selected_user.username }}</td>
               </tr>
             </tbody>
           </table>
@@ -76,7 +75,7 @@ const template = `
       <form @submit.prevent="sendCheckoutRequest">
         <div class="field">
           <div class="control">
-            <button class="button is-primary">Checkout</button>
+            <button class="button is-primary">{{ $t('actions.checkout') }}</button>
           </div>
         </div>
       </form>

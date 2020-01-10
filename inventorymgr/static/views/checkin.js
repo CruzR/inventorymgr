@@ -9,17 +9,17 @@ const template = `
       </div>
       <form @submit.prevent="selectItem">
         <div class="field">
-          <label class="label" for="checkin-item">Item Barcode</label>
+          <label class="label" for="checkin-item">{{ $t('fields.item_barcode') }}</label>
           <div class="field has-addons">
             <div class="control is-expanded">
               <input
                 id="checkin-item"
-                placeholder="Item Barcode" autofocus
+                autofocus
                 class="input"
                 v-model="item_barcode">
             </div>
             <div class="control">
-              <button class="button">Add</button>
+              <button class="button">{{ $t('actions.add') }}</button>
             </div>
           </div>
         </div>
@@ -29,9 +29,9 @@ const template = `
         class="table is-fullwidth responsive-table">
         <thead>
           <tr>
-            <th>Item</th>
-            <th>Borrowed By</th>
-            <th>Received At</th>
+            <th>{{ $t('fields.item') }}</th>
+            <th>{{ $t('fields.borrowed_by') }}</th>
+            <th>{{ $t('fields.received_at') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -43,7 +43,7 @@ const template = `
         </tbody>
       </table>
       <form @submit.prevent="sendCheckinRequest">
-        <button class="button is-primary">Checkin</button>
+        <button class="button is-primary">{{ $t('actions.checkin') }}</button>
       </form>
     </div>`
 

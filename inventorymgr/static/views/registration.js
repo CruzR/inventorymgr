@@ -4,7 +4,7 @@ import { register } from '/static/api.js'
 const template = `
     <div class="columns is-centered section">
       <div class="column is-narrow">
-        <h1 class="title">Register</h1>
+        <h1 class="title">{{ $t('actions.register') }}</h1>
         <div v-if="error" class="message is-danger">
           <div class="message-body">
             {{ error }}
@@ -12,7 +12,7 @@ const template = `
         </div>
         <form class="box" @submit.prevent="sendRegistrationRequest">
           <div class="field">
-            <label for="reg-username" class="label">Username</label>
+            <label for="reg-username" class="label">{{ $t('fields.username') }}</label>
             <div class="control">
               <input required
                 id="reg-username" type="text"
@@ -21,7 +21,7 @@ const template = `
             </div>
           </div>
           <div class="field">
-            <label for="reg-password" class="label">Password</label>
+            <label for="reg-password" class="label">{{ $t('fields.password') }}</label>
             <div class="control">
               <input required
                 id="reg-password" type="password"
@@ -30,7 +30,9 @@ const template = `
             </div>
           </div>
           <div class="field">
-            <label for="reg-repeat-password" class="label">Repeat Password</label>
+            <label for="reg-repeat-password" class="label">
+              {{ $t('fields.repeat_password') }}
+            </label>
             <div class="control">
               <input required
                 id="reg-repeat-password" type="password"
@@ -40,7 +42,9 @@ const template = `
           </div>
           <div class="field">
             <div class="control">
-              <button type="submit" class="button is-primary">Register</button>
+              <button type="submit" class="button is-primary">
+                {{ $t('actions.register') }}
+              </button>
             </div>
           </div>
         </form>

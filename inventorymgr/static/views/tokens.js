@@ -12,21 +12,21 @@ const template = `
       <table class="table is-fullwidth responsive-table">
         <thead>
           <tr>
-            <th>Token</th>
-            <th>Expires</th>
-            <th>Actions</th>
+            <th>{{ $t('fields.token') }}</th>
+            <th>{{ $t('fields.expires') }}</th>
+            <th>{{ $t('fields.actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="token in tokens">
-            <td data-label="Token">{{ token.token }}</td>
-            <td data-label="Expires">{{ token.expires }}</td>
-            <td data-label="Actions">
+            <td :data-label="$t('fields.token')">{{ token.token }}</td>
+            <td :data-label="$t('fields.expires')">{{ token.expires }}</td>
+            <td :data-label="$t('fields.actions')">
               <div class="buttons">
                 <button type="button" class="button is-small"
-                  @click="copyTokenUrl(token)">Copy</button>
+                  @click="copyTokenUrl(token)">{{ $t('actions.copy') }}</button>
                 <button type="button" class="button is-danger is-small"
-                  @click="deleteToken(token)">Delete</button>
+                  @click="deleteToken(token)">{{ $t('actions.delete') }}</button>
               </div>
             </td>
           </tr>
@@ -35,7 +35,7 @@ const template = `
       <div class="field is-grouped is-grouped-right">
         <div class="control">
           <button type="button" class="button"
-            @click="sendGenerateTokenRequest">Generate Token</button>
+            @click="sendGenerateTokenRequest">{{ $t('actions.generate_token') }}</button>
         </div>
       </div>
     </div>`

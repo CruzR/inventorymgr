@@ -10,11 +10,11 @@ const template = `
     </div>
     <form @submit.prevent="$emit('commit-user-change', user, repeatedPassword)">
       <div class="field">
-        <label class="label" for="userform-username">Username</label>
+        <label class="label" for="userform-username">{{ $t('fields.username') }}</label>
         <div class="control">
           <input
             id="userform-username"
-            type="text" placeholder="Username"
+            type="text"
             :readonly="isViewContext"
             :class="{ 'input': true, 'is-static': isViewContext }"
             v-model="user.username">
@@ -22,20 +22,20 @@ const template = `
       </div>
       <template v-if="isEditContext && !changePassword">
         <div class="field">
-          <label class="label">Password</label>
+          <label class="label">{{ $t('fields.password') }}</label>
           <div class="control">
             <button
               type="button"
               class="button"
               @click="changePassword = true">
-              Change password
+              {{ $t('actions.change_password') }}
             </button>
           </div>
         </div>
       </template>
       <template v-else-if="isCreateContext || (!isViewContext && changePassword)">
         <div class="field">
-          <label class="label" for="userform-password">New password</label>
+          <label class="label" for="userform-password">{{ $t('fields.new_password') }}</label>
           <div class="control">
             <input
               id="userform-password"
@@ -45,7 +45,9 @@ const template = `
           </div>
         </div>
         <div class="field">
-          <label class="label" for="userform-repeatpassword">Repeat new password</label>
+          <label
+            class="label"
+            for="userform-repeatpassword">{{ $t('fields.repeat_new_password') }}</label>
           <div class="control">
             <input
               id="userform-repeatpassword"
@@ -56,14 +58,14 @@ const template = `
         </div>
       </template>
       <fieldset class="field">
-        <legend class="label">Permissions</legend>
+        <legend class="label">{{ $t('fields.permissions') }}</legend>
         <div class="field">
           <label class="checkbox">
             <input
               type="checkbox"
               :disabled="isViewContext"
               v-model="user.create_users">
-            Create Users
+            {{ $t('permissions.create_users') }}
           </label>
         </div>
         <div class="field">
@@ -72,7 +74,7 @@ const template = `
               type="checkbox"
               :disabled="isViewContext"
               v-model="user.view_users">
-            View Users
+            {{ $t('permissions.view_users') }}
           </label>
         </div>
         <div class="field">
@@ -81,7 +83,7 @@ const template = `
               type="checkbox"
               :disabled="isViewContext"
               v-model="user.update_users">
-            Update Users
+            {{ $t('permissions.update_users') }}
           </label>
         </div>
         <div class="field">
@@ -90,7 +92,7 @@ const template = `
               type="checkbox"
               :disabled="isViewContext"
               v-model="user.edit_qualifications">
-            Edit Qualifications
+            {{ $t('permissions.edit_qualifications') }}
           </label>
         </div>
         <div class="field">
@@ -99,7 +101,7 @@ const template = `
               type="checkbox"
               :disabled="isViewContext"
               v-model="user.create_items">
-            Create Items
+            {{ $t('permissions.create_items') }}
           </label>
         </div>
         <div class="field">
@@ -108,12 +110,12 @@ const template = `
               type="checkbox"
               :disabled="isViewContext"
               v-model="user.manage_checkouts">
-            Manage Checkouts
+            {{ $t('permissions.manage_checkouts') }}
           </label>
         </div>
       </fieldset>
       <div class="field">
-        <label class="label">Qualifications</label>
+        <label class="label">{{ $t('fields.qualifications') }}</label>
         <div class="control">
           <tag-select-box
             :items.sync="user.qualifications"
@@ -124,18 +126,18 @@ const template = `
       </div>
       <div class="field" v-if="context == 'create'">
         <div class="control">
-          <button class="button is-primary" type="submit">Create</button>
+          <button class="button is-primary" type="submit">{{ $t('actions.create') }}</button>
         </div>
       </div>
       <div class="field is-grouped" v-else-if="context == 'edit'">
         <div class="control">
-          <button class="button is-primary" type="submit">Save</button>
+          <button class="button is-primary" type="submit">{{ $t('actions.save') }}</button>
         </div>
         <div class="control">
           <button
             class="button" type="button"
             @click="$emit('cancel-user-change')">
-            Cancel
+            {{ $t('actions.cancel') }}
           </button>
         </div>
       </div>
@@ -145,14 +147,14 @@ const template = `
             :to="editUserUrl"
             v-slot="{ href, navigate }">
             <a class="button is-primary" :href="href" @click="navigate">
-              Edit
+             {{ $t('actions.edit') }}
             </a>
           </router-link>
         </div>
         <div class="control">
           <button type="button" class="button is-danger"
             @click="$emit('delete-user', current)">
-            Delete
+            {{ $t('actions.delete') }}
           </button>
         </div>
       </div>

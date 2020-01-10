@@ -7,11 +7,11 @@ const template = `
       </div>
       <form @submit.prevent="$emit('commit-qualification-change', qualification)">
         <div class="field">
-          <label class="label" for="qualificationform-name">Name</label>
+          <label class="label" for="qualificationform-name">{{ $t('fields.qualification') }}</label>
           <div class="control">
             <input
               id="qualificationform-name"
-              type="text" placeholder="Name"
+              type="text"
               :readonly="isViewContext"
               :class="{ 'input': true, 'is-static': isViewContext }"
               v-model="qualification.name">
@@ -20,14 +20,14 @@ const template = `
         <div class="field" v-if="context === 'create'">
           <div class="control">
             <button class="button is-primary" type="submit">
-              Create
+              {{ $t('actions.create') }}
             </button>
           </div>
         </div>
         <div class="field is-grouped" v-else-if="context === 'edit'">
           <div class="control">
             <button class="button is-primary" type="submit">
-              Save
+              {{ $t('actions.save') }}
             </button>
           </div>
           <div class="control">
@@ -35,7 +35,7 @@ const template = `
               type="button"
               class="button"
               @click="$emit('cancel-qualification-change')">
-              Cancel
+              {{ $t('actions.cancel') }}
             </button>
           </div>
         </div>
@@ -45,14 +45,14 @@ const template = `
              :to="'/qualifications/' + current.id + '/edit'"
              v-slot="{ href, navigate }">
              <a :href="href" class="button is-primary" @click="navigate">
-               Edit
+               {{ $t('actions.edit') }}
              </a>
            </router-link>
           </div>
           <div class="control">
             <button type="button" class="button is-danger"
               @click="$emit('delete-qualification', current)">
-              Delete
+              {{ $t('actions.delete') }}
             </button>
           </div>
         </div>

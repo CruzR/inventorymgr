@@ -4,7 +4,7 @@ import { login } from '/static/api.js'
 const template = `
     <div class="columns is-centered section">
       <div class="column is-narrow">
-        <h1 class="title">Login</h1>
+        <h1 class="title">{{ $t('actions.login') }}</h1>
         <div v-if="errorMessage" class="message is-danger">
           <div class="message-body">
             {{ errorMessage }}
@@ -12,21 +12,16 @@ const template = `
         </div>
         <form class="box" @submit.prevent="sendLoginRequest">
           <div class="field">
-            <label class="label" for="login-username">Username</label>
+            <label class="label" for="login-username">{{ $t('fields.username') }}</label>
             <div class="control">
-              <input
-                id="login-username"
-                class="input" type="text" placeholder="Username"
-                v-model="username">
+              <input id="login-username" class="input" type="text" v-model="username">
             </div>
           </div>
           <div class="field">
-            <label class="label" for="login-password">Password</label>
+            <label class="label" for="login-password">{{ $t('fields.password') }}</label>
             <div class="control">
               <input
-                id="login-password"
-                class="input" type="password" placeholder="Password"
-                v-model="password">
+                id="login-password" class="input" type="password" v-model="password">
             </div>
           </div>
           <div class="field">
@@ -34,7 +29,7 @@ const template = `
               <button
                   type="submit"
                   class="button is-primary">
-                Login
+                {{ $t('actions.login') }}
               </button>
             </div>
           </div>

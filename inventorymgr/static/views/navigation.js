@@ -33,20 +33,20 @@ const template = `
       </div>
       <div :class="{ 'navbar-menu': true, 'is-active': showMenu }">
         <div class="navbar-start">
-          <navbar-link href="/users">Users</navbar-link>
-          <navbar-link href="/qualifications">Qualifications</navbar-link>
-          <navbar-link href="/tokens">Invites</navbar-link>
-          <navbar-link href="/items">Inventory</navbar-link>
-          <navbar-link href="/checkout">Checkout</navbar-link>
-          <navbar-link href="/checkin">Checkin</navbar-link>
-          <navbar-link href="/borrowstates">Borrowed Items</navbar-link>
+          <navbar-link href="/users">{{ $t('page.users') }}</navbar-link>
+          <navbar-link href="/qualifications">{{ $t('page.qualifications') }}</navbar-link>
+          <navbar-link href="/tokens">{{ $t('page.invites') }}</navbar-link>
+          <navbar-link href="/items">{{ $t('page.inventory') }}</navbar-link>
+          <navbar-link href="/checkout">{{ $t('page.checkout') }}</navbar-link>
+          <navbar-link href="/checkin">{{ $t('page.checkin') }}</navbar-link>
+          <navbar-link href="/borrowstates">{{ $t('page.borrowed_items') }}</navbar-link>
         </div>
         <div class="navbar-end">
           <navbar-link
             v-if="sessionUser"
             href="/users/me">{{ sessionUser.username }}</navbar-link>
           <a class="navbar-item" @click="sendLogoutRequest">
-            Logout
+            {{ $t('actions.logout') }}
           </a>
         </div>
       </div>

@@ -11,7 +11,9 @@ const template = `
           </div>
         </div>
         <div class="control">
-          <button type="button" class="button" @click="addSelected">Add</button>
+          <button
+            type="button" class="button"
+            @click="addSelected">{{ $t('actions.add') }}</button>
         </div>
       </div>
       <div class="tags">
