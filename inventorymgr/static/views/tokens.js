@@ -53,7 +53,7 @@ function deleteToken(token) {
             this.$store.commit('deleteToken', token);
         } else {
             console.error(response.error);
-            this.error = response.error.message;
+            this.error = this.$t(`errors.${response.error.reason}`);
         }
     });
 }

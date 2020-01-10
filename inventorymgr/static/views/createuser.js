@@ -10,12 +10,12 @@ const template = `
 
 function sendCreateUserRequest(user, repeatedPassword) {
     if (user.password !== repeatedPassword) {
-        this.errorMessage = 'Passwords do not match';
+        this.errorMessage = this.$t('errors.password_mismatch');
         return;
     }
 
     if (!user.password) {
-        this.errorMessage = 'Password is empty';
+        this.errorMessage = this.$t('errors.password_missing');
         return;
     }
 
@@ -25,7 +25,7 @@ function sendCreateUserRequest(user, repeatedPassword) {
             this.$router.push('/users');
         } else {
             console.error(response.error);
-            this.errorMessage = response.error.message;
+            this.errorMessage = this.$t(`errors.${response.error.reason}`);
         }
     })
 }

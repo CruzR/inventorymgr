@@ -75,7 +75,7 @@ function sendRegistrationRequest() {
             this.$router.push('/login');
         } else {
             console.error(response.error);
-            this.error = response.error.message;
+            this.error = this.$t(`errors.${response.error.reason}`);
         }
     });
 }

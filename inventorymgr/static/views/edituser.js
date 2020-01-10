@@ -15,7 +15,7 @@ const template = `
 
 function sendUpdateUserRequest(user, repeatedPassword) {
     if ((user.password || repeatedPassword) && user.password !== repeatedPassword) {
-        this.errorMessage = 'Passwords do not match';
+        this.errorMessage = this.$t('errors.password_mismatch');
         return;
     }
 
@@ -32,7 +32,7 @@ function sendUpdateUserRequest(user, repeatedPassword) {
             this.$router.push('/users');
         } else {
             console.error(response.error);
-            this.errorMessage = response.error.message;
+            this.errorMessage = this.$t(`errors.${response.error.reason}`);
         }
     })
 }

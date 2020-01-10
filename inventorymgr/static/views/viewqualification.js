@@ -23,7 +23,7 @@ function sendDeleteQualificationRequest(qualification) {
             this.$router.push('/qualifications');
         } else {
             console.error(response.error);
-            this.errorMessage = response.error.message;
+            this.errorMessage = this.$t(`errors.${response.error.reason}`);
         }
     })
 }

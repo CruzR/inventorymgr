@@ -31,7 +31,7 @@ function sendDeleteUserRequest(user) {
             }
         } else {
             console.error(response.error);
-            this.errorMessage = response.error.message;
+            this.errorMessage = this.$t(`errors.${response.error.reason}`);
         }
     })
 }
