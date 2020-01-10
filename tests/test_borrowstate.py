@@ -27,7 +27,7 @@ def test_fetch_borrowstates_success(client, auth):
     assert response.is_json
     assert response.json['borrowstates'] == [{
         'id': 1,
-        'borrowing_user': {'id': 1, 'username': 'test'},
+        'borrowing_user': {'id': 1, 'username': 'test', 'barcode': '0000009000001'},
         'borrowed_item': {'id': 1, 'name': 'existing_item', 'barcode': '0000000000001'},
         'received_at': '2020-01-02T12:34:56',
         'returned_at': None
@@ -76,7 +76,7 @@ def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
     assert response.is_json
     assert response.json['borrowstates'] == [{
         'id': 2,
-        'borrowing_user': {'id': 1, 'username': 'test'},
+        'borrowing_user': {'id': 1, 'username': 'test', 'barcode': '0000009000001'},
         'borrowed_item': {'id': 1, 'name': 'existing_item', 'barcode': '0000000000001'},
         'received_at': '2020-01-04T13:37:00',
         'returned_at': None,
@@ -114,7 +114,7 @@ def test_checkin_successful(client, auth, checkin_request, app, monkeypatch):
     assert response.is_json
     assert response.json['borrowstates'] == [{
         'id': 1,
-        'borrowing_user': {'id': 1, 'username': 'test'},
+        'borrowing_user': {'id': 1, 'username': 'test', 'barcode': '0000009000001'},
         'borrowed_item': {'id': 1, 'name': 'existing_item', 'barcode': '0000000000001'},
         'received_at': '2020-01-02T12:34:56',
         'returned_at': '2020-01-06T13:37:42',

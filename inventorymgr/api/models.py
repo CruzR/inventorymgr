@@ -12,6 +12,10 @@ class QualificationSchema(Schema):
     name = fields.Str(required=True, validate=bool)
 
 
+_T = TypeVar('_T')
+_post_dump = cast(Callable[[_T], _T], post_dump) # pylint: disable=invalid-name
+_pre_load = cast(Callable[[_T], _T], pre_load) # pylint: disable=invalid-name
+
 class UserSchema(Schema):
     """Marshmallow schema to validate user JSON objects."""
     id = fields.Integer(required=True)
@@ -25,6 +29,21 @@ class UserSchema(Schema):
     manage_checkouts = fields.Bool(required=True)
     qualifications = fields.Nested(QualificationSchema, required=True, many=True)
 
+    @_post_dump
+    def add_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
+        """Generate GTIN13 string from user id."""
+        # pylint: disable=no-self-use,unused-argument
+        data['barcode'] = '{:013d}'.format(9_000_000 + data['id'])
+        return data
+
+    @_pre_load
+    def remove_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
+        """Remove GTIN13 string before deserializing."""
+        # pylint: disable=no-self-use,unused-argument
+        if 'barcode' in data:
+            del data['barcode']
+        return data
+
 
 class RegistrationTokenSchema(Schema):
     """Marshmallow schema to validate registration tokens."""
@@ -32,10 +51,6 @@ class RegistrationTokenSchema(Schema):
     token = fields.Str(required=True, validate=bool)
     expires = fields.DateTime(required=True)
 
-
-_T = TypeVar('_T')
-_post_dump = cast(Callable[[_T], _T], post_dump) # pylint: disable=invalid-name
-_pre_load = cast(Callable[[_T], _T], pre_load) # pylint: disable=invalid-name
 
 class BorrowableItemSchema(Schema):
     """Marshmallow schema to validate borrowable items."""
