@@ -38,7 +38,7 @@ def create_qualification() -> Dict[str, Any]:
     qualification = qualification_schema.load(request.json, partial=('id',))
 
     if 'id' in qualification:
-        raise APIError("Id specified", reason='id_specified', status_code=400)
+        raise APIError(reason='id_specified', status_code=400)
 
     qualification_obj = Qualification(**qualification)
 
@@ -47,7 +47,7 @@ def create_qualification() -> Dict[str, Any]:
         db.session.commit()
     except IntegrityError as exc:
         db.session.rollback()
-        raise APIError("Qualification exists", reason='object_exists', status_code=400) from exc
+        raise APIError(reason='object_exists', status_code=400) from exc
 
     return cast(Dict[str, Any], qualification_schema.dump(qualification_obj))
 
@@ -60,10 +60,10 @@ def update_qualification(qual_id: int) -> Dict[str, Any]:
     qualification_schema = QualificationSchema()
     qualification = qualification_schema.load(request.json)
     if qualification['id'] != qual_id:
-        raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
+        raise APIError(reason='incorrect_id', status_code=400)
 
     if Qualification.query.filter_by(id=qual_id).count() < 1:
-        raise APIError("Qualification does not exist", reason='no_such_object', status_code=400)
+        raise APIError(reason='no_such_object', status_code=400)
 
     qualification_obj = Qualification.query.get(qual_id)
     qualification_obj.name = qualification['name']
@@ -80,10 +80,10 @@ def delete_qualification(qual_id: int) -> Dict[str, bool]:
     qualification_schema = QualificationSchema()
     qualification = qualification_schema.load(request.json)
     if qualification['id'] != qual_id:
-        raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
+        raise APIError(reason='incorrect_id', status_code=400)
 
     if Qualification.query.filter_by(id=qual_id).count() < 1:
-        raise APIError("Qualification does not exist", reason='no_such_object', status_code=400)
+        raise APIError(reason='no_such_object', status_code=400)
 
     db.session.delete(Qualification.query.get(qual_id))
     db.session.commit()

@@ -41,18 +41,10 @@ def new_user() -> Dict[str, Any]:
     password = user_dict['password']
 
     if user_dict['qualifications'] and not can_set_qualifications():
-        raise APIError(
-            "Requires edit_qualifications",
-            reason="insufficient_permissions",
-            status_code=403
-        )
+        raise insufficient_permissions()
 
     if not can_set_permissions(user_dict):
-        raise APIError(
-            "Cannot set permissions",
-            reason="permissions_not_subset",
-            status_code=403
-        )
+        raise APIError(reason="permissions_not_subset", status_code=403)
 
     qualifications = [
         Qualification.query.get(q['id']) for q in user_dict['qualifications']]
@@ -70,7 +62,7 @@ def new_user() -> Dict[str, Any]:
         return cast(Dict[str, Any], user_schema.dump(user))
 
     except IntegrityError as exc:
-        raise APIError('Username already taken', reason='user_exists', status_code=400) from exc
+        raise APIError(reason='user_exists', status_code=400) from exc
 
 
 @bp.route('/<int:user_id>', methods=('PUT',))
@@ -82,11 +74,11 @@ def update_user(user_id: int) -> Dict[str, Any]:
     user_dict = user_schema.load(request.json, partial=('password',))
 
     if user_dict['id'] != user_id:
-        raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
+        raise APIError(reason='incorrect_id', status_code=400)
 
     user = User.query.get(user_id)
     if user is None:
-        raise APIError('No such user', reason='no_such_user', status_code=400)
+        raise APIError(reason='no_such_user', status_code=400)
 
     update_user_qualifications(user, user_dict)
     update_user_permissions(user, user_dict)
@@ -105,11 +97,7 @@ def update_user_qualifications(user: User, user_dict: Dict[str, Any]) -> None:
 
     if current_qualifications != new_qualifications:
         if not can_set_qualifications():
-            raise APIError(
-                "Requires edit_qualifications",
-                reason="insufficient_permissions",
-                status_code=403
-            )
+            raise insufficient_permissions()
         qualifications = [Qualification.query.get(q_id) for q_id in new_qualifications]
         user.qualifications = qualifications
 
@@ -118,11 +106,7 @@ def update_user_permissions(user: User, user_dict: Dict[str, Any]) -> None:
     """Update user permissions."""
     if wants_to_update_permissions(user, user_dict):
         if not can_set_permissions(user_dict):
-            raise APIError(
-                "Cannot set permissions",
-                reason="permissions_not_subset",
-                status_code=403
-            )
+            raise APIError(reason="permissions_not_subset", status_code=403)
         for perm in PERMISSIONS:
             setattr(user, perm, user_dict[perm])
 
@@ -159,7 +143,7 @@ def get_self() -> Any:
     self_id = session['user_id']
     self_user = User.query.get(self_id)
     if self_user is None:
-        raise APIError('No such user', reason='no_such_user', status_code=400)
+        raise APIError(reason='no_such_user', status_code=400)
     return UserSchema().dump(self_user)
 
 
@@ -171,11 +155,11 @@ def update_self() -> Any:
     user_dict = user_schema.load(request.json, partial=('password',))
 
     if user_dict['id'] != session['user_id']:
-        raise APIError("Incorrect id", reason='incorrect_id', status_code=400)
+        raise APIError(reason='incorrect_id', status_code=400)
 
     user = User.query.get(user_dict['id'])
     if user is None:
-        raise APIError('No such user', reason='no_such_user', status_code=400)
+        raise APIError(reason='no_such_user', status_code=400)
 
     if user.edit_qualifications:
         update_user_qualifications(user, user_dict)
@@ -197,10 +181,7 @@ def update_self() -> Any:
 
 def insufficient_permissions() -> APIError:
     """Return an API error for insufficient permissions."""
-    return APIError(
-        'Insufficient permissions',
-        reason='insufficient_permissions',
-        status_code=403)
+    return APIError(reason='insufficient_permissions', status_code=403)
 
 
 def wants_to_update_qualifications(user: User, user_dict: Dict[str, Any]) -> bool:

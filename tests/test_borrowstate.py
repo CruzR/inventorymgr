@@ -10,7 +10,6 @@ def test_fetch_borrowstates_unauthenticated(client):
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'authentication_required'
-    assert 'message' in response.json
 
 
 def test_fetch_borrowstates_insufficient_permissions(client, auth):
@@ -19,7 +18,6 @@ def test_fetch_borrowstates_insufficient_permissions(client, auth):
     assert response.status_code == 403
     assert response.is_json
     assert response.json['reason'] == 'insufficient_permissions'
-    assert 'message' in response.json
 
 
 def test_fetch_borrowstates_success(client, auth):

@@ -45,9 +45,7 @@ def checkout() -> Tuple[Dict[str, Any], int]:
         if not has_required_qualifications(borrowing_user, item)]
 
     if unqualified_for:
-        return {
-            'message': 'User is missing qualifications.',
-            'reason': 'missing_qualifications'}, 403
+        return {'reason': 'missing_qualifications'}, 403
 
     borrowstates = [
         BorrowState(borrowing_user=borrowing_user, borrowed_item=item, received_at=now)

@@ -42,11 +42,7 @@ def requires_permissions(*permissions: str) -> Callable[[Callable[..., Any]], Ca
         def inner(*args: Any, **kwargs: Any) -> Any:
             user = get_session_user()
             if not all(getattr(user, p, False) for p in permissions):
-                raise APIError(
-                    'Insufficient permissions',
-                    reason='insufficient_permissions',
-                    status_code=403
-                )
+                raise APIError(reason='insufficient_permissions', status_code=403)
             return to_be_wrapped(*args, **kwargs)
         return inner
     return outer

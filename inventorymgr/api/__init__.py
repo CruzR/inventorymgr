@@ -21,7 +21,4 @@ _ALL_METHODS = ('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE')
 def unknown_resource(path: str) -> Tuple[Dict[str, str], int]:
     """Return 404 if no route is registered for a resource."""
     resource = f'/api/{path}'
-    return {
-        'message': f'Unknown API resource {resource}',
-        'reason': 'unknown_resource',
-        'resource': resource}, 404
+    return {'reason': 'unknown_resource', 'resource': resource}, 404

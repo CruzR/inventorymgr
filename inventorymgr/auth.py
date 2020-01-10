@@ -40,11 +40,7 @@ def login() -> Any:
         response.set_cookie('is_authenticated', '1')
         return response
 
-    raise APIError(
-        'Invalid username or password',
-        reason='invalid_user_or_password',
-        status_code=403
-    )
+    raise APIError(reason='invalid_user_or_password', status_code=403)
 
 
 @bp.route('/logout', methods=('POST',))
@@ -84,9 +80,7 @@ def authentication_required(to_be_wrapped: Callable[..., Any]) -> Callable[..., 
         if user_id is None or User.query.get(user_id) is None:
             if 'user_id' in session:
                 del session['user_id']
-            response = make_response(
-                {'message': 'Authentication required',
-                 'reason': 'authentication_required'}, 403)
+            response = make_response({'reason': 'authentication_required'}, 403)
             response.set_cookie('is_authenticated', max_age=0, expires=0)
             return response
         return to_be_wrapped(*args, **kwargs)

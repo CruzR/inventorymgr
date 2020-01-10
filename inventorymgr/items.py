@@ -32,10 +32,7 @@ def create_item() -> Tuple[Dict[str, Any], int]:
         db.session.commit()
         return BorrowableItemSchema().dump(item), 200
     except IntegrityError as exc:
-        raise APIError(
-            'Item already exists',
-            reason='item_exists',
-            status_code=400) from exc
+        raise APIError(reason='item_exists', status_code=400) from exc
 
 
 @bp.route('', methods=('GET',))
@@ -55,11 +52,11 @@ def update_item(item_id: int) -> Dict[str, Any]:
     received_item = schema.load(request.json)
 
     if received_item['id'] != item_id:
-        raise APIError('Item ids do not match', reason='id_mismatch', status_code=400)
+        raise APIError(reason='id_mismatch', status_code=400)
 
     item = BorrowableItem.query.get(item_id)
     if item is None:
-        raise APIError('Item does not exist', reason='nonexistent_item', status_code=400)
+        raise APIError(reason='nonexistent_item', status_code=400)
 
     item.name = received_item['name']
     qual_ids = [q['id'] for q in received_item['required_qualifications']]
