@@ -21,6 +21,7 @@ export const messages = {
             view: 'View',
         },
         errors: {
+            already_borrowed: 'Item is already borrowed.',
             authentication_required: 'You need to be logged in to do that.',
             expired_token: 'Registration link has expired.',
             id_mismatch: 'IDs do not match.',
@@ -104,6 +105,7 @@ export const messages = {
             view: 'Anzeigen',
         },
         errors: {
+            already_borrowed: 'Objekt ist bereits entliehen.',
             authentication_required: 'Du musst angemeldet sein, um das zu tun.',
             expired_token: 'Registrierungs-Link ist abgelaufen.',
             id_mismatch: 'IDs stimmen nicht überein.',

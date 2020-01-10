@@ -47,6 +47,9 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     if unqualified_for:
         return {'reason': 'missing_qualifications'}, 403
 
+    if any_item_already_borrowed(checkout_request['borrowed_item_ids']):
+        return {'reason': 'already_borrowed'}, 400
+
     borrowstates = [
         BorrowState(borrowing_user=borrowing_user, borrowed_item=item, received_at=now)
         for item in borrowed_items]
@@ -78,9 +81,14 @@ def open_borrowstates_for_item(item_id: int) -> Iterable[BorrowState]:
     """Return all borrow states for an item without a return date."""
     return cast(
         Iterable[BorrowState],
-        BorrowState.query.filter_by(borrowed_item_id=item_id, returned_at=None))
+        BorrowState.query.filter_by(borrowed_item_id=item_id, returned_at=None).all())
 
 
 def has_required_qualifications(user: User, item: BorrowableItem) -> bool:
     """Check if user has all required qualifications to borrow item."""
     return all(q in user.qualifications for q in item.required_qualifications)
+
+
+def any_item_already_borrowed(item_ids: Iterable[int]) -> bool:
+    """Check if any item in item_ids already has an open borrowstate."""
+    return any(bool(open_borrowstates_for_item(item_id)) for item_id in item_ids)

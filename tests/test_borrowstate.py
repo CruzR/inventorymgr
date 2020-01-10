@@ -38,7 +38,7 @@ def test_fetch_borrowstates_success(client, auth):
 def checkout_request():
     return {
         'borrowing_user_id': 2,
-        'borrowed_item_ids': [1],
+        'borrowed_item_ids': [2],
     }
 
 
@@ -65,6 +65,15 @@ def test_checkout_missing_qualifications(client, auth, checkout_request):
     assert response.json['reason'] == 'missing_qualifications'
 
 
+def test_checkout_twice_fails(client, auth, checkout_request, app):
+    auth.login('test')
+    checkout_request.update({'borrowing_user_id': 1, 'borrowed_item_ids': [1]})
+    response = client.post('/api/v1/borrowstates/checkout', json=checkout_request)
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'already_borrowed'
+
+
 def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
     def fake_utcnow():
         return datetime.datetime(2020, 1, 4, 13, 37)
@@ -77,7 +86,7 @@ def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
     assert response.json['borrowstates'] == [{
         'id': 2,
         'borrowing_user': {'id': 1, 'username': 'test', 'barcode': '0000009000001'},
-        'borrowed_item': {'id': 1, 'name': 'existing_item', 'barcode': '0000000000001'},
+        'borrowed_item': {'id': 2, 'name': 'another_item', 'barcode': '0000000000002'},
         'received_at': '2020-01-04T13:37:00',
         'returned_at': None,
     }]
