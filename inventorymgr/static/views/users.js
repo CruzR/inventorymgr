@@ -6,6 +6,7 @@ const template = `
       <thead>
         <tr>
           <th>{{ $t('fields.username') }}</th>
+          <th>{{ $t('fields.barcode') }}</th>
           <th><abbr :title="$t('permissions.create_users')">👤✨</abbr></th>
           <th><abbr :title="$t('permissions.view_users')">👤🔍</abbr></th>
           <th><abbr :title="$t('permissions.update_users')">👤✏️</abbr></th>
@@ -19,6 +20,7 @@ const template = `
       <tbody>
         <tr v-for="user in users">
           <td :data-label="$t('fields.username')">{{ user.username }}</td>
+          <td :data-label="$t('fields.barcode')">{{ user.barcode }}</td>
           <td :data-label="$t('permissions.create_users')">
             <input type="checkbox" :checked="user.create_users" disabled>
           </td>

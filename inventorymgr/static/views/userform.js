@@ -20,6 +20,16 @@ const template = `
             v-model="user.username">
         </div>
       </div>
+      <div v-if="!isCreateContext" class="field">
+        <label class="label" for="userform-barcode">{{ $t('fields.barcode') }}</label>
+        <div class="control">
+          <input
+            id="userform-barcode"
+            type="text" readonly
+            class="input is-static"
+            :value="user.barcode">
+        </div>
+      </div>
       <template v-if="isEditContext && !changePassword">
         <div class="field">
           <label class="label">{{ $t('fields.password') }}</label>
