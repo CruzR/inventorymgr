@@ -44,13 +44,13 @@ const template = `
         <div class="column">
           <form @submit.prevent="selectUser">
             <div class="field">
-              <label class="label" for="checkout-user">{{ $t('fields.username') }}</label>
+              <label class="label" for="checkout-user">{{ $t('fields.user_barcode') }}</label>
               <div class="field has-addons">
                 <div class="control is-expanded">
                   <input
                     id="checkout-user"
                     class="input"
-                    v-model="username">
+                    v-model="user_barcode">
                 </div>
                 <div class="control">
                   <button class="button">{{ $t('actions.add') }}</button>
@@ -97,11 +97,11 @@ function selectItem() {
 
 
 function selectUser(e) {
-    const username = this.username.trim();
-    const user = this.users.find(u => u.username === username);
+    const barcode = this.user_barcode.trim();
+    const user = this.users.find(u => u.barcode === barcode);
     if (user) {
         this.selected_user = user;
-        this.username = '';
+        this.user_barcode = '';
     }
 }
 
@@ -143,7 +143,7 @@ export default {
         return {
             errorMessage: '',
             item_barcode: '',
-            username: '',
+            user_barcode: '',
             selected_items: [],
             selected_user: null,
         };

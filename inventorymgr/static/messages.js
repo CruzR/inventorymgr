@@ -61,6 +61,7 @@ export const messages = {
             returned_at: 'Returned at',
             token: 'Token',
             user: 'User',
+            user_barcode: 'User Barcode',
             username: 'Username',
         },
         page: {
@@ -143,6 +144,7 @@ export const messages = {
             returned_at: 'Zurückgegeben am',
             token: 'Token',
             user: 'Benutzer',
+            user_barcode: 'Benutzer-Barcode',
             username: 'Benutzername',
         },
         page: {
