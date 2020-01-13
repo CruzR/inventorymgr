@@ -80,12 +80,15 @@ def update_user(user_id: int) -> Dict[str, Any]:
     if user is None:
         raise APIError(reason='no_such_user', status_code=400)
 
-    update_user_qualifications(user, user_dict)
-    update_user_permissions(user, user_dict)
-    update_user_username(user, user_dict)
-    update_user_password(user, user_dict)
-
-    db.session.commit()
+    try:
+        update_user_qualifications(user, user_dict)
+        update_user_permissions(user, user_dict)
+        update_user_username(user, user_dict)
+        update_user_password(user, user_dict)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        raise APIError(reason='user_exists', status_code=400)
 
     return cast(Dict[str, Any], user_schema.dump(user))
 

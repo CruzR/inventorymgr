@@ -298,6 +298,15 @@ def test_updating_nonexistant_user(client, app, test_user, auth):
         assert count_users_with_name(test_user['username']) == 0
 
 
+def test_updating_user_to_existing_name(client, auth, test_user):
+    auth.login('test')
+    test_user['id'] = 2
+    response = client.put('/api/v1/users/2', json=test_user)
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'user_exists'
+
+
 def test_updating_unqualified_users_without_edit_qualifications(client, app, test_user, auth):
     with app.app_context():
         user = User.query.get(1)
