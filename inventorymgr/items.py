@@ -65,9 +65,13 @@ def update_item(item_id: int) -> Dict[str, Any]:
     if any(q is None for q in qualifications):
         raise APIError(reason='unknown_qualification', status_code=400)
 
-    item.name = received_item['name']
-    item.required_qualifications = qualifications
-    db.session.commit()
+    try:
+        item.name = received_item['name']
+        item.required_qualifications = qualifications
+        db.session.commit()
+    except IntegrityError as exc:
+        db.session.rollback()
+        raise APIError(reason='item_exists', status_code=400) from exc
 
     return cast(Dict[str, Any], schema.dump(item))
 

@@ -134,6 +134,17 @@ def test_update_item_unknown_qualification(client, auth, app):
     assert response.json['reason'] == 'unknown_qualification'
 
 
+def test_update_item_to_existing_name(client, auth):
+    auth.login('test')
+    response = client.put('/api/v1/items/2', json={
+        'id': 2,
+        'name': 'existing_item',
+        'required_qualifications': []})
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'item_exists'
+
+
 def test_update_item_success(client, auth, app):
     auth.login('test')
     response = client.put('/api/v1/items/1',
