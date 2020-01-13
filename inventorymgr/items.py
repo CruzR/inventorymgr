@@ -26,6 +26,8 @@ def create_item() -> Tuple[Dict[str, Any], int]:
     try:
         qual_ids = [q['id'] for q in received_item['required_qualifications']]
         qualifications = [Qualification.query.get(q_id) for q_id in qual_ids]
+        if any(q is None for q in qualifications):
+            raise APIError(reason='unknown_qualification', status_code=400)
         item = BorrowableItem(
             name=received_item['name'], required_qualifications=qualifications)
         db.session.add(item)

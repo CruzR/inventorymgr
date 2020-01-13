@@ -33,6 +33,17 @@ def test_create_existing_item(client, auth):
     assert response.json['reason'] == 'item_exists'
 
 
+def test_create_item_unknown_qualification(client, auth):
+    auth.login('test')
+    response = client.post('/api/v1/items', json={
+        'name': 'new_item',
+        'required_qualifications': [{'id': 2, 'name': 'other_qualification'}],
+    })
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'unknown_qualification'
+
+
 def test_create_item_success(client, auth, app):
     auth.login('test')
     response = client.post('/api/v1/items', json={
