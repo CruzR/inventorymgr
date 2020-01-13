@@ -60,9 +60,13 @@ def update_item(item_id: int) -> Dict[str, Any]:
     if item is None:
         raise APIError(reason='nonexistent_item', status_code=400)
 
-    item.name = received_item['name']
     qual_ids = [q['id'] for q in received_item['required_qualifications']]
-    item.required_qualifications = [Qualification.query.get(q_id) for q_id in qual_ids]
+    qualifications = [Qualification.query.get(q_id) for q_id in qual_ids]
+    if any(q is None for q in qualifications):
+        raise APIError(reason='unknown_qualification', status_code=400)
+
+    item.name = received_item['name']
+    item.required_qualifications = qualifications
     db.session.commit()
 
     return cast(Dict[str, Any], schema.dump(item))
