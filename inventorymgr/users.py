@@ -102,6 +102,8 @@ def update_user_qualifications(user: User, user_dict: Dict[str, Any]) -> None:
         if not can_set_qualifications():
             raise insufficient_permissions()
         qualifications = [Qualification.query.get(q_id) for q_id in new_qualifications]
+        if any(q is None for q in qualifications):
+            raise APIError(reason='unknown_qualification', status_code=400)
         user.qualifications = qualifications
 
 
