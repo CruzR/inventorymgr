@@ -69,4 +69,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     from . import borrowstates
     app.register_blueprint(borrowstates.bp)
 
+    from . import error_reports
+    app.register_blueprint(error_reports.bp)
+
     return app

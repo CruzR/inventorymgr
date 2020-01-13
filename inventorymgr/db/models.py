@@ -81,3 +81,20 @@ class BorrowState(db.Model): # type: ignore
     borrowed_item = db.relationship('BorrowableItem')
     received_at = db.Column(db.DateTime, nullable=False)
     returned_at = db.Column(db.DateTime)
+
+
+class JavascriptError(db.Model): # type: ignore
+    """ORM model for storing JS errors sent from window.onerror."""
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    user_agent_raw = db.Column(db.String, nullable=False)
+    platform = db.Column(db.String)
+    browser = db.Column(db.String)
+    browser_version = db.Column(db.String)
+    browser_language = db.Column(db.String)
+    location = db.Column(db.String, nullable=False)
+    message = db.Column(db.String)
+    source = db.Column(db.String)
+    lineno = db.Column(db.Integer)
+    colno = db.Column(db.Integer)
+    stack = db.Column(db.String)

@@ -26,6 +26,11 @@ import BorrowStatesList from '/static/views/borrowstates.js'
 import CheckoutView from '/static/views/checkout.js'
 import CheckinView from '/static/views/checkin.js'
 
+
+Vue.config.errorHandler = (err, vm, info) => {
+    handleError(err.message, err.fileName, err.lineNumber, err.columnNumber, err);
+};
+
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueI18n);
