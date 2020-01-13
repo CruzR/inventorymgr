@@ -159,7 +159,7 @@ def test_updating_user(client, app, test_user, auth):
         assert is_password_correct(test_user['username'], test_user['password'])
 
 
-def test_updating_user(client, app, test_user, auth):
+def test_updating_user_except_password(client, app, test_user, auth):
     auth.login('test')
     test_user['username'] = 'test_1'
     del test_user['password']
