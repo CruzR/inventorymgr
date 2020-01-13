@@ -66,8 +66,12 @@ def update_qualification(qual_id: int) -> Dict[str, Any]:
         raise APIError(reason='no_such_object', status_code=400)
 
     qualification_obj = Qualification.query.get(qual_id)
-    qualification_obj.name = qualification['name']
-    db.session.commit()
+
+    try:
+        qualification_obj.name = qualification['name']
+        db.session.commit()
+    except IntegrityError:
+        raise APIError(reason='qualification_exists', status_code=400)
 
     return cast(Dict[str, Any], qualification)
 

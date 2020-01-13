@@ -1,3 +1,4 @@
+from inventorymgr.db import db
 from inventorymgr.db.models import Qualification
 
 
@@ -122,6 +123,18 @@ def test_update_qualification_with_nonexistant_object(client, app, auth):
     with app.app_context():
         assert Qualification.query.filter_by(name='test').count() == 0
         assert Qualification.query.filter_by(name="Driver's License").count() == 1
+
+
+def test_update_qualification_to_existing_name(client, app, auth):
+    with app.app_context():
+        db.session.add(Qualification(name='some_other_qualification'))
+        db.session.commit()
+    auth.login('test')
+    response = client.put('/api/v1/qualifications/2', json={
+        'id': 2, 'name': "Driver's License"})
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'qualification_exists'
 
 
 def test_update_qualification(client, app, auth):
