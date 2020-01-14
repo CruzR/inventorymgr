@@ -37,6 +37,9 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     now = _utcnow()
 
     borrowing_user = User.query.get(checkout_request['borrowing_user_id'])
+    if borrowing_user is None:
+        return {'reason': 'no_such_user'}, 400
+
     borrowed_items = [
         BorrowableItem.query.get(item_id)
         for item_id in checkout_request['borrowed_item_ids']]
