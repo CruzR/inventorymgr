@@ -74,6 +74,15 @@ def test_checkout_twice_fails(client, auth, checkout_request, app):
     assert response.json['reason'] == 'already_borrowed'
 
 
+def test_checkout_nonexistent_item(client, auth):
+    auth.login('test')
+    response = client.post('/api/v1/borrowstates/checkout', json={
+        'borrowing_user_id': 1, 'borrowed_item_ids': [3]})
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json['reason'] == 'nonexistent_item'
+
+
 def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
     def fake_utcnow():
         return datetime.datetime(2020, 1, 4, 13, 37)

@@ -40,6 +40,10 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     borrowed_items = [
         BorrowableItem.query.get(item_id)
         for item_id in checkout_request['borrowed_item_ids']]
+
+    if any(item is None for item in borrowed_items):
+        return {'reason': 'nonexistent_item'}, 400
+
     unqualified_for = [
         item for item in borrowed_items
         if not has_required_qualifications(borrowing_user, item)]
