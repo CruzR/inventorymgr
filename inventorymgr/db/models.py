@@ -38,8 +38,12 @@ class User(db.Model): # type: ignore
     manage_checkouts = db.Column(db.Boolean, nullable=False, default=False)
     qualifications = db.relationship(
         'Qualification',
-        secondary=_USER_QUALIFICATIONS_TABLE
-    )
+        secondary=_USER_QUALIFICATIONS_TABLE,
+        back_populates='users')
+    borrowstates = db.relationship(
+        'BorrowState',
+        back_populates='borrowing_user',
+        cascade='all, delete, delete-orphan')
 
 
 class RegistrationToken(db.Model): # type: ignore
@@ -57,6 +61,14 @@ class Qualification(db.Model): # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
+    users = db.relationship(
+        'User',
+        secondary=_USER_QUALIFICATIONS_TABLE,
+        back_populates='qualifications')
+    items = db.relationship(
+        'BorrowableItem',
+        secondary=_REQUIRED_QUALIFICATIONS_TABLE,
+        back_populates='required_qualifications')
 
 
 class BorrowableItem(db.Model): # type: ignore
@@ -67,18 +79,22 @@ class BorrowableItem(db.Model): # type: ignore
     name = db.Column(db.String, unique=True, nullable=False)
     required_qualifications = db.relationship(
         'Qualification',
-        secondary=_REQUIRED_QUALIFICATIONS_TABLE
-    )
+        secondary=_REQUIRED_QUALIFICATIONS_TABLE,
+        back_populates='items')
+    borrowstates = db.relationship(
+        'BorrowState',
+        back_populates='borrowed_item',
+        cascade='all, delete, delete-orphan')
 
 
 class BorrowState(db.Model): # type: ignore
     """ORM model for borrow state of items."""
     id = db.Column(db.Integer, primary_key=True)
     borrowing_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    borrowing_user = db.relationship('User')
+    borrowing_user = db.relationship('User', back_populates='borrowstates')
     borrowed_item_id = db.Column(
         db.Integer, db.ForeignKey('borrowable_item.id'), nullable=False)
-    borrowed_item = db.relationship('BorrowableItem')
+    borrowed_item = db.relationship('BorrowableItem', back_populates='borrowstates')
     received_at = db.Column(db.DateTime, nullable=False)
     returned_at = db.Column(db.DateTime)
 

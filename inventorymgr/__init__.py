@@ -10,6 +10,7 @@ import os
 from typing import Any, Dict, Optional
 
 from flask import Flask
+from sqlalchemy import event # type: ignore
 
 
 def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
@@ -59,6 +60,12 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     from .db import db, init_db_command
     db.init_app(app)
     app.cli.add_command(init_db_command)
+
+    if app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite:'):
+        def _sqlite_enforce_foreign_keys(dbapi_con: Any, _con_record: Any) -> None:
+            dbapi_con.execute('PRAGMA foreign_keys=ON;')
+        with app.app_context(): # type: ignore
+            event.listen(db.engine, 'connect', _sqlite_enforce_foreign_keys)
 
     from .app import bp
     app.register_blueprint(bp)
