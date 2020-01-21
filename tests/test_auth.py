@@ -2,20 +2,22 @@ from flask import session
 
 
 def test_login_invalid_user_and_password(client):
-    invalid_user = {'username': 'unknow_user', 'password': 'test'}
-    invalid_password_user = {'username': 'test', 'password': '123456'}
+    invalid_user = {"username": "unknow_user", "password": "test"}
+    invalid_password_user = {"username": "test", "password": "123456"}
 
     with client:
-        invalid_user_response = client.post('/api/v1/auth/login', json=invalid_user)
-        assert session.get('user_id') is None
+        invalid_user_response = client.post("/api/v1/auth/login", json=invalid_user)
+        assert session.get("user_id") is None
         cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
-        assert cookies.get('is_authenticated') is None
+        assert cookies.get("is_authenticated") is None
 
     with client:
-        invalid_pw_response = client.post('/api/v1/auth/login', json=invalid_password_user)
-        assert session.get('user_id') is None
+        invalid_pw_response = client.post(
+            "/api/v1/auth/login", json=invalid_password_user
+        )
+        assert session.get("user_id") is None
         cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
-        assert cookies.get('is_authenticated') is None
+        assert cookies.get("is_authenticated") is None
 
     assert invalid_user_response.status_code == 403
     assert invalid_pw_response.status_code == 403
@@ -25,36 +27,36 @@ def test_login_invalid_user_and_password(client):
 
 
 def test_login_valid_user_and_password(client):
-    user = {'username': 'test', 'password': 'test'}
+    user = {"username": "test", "password": "test"}
 
     with client:
-        response = client.post('/api/v1/auth/login', json=user)
-        assert session.get('user_id') == 1
+        response = client.post("/api/v1/auth/login", json=user)
+        assert session.get("user_id") == 1
 
     assert response.status_code == 200
     assert response.is_json
-    assert response.json['username'] == 'test'
+    assert response.json["username"] == "test"
     cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
-    assert cookies.get('is_authenticated') == '1'
+    assert cookies.get("is_authenticated") == "1"
 
 
 def test_logout_when_not_logged_in(client):
     with client:
-        response = client.post('/api/v1/auth/logout')
+        response = client.post("/api/v1/auth/logout")
         assert response.status_code == 200
-        assert session.get('user_id') is None
+        assert session.get("user_id") is None
 
     cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
-    assert cookies.get('is_authenticated') is None
+    assert cookies.get("is_authenticated") is None
 
 
 def test_logout_when_logged_in(client):
-    client.post('/api/v1/auth/login', json={'username': 'test', 'password': 'test'})
+    client.post("/api/v1/auth/login", json={"username": "test", "password": "test"})
 
     with client:
-        response = client.post('/api/v1/auth/logout')
+        response = client.post("/api/v1/auth/logout")
         assert response.status_code == 200
-        assert session.get('user_id') is None
+        assert session.get("user_id") is None
 
     cookies = {cookie.name: cookie.value for cookie in client.cookie_jar}
-    assert cookies.get('is_authenticated') is None
+    assert cookies.get("is_authenticated") is None

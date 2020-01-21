@@ -9,21 +9,21 @@ from . import db
 
 
 _USER_QUALIFICATIONS_TABLE = db.Table(
-    'user_qualifications',
+    "user_qualifications",
     db.Model.metadata,
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('qualification_id', db.Integer, db.ForeignKey('qualification.id'))
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
+    db.Column("qualification_id", db.Integer, db.ForeignKey("qualification.id")),
 )
 
 _REQUIRED_QUALIFICATIONS_TABLE = db.Table(
-    'required_qualifications',
+    "required_qualifications",
     db.Model.metadata,
-    db.Column('item_id', db.Integer, db.ForeignKey('borrowable_item.id')),
-    db.Column('qualification_id', db.Integer, db.ForeignKey('qualification.id'))
+    db.Column("item_id", db.Integer, db.ForeignKey("borrowable_item.id")),
+    db.Column("qualification_id", db.Integer, db.ForeignKey("qualification.id")),
 )
 
 
-class User(db.Model): # type: ignore
+class User(db.Model):  # type: ignore
 
     """ORM model for user objects."""
 
@@ -37,16 +37,16 @@ class User(db.Model): # type: ignore
     create_items = db.Column(db.Boolean, nullable=False, default=False)
     manage_checkouts = db.Column(db.Boolean, nullable=False, default=False)
     qualifications = db.relationship(
-        'Qualification',
-        secondary=_USER_QUALIFICATIONS_TABLE,
-        back_populates='users')
+        "Qualification", secondary=_USER_QUALIFICATIONS_TABLE, back_populates="users"
+    )
     borrowstates = db.relationship(
-        'BorrowState',
-        back_populates='borrowing_user',
-        cascade='all, delete, delete-orphan')
+        "BorrowState",
+        back_populates="borrowing_user",
+        cascade="all, delete, delete-orphan",
+    )
 
 
-class RegistrationToken(db.Model): # type: ignore
+class RegistrationToken(db.Model):  # type: ignore
 
     """ORM model for registration tokens."""
 
@@ -55,52 +55,57 @@ class RegistrationToken(db.Model): # type: ignore
     expires = db.Column(db.TIMESTAMP, nullable=False, default=datetime.datetime.now)
 
 
-class Qualification(db.Model): # type: ignore
+class Qualification(db.Model):  # type: ignore
 
     """ORM model for user qualifications (e.g. driver's license)."""
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
     users = db.relationship(
-        'User',
-        secondary=_USER_QUALIFICATIONS_TABLE,
-        back_populates='qualifications')
+        "User", secondary=_USER_QUALIFICATIONS_TABLE, back_populates="qualifications"
+    )
     items = db.relationship(
-        'BorrowableItem',
+        "BorrowableItem",
         secondary=_REQUIRED_QUALIFICATIONS_TABLE,
-        back_populates='required_qualifications')
+        back_populates="required_qualifications",
+    )
 
 
-class BorrowableItem(db.Model): # type: ignore
+class BorrowableItem(db.Model):  # type: ignore
 
     """ORM model for borrowable items (tools, vehicles, ...)."""
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
     required_qualifications = db.relationship(
-        'Qualification',
+        "Qualification",
         secondary=_REQUIRED_QUALIFICATIONS_TABLE,
-        back_populates='items')
+        back_populates="items",
+    )
     borrowstates = db.relationship(
-        'BorrowState',
-        back_populates='borrowed_item',
-        cascade='all, delete, delete-orphan')
+        "BorrowState",
+        back_populates="borrowed_item",
+        cascade="all, delete, delete-orphan",
+    )
 
 
-class BorrowState(db.Model): # type: ignore
+class BorrowState(db.Model):  # type: ignore
     """ORM model for borrow state of items."""
+
     id = db.Column(db.Integer, primary_key=True)
-    borrowing_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    borrowing_user = db.relationship('User', back_populates='borrowstates')
+    borrowing_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    borrowing_user = db.relationship("User", back_populates="borrowstates")
     borrowed_item_id = db.Column(
-        db.Integer, db.ForeignKey('borrowable_item.id'), nullable=False)
-    borrowed_item = db.relationship('BorrowableItem', back_populates='borrowstates')
+        db.Integer, db.ForeignKey("borrowable_item.id"), nullable=False
+    )
+    borrowed_item = db.relationship("BorrowableItem", back_populates="borrowstates")
     received_at = db.Column(db.DateTime, nullable=False)
     returned_at = db.Column(db.DateTime)
 
 
-class JavascriptError(db.Model): # type: ignore
+class JavascriptError(db.Model):  # type: ignore
     """ORM model for storing JS errors sent from window.onerror."""
+
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
     user_agent_raw = db.Column(db.String, nullable=False)

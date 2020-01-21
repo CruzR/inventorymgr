@@ -8,17 +8,18 @@ from .error import APIError, handle_api_error
 from .models import QualificationSchema, UserSchema
 
 
-__all__ = ['APIError', 'handle_api_error', 'QualificationSchema', 'UserSchema', 'bp']
+__all__ = ["APIError", "handle_api_error", "QualificationSchema", "UserSchema", "bp"]
 
 
-bp = Blueprint('api', __name__)
+bp = Blueprint("api", __name__)
 
 
-_ALL_METHODS = ('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE')
+_ALL_METHODS = ("GET", "HEAD", "POST", "PUT", "PATCH", "DELETE")
 
-@bp.route('/api/', methods=_ALL_METHODS, defaults={'path': ''})
-@bp.route('/api/<path:path>', methods=_ALL_METHODS)
+
+@bp.route("/api/", methods=_ALL_METHODS, defaults={"path": ""})
+@bp.route("/api/<path:path>", methods=_ALL_METHODS)
 def unknown_resource(path: str) -> Tuple[Dict[str, str], int]:
     """Return 404 if no route is registered for a resource."""
-    resource = f'/api/{path}'
-    return {'reason': 'unknown_resource', 'resource': resource}, 404
+    resource = f"/api/{path}"
+    return {"reason": "unknown_resource", "resource": resource}, 404

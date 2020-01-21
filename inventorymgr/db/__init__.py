@@ -19,15 +19,15 @@ teardown_db()
 
 import click
 from flask.cli import with_appcontext
-from flask_sqlalchemy import SQLAlchemy # type: ignore
+from flask_sqlalchemy import SQLAlchemy  # type: ignore
 
 
 db = SQLAlchemy()
 
 
-@click.command('init-db')
+@click.command("init-db")
 @with_appcontext
 def init_db_command() -> None:
     """CLI command to recreate the database from its schema."""
     db.create_all()
-    click.echo('Initialized database.')
+    click.echo("Initialized database.")

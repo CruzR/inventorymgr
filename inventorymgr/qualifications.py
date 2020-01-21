@@ -8,7 +8,7 @@ hold some kind of qualification or skill, e.g. a driver's license.
 from typing import Any, Dict, cast
 
 from flask import Blueprint, jsonify, request
-from sqlalchemy.exc import IntegrityError # type: ignore
+from sqlalchemy.exc import IntegrityError  # type: ignore
 
 from .accesscontrol import requires_permissions
 from .api import APIError, QualificationSchema
@@ -17,10 +17,10 @@ from .db import db
 from .db.models import Qualification
 
 
-bp = Blueprint('qualifications', __name__, url_prefix='/api/v1/qualifications')
+bp = Blueprint("qualifications", __name__, url_prefix="/api/v1/qualifications")
 
 
-@bp.route('', methods=('GET',))
+@bp.route("", methods=("GET",))
 @authentication_required
 def list_qualifications() -> Dict[str, Any]:
     """API endpoint that returns a list of all qualifications."""
@@ -29,16 +29,16 @@ def list_qualifications() -> Dict[str, Any]:
     return cast(Dict[str, Any], jsonify(qualifications_schema.dump(qualifications)))
 
 
-@bp.route('', methods=('POST',))
+@bp.route("", methods=("POST",))
 @authentication_required
-@requires_permissions('edit_qualifications')
+@requires_permissions("edit_qualifications")
 def create_qualification() -> Dict[str, Any]:
     """API endpoint that creates a new qualification."""
     qualification_schema = QualificationSchema()
-    qualification = qualification_schema.load(request.json, partial=('id',))
+    qualification = qualification_schema.load(request.json, partial=("id",))
 
-    if 'id' in qualification:
-        raise APIError(reason='id_specified', status_code=400)
+    if "id" in qualification:
+        raise APIError(reason="id_specified", status_code=400)
 
     qualification_obj = Qualification(**qualification)
 
@@ -47,49 +47,49 @@ def create_qualification() -> Dict[str, Any]:
         db.session.commit()
     except IntegrityError as exc:
         db.session.rollback()
-        raise APIError(reason='object_exists', status_code=400) from exc
+        raise APIError(reason="object_exists", status_code=400) from exc
 
     return cast(Dict[str, Any], qualification_schema.dump(qualification_obj))
 
 
-@bp.route('/<int:qual_id>', methods=('PUT',))
+@bp.route("/<int:qual_id>", methods=("PUT",))
 @authentication_required
-@requires_permissions('edit_qualifications')
+@requires_permissions("edit_qualifications")
 def update_qualification(qual_id: int) -> Dict[str, Any]:
     """API endpoint that updates an existing qualification."""
     qualification_schema = QualificationSchema()
     qualification = qualification_schema.load(request.json)
-    if qualification['id'] != qual_id:
-        raise APIError(reason='incorrect_id', status_code=400)
+    if qualification["id"] != qual_id:
+        raise APIError(reason="incorrect_id", status_code=400)
 
     if Qualification.query.filter_by(id=qual_id).count() < 1:
-        raise APIError(reason='no_such_object', status_code=400)
+        raise APIError(reason="no_such_object", status_code=400)
 
     qualification_obj = Qualification.query.get(qual_id)
 
     try:
-        qualification_obj.name = qualification['name']
+        qualification_obj.name = qualification["name"]
         db.session.commit()
     except IntegrityError:
-        raise APIError(reason='qualification_exists', status_code=400)
+        raise APIError(reason="qualification_exists", status_code=400)
 
     return cast(Dict[str, Any], qualification)
 
 
-@bp.route('/<int:qual_id>', methods=('DELETE',))
+@bp.route("/<int:qual_id>", methods=("DELETE",))
 @authentication_required
-@requires_permissions('edit_qualifications')
+@requires_permissions("edit_qualifications")
 def delete_qualification(qual_id: int) -> Dict[str, bool]:
     """API endpoint that deletes a qualification."""
     qualification_schema = QualificationSchema()
     qualification = qualification_schema.load(request.json)
-    if qualification['id'] != qual_id:
-        raise APIError(reason='incorrect_id', status_code=400)
+    if qualification["id"] != qual_id:
+        raise APIError(reason="incorrect_id", status_code=400)
 
     if Qualification.query.filter_by(id=qual_id).count() < 1:
-        raise APIError(reason='no_such_object', status_code=400)
+        raise APIError(reason="no_such_object", status_code=400)
 
     db.session.delete(Qualification.query.get(qual_id))
     db.session.commit()
 
-    return {'success': True}
+    return {"success": True}

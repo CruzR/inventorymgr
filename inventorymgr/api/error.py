@@ -26,7 +26,7 @@ class APIError(Exception):
 
     def as_dict(self) -> Dict[str, str]:
         """Convert exception to a dict to be returned from an API call."""
-        return {'reason': self.reason}
+        return {"reason": self.reason}
 
 
 def handle_api_error(error: APIError) -> Response:
