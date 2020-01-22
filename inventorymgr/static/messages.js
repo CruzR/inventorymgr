@@ -45,6 +45,7 @@ export const messages = {
             unknown_qualification: 'Qualification does not exist.',
             unknown_resource: 'Unknown API endpoint.',
             user_exists: 'User already exists.',
+            validation_failed: 'API request was malformed, try refreshing the page.',
         },
         fields: {
             actions: 'Actions',
@@ -132,6 +133,7 @@ export const messages = {
             unknown_qualification: 'Qualifikation existiert nicht.',
             unknown_resource: 'Unbekannter API-Endpoint.',
             user_exists: 'Benutzer existiert bereits.',
+            validation_failed: 'API-Anfrage fehlgeschlagen, bitte Seite neu laden.',
         },
         fields: {
             actions: 'Aktionen',

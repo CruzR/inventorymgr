@@ -10,6 +10,7 @@ import os
 from typing import Any, Dict, Optional
 
 from flask import Flask
+from marshmallow import ValidationError
 from sqlalchemy import event  # type: ignore
 
 
@@ -42,6 +43,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     from . import api
 
     app.errorhandler(api.APIError)(api.handle_api_error)
+    app.errorhandler(ValidationError)(api.handle_validation_error)
     app.register_blueprint(api.bp)
 
     from . import auth

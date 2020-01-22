@@ -4,11 +4,18 @@ from typing import Dict, Tuple
 
 from flask import Blueprint
 
-from .error import APIError, handle_api_error
+from .error import APIError, handle_api_error, handle_validation_error
 from .models import QualificationSchema, UserSchema
 
 
-__all__ = ["APIError", "handle_api_error", "QualificationSchema", "UserSchema", "bp"]
+__all__ = [
+    "APIError",
+    "handle_api_error",
+    "handle_validation_error",
+    "QualificationSchema",
+    "UserSchema",
+    "bp",
+]
 
 
 bp = Blueprint("api", __name__)
