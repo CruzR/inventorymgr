@@ -44,6 +44,11 @@ const template = `
           </tr>
         </tbody>
       </table>
+      <router-link to="/items/new" v-slot="{ href, navigate }">
+        <a class="button" :href="href" @click="navigate">
+          {{ $t('actions.create_item') }}
+        </a>
+      </router-link>
     </div>`
 
 
