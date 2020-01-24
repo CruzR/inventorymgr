@@ -51,7 +51,7 @@ const template = `
               </div>
             </td>
             <td :data-label="$t('fields.actions')">
-              <div class="control">
+              <div class="buttons">
                 <router-button
                   :to="'/users/' + user.id + '/edit'" kind="is-primary is-small">
                   {{ $t('actions.edit') }}

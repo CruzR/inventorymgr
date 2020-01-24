@@ -15,7 +15,7 @@ const template = `
           <tr v-for="qualification in qualifications">
             <td :data-label="$t('fields.qualification')">{{ qualification.name }}</td>
             <td :data-label="$t('fields.actions')">
-              <div class="control">
+              <div class="buttons">
                 <router-button
                   :to="'/qualifications/' + qualification.id + '/edit'"
                   kind="is-primary is-small">
