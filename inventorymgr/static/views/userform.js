@@ -14,7 +14,7 @@ const template = `
         <div class="control">
           <input
             id="userform-username"
-            type="text"
+            type="text" required
             :readonly="isViewContext"
             :class="{ 'input': true, 'is-static': isViewContext }"
             v-model="user.username">

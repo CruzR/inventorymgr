@@ -14,14 +14,21 @@ const template = `
           <div class="field">
             <label class="label" for="login-username">{{ $t('fields.username') }}</label>
             <div class="control">
-              <input id="login-username" class="input" type="text" v-model="username">
+              <input
+                id="login-username"
+                type="text" required
+                class="input"
+                v-model="username">
             </div>
           </div>
           <div class="field">
             <label class="label" for="login-password">{{ $t('fields.password') }}</label>
             <div class="control">
               <input
-                id="login-password" class="input" type="password" v-model="password">
+                id="login-password"
+                type="password" required
+                class="input"
+                v-model="password">
             </div>
           </div>
           <div class="field">

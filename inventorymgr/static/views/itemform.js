@@ -12,7 +12,7 @@ const template = `
         <div class="field">
           <label class="label" for="item-name">{{ $t('fields.item') }}</label>
           <div class="control">
-            <input id="item-name" type="text"
+            <input id="item-name" type="text" required
               :readonly="isViewContext"
               :class="{ 'input': true, 'is-static': isViewContext }"
               v-model="item.name">

@@ -11,7 +11,7 @@ const template = `
           <div class="control">
             <input
               id="qualificationform-name"
-              type="text"
+              type="text" required
               :readonly="isViewContext"
               :class="{ 'input': true, 'is-static': isViewContext }"
               v-model="qualification.name">
