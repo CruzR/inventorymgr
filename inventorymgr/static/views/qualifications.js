@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import RouterButton from '/static/views/routerbutton.js'
 
 
 const template = `
@@ -15,30 +16,23 @@ const template = `
             <td :data-label="$t('fields.qualification')">{{ qualification.name }}</td>
             <td :data-label="$t('fields.actions')">
               <div class="control">
-                <router-link
+                <router-button
                   :to="'/qualifications/' + qualification.id + '/edit'"
-                  v-slot="{ href, navigate }">
-                  <a :href="href" class="button is-primary is-small" @click="navigate">
-                    {{ $t('actions.edit') }}
-                  </a>
-                </router-link>
-                <router-link
-                  :to="'/qualifications/' + qualification.id"
-                  v-slot="{ href, navigate }">
-                  <a :href="href" class="button is-primary is-small" @click="navigate">
-                    {{ $t('actions.view') }}
-                  </a>
-                </router-link>
+                  kind="is-primary is-small">
+                  {{ $t('actions.edit') }}
+                </router-button>
+                <router-button
+                  :to="'/qualifications/' + qualification.id" kind="is-small">
+                  {{ $t('actions.view') }}
+                </router-button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
-      <router-link to="/qualifications/new" v-slot="{ href, navigate }">
-        <a class="button" :href="href" @click="navigate">
-          {{ $t('actions.create_qualification') }}
-        </a>
-      </router-link>
+      <router-button to="/qualifications/new">
+        {{ $t('actions.create_qualification') }}
+      </router-button>
     </div>
     `
 
@@ -46,4 +40,5 @@ const template = `
 export default {
     template,
     computed: mapState(['qualifications']),
+    components: { RouterButton },
 }

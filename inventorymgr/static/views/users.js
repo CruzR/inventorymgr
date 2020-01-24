@@ -1,4 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
+import RouterButton from '/static/views/routerbutton.js'
 
 
 const template = `
@@ -51,30 +52,21 @@ const template = `
             </td>
             <td :data-label="$t('fields.actions')">
               <div class="control">
-                <router-link
-                  :to="'/users/' + user.id + '/edit'"
-                  v-slot="{ href, navigate }">
-                  <a class="button is-primary is-small" :href="href" @click="navigate">
-                    {{ $t('actions.edit') }}
-                  </a>
-                </router-link>
-                <router-link
-                  :to="'/users/' + user.id"
-                  v-slot="{ href, navigate }">
-                  <a class="button is-primary is-small" :href="href" @click="navigate">
-                    {{ $t('actions.view') }}
-                  </a>
-                </router-link>
+                <router-button
+                  :to="'/users/' + user.id + '/edit'" kind="is-primary is-small">
+                  {{ $t('actions.edit') }}
+                </router-button>
+                <router-button :to="'/users/' + user.id" kind="is-small">
+                  {{ $t('actions.view') }}
+                </router-button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
-      <router-link to="/users/new" v-slot="{ href, navigate }">
-        <a class="button" :href="href" @click="navigate">
-          {{ $t('actions.create_user') }}
-        </a>
-      </router-link>
+      <router-button to="/users/new">
+        {{ $t('actions.create_user') }}
+      </router-button>
     </div>
     `
 
@@ -82,4 +74,5 @@ const template = `
 export default {
     template,
     computed: mapState(['users']),
+    components: { RouterButton },
 }
