@@ -18,6 +18,7 @@ export const messages = {
             logout: 'Logout',
             register: 'Register',
             save: 'Save',
+            show_returned: 'Show returned',
             view: 'View',
         },
         errors: {
@@ -106,6 +107,7 @@ export const messages = {
             logout: 'Abmelden',
             register: 'Registrieren',
             save: 'Speichern',
+            show_returned: 'Zurückgegebene anzeigen',
             view: 'Anzeigen',
         },
         errors: {

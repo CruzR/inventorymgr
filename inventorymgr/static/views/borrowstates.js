@@ -3,6 +3,12 @@ import { mapState } from '/static/vuex.esm.browser.js'
 
 const template = `
     <div>
+      <div class="field is-grouped is-grouped-right">
+        <label class="checkbox">
+          <input type="checkbox" v-model="showReturned">
+          {{ $t('actions.show_returned') }}
+        </label>
+      </div>
       <table class="table is-fullwidth responsive-table">
         <thead>
           <tr>
@@ -13,7 +19,7 @@ const template = `
           </tr>
         </thead>
         <tbody>
-          <tr v-for="borrowstate in borrowstates">
+          <tr v-for="borrowstate in filteredItems">
             <td :data-label="$t('fields.item')">
               {{ borrowstate.borrowed_item.name }}
             </td>
@@ -34,5 +40,14 @@ const template = `
 
 export default {
     template,
-    computed: mapState(['borrowstates']),
+    data: () => { return { showReturned: false } },
+    computed: {
+        filteredItems: function() {
+            if (this.showReturned) {
+                return this.borrowstates;
+            }
+            return this.borrowstates.filter(b => b.returned_at === null);
+        },
+        ...mapState(['borrowstates']),
+    },
 }
