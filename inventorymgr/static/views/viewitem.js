@@ -1,15 +1,25 @@
 import { mapState } from '/static/vuex.esm.browser.js'
 import { deleteItem } from '/static/api.js'
+import DeleteDialog from '/static/views/delete-dialog.js'
 import ItemForm from '/static/views/itemform.js'
 
 const template = `
-    <item-form
-      v-if="currentItem"
-      context="view"
-      :current="currentItem"
-      :error="errorMessage"
-      @delete-item="sendDeleteItemRequest">
-    </item-form>`
+    <div>
+      <delete-dialog
+        :show="showDeleteDialog"
+        @cancel-delete="showDeleteDialog = false"
+        @commit-delete="sendDeleteItemRequest(currentItem)">
+        {{ $t('messages.delete_item', {name: currentItem.name}) }}
+      </delete-dialog>
+      <item-form
+        v-if="currentItem"
+        context="view"
+        :current="currentItem"
+        :error="errorMessage"
+        @delete-item="showDeleteDialog = true">
+      </item-form>
+    </div>
+    `
 
 
 function currentItem() {
@@ -33,8 +43,8 @@ function sendDeleteItemRequest(item) {
 
 export default {
     template,
-    data: () => { return { errorMessage: '' } },
+    data: () => { return { errorMessage: '', showDeleteDialog: false } },
     computed: { currentItem, ...mapState(['items']) },
     methods: { sendDeleteItemRequest },
-    components: { ItemForm },
+    components: { ItemForm, DeleteDialog },
 }
