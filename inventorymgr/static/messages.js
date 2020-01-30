@@ -88,6 +88,7 @@ export const messages = {
             manage_checkouts: 'Checkout Inventory',
         },
         messages: {
+            delete_qualification: 'Really delete qualification {name}? This action cannot be reversed.',
             delete_user: 'Really delete user {name}? This action cannot be reversed.',
         },
     },
@@ -180,6 +181,7 @@ export const messages = {
             manage_checkouts: 'Inventar ausgeben',
         },
         messages: {
+            delete_qualification: 'Qualifikation {name} wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
             delete_user: 'Benutzer {name} wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
         },
     },

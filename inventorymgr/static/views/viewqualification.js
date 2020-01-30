@@ -1,15 +1,25 @@
 import { mapState } from '/static/vuex.esm.browser.js'
 import { deleteQualification } from '/static/api.js'
+import DeleteDialog from '/static/views/delete-dialog.js'
 import QualificationForm from '/static/views/qualificationform.js'
 
 
 const template = `
-    <qualification-form
-      v-if="currentQualification"
-      context="view"
-      :current="currentQualification"
-      @delete-qualification="sendDeleteQualificationRequest">
-    </qualification-form>`
+    <div>
+      <delete-dialog
+        :show="showDeleteDialog"
+        @cancel-delete="showDeleteDialog = false"
+        @commit-delete="sendDeleteQualificationRequest(currentQualification)">
+        {{ $t('messages.delete_qualification', {name: currentQualification.name}) }}
+      </delete-dialog>
+      <qualification-form
+        v-if="currentQualification"
+        context="view"
+        :current="currentQualification"
+        @delete-qualification="showDeleteDialog = true">
+      </qualification-form>
+    </div>
+    `
 
 function currentQualification() {
     const id = parseInt(this.$route.params.id);
@@ -31,7 +41,7 @@ function sendDeleteQualificationRequest(qualification) {
 export default {
     template,
     data: () => {
-        return { errorMessage: '' }
+        return { errorMessage: '', showDeleteDialog: false }
     },
     computed: {
         currentQualification,
@@ -41,6 +51,7 @@ export default {
         sendDeleteQualificationRequest
     },
     components: {
-        QualificationForm
+        QualificationForm,
+        DeleteDialog,
     }
 }
