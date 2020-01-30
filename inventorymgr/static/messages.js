@@ -87,6 +87,9 @@ export const messages = {
             create_items: 'Edit Inventory',
             manage_checkouts: 'Checkout Inventory',
         },
+        messages: {
+            delete_user: 'Really delete user {name}? This action cannot be reversed.',
+        },
     },
     de: {
         actions: {
@@ -175,6 +178,9 @@ export const messages = {
             edit_qualifications: 'Qualifikationen bearbeiten',
             create_items: 'Inventar bearbeiten',
             manage_checkouts: 'Inventar ausgeben',
+        },
+        messages: {
+            delete_user: 'Benutzer {name} wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
         },
     },
 };

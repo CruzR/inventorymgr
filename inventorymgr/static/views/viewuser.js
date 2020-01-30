@@ -1,14 +1,24 @@
 import { mapState } from '/static/vuex.esm.browser.js'
 import { deleteUser } from '/static/api.js'
+import DeleteDialog from '/static/views/delete-dialog.js'
 import UserForm from '/static/views/userform.js'
 
 const template = `
-    <user-form
-      v-if="currentUser"
-      :current="currentUser"
-      context="view"
-      @delete-user="sendDeleteUserRequest">
-    </user-form>`
+    <div>
+      <delete-dialog
+        :show="showDeleteWarning"
+        @cancel-delete="showDeleteWarning=false"
+        @commit-delete="sendDeleteUserRequest(currentUser)">
+        {{ $t('messages.delete_user', {name: currentUser.username}) }}
+      </delete-dialog>
+      <user-form
+        v-if="currentUser"
+        :current="currentUser"
+        context="view"
+        @delete-user="showDeleteWarning=true">
+      </user-form>
+    </div>
+    `
 
 function currentUser() {
     if (this.$route.params.id === 'me') {
@@ -38,6 +48,7 @@ function sendDeleteUserRequest(user) {
 
 export default {
     template,
+    data: () => { return { showDeleteWarning: false }; },
     computed: {
         currentUser,
         ...mapState(['sessionUser', 'users']),
@@ -46,6 +57,7 @@ export default {
         sendDeleteUserRequest
     },
     components: {
-        UserForm
+        UserForm,
+        DeleteDialog,
     }
 }
