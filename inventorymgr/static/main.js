@@ -3,7 +3,7 @@ import Vuex from '/static/vuex.esm.browser.js'
 import { mapState } from '/static/vuex.esm.browser.js'
 import VueI18n from '/static/vue-i18n.esm.browser.js'
 import { messages } from '/static/messages.js'
-import { fetchBorrowStates, fetchItems, fetchQualifications, fetchRegistrationTokens, fetchSessionUser, fetchUsers } from '/static/api.js'
+import { fetchBorrowStates, fetchItems, fetchQualifications, fetchRegistrationTokens, fetchUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
@@ -167,7 +167,7 @@ router.beforeEach((to, from, next) => {
         }
     } else {
         if (store.state.sessionUser === null) {
-            fetchSessionUser().then(response => {
+            fetchUser('me').then(response => {
                 if (response.success) {
                     store.commit('setSessionUser', response.data)
                 } else {

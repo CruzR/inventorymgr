@@ -99,8 +99,8 @@ export function fetchRegistrationTokens() {
     return fetch('/api/v1/registration/tokens').then(unpackJson);
 }
 
-export function fetchSessionUser() {
-    return fetch('/api/v1/users/me').then(unpackJson);
+export function fetchUser(user_id) {
+    return fetch('/api/v1/users/' + user_id).then(unpackJson);
 }
 
 export function createUser(user) {
