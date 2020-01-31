@@ -146,6 +146,17 @@ def delete_user(user_id: int) -> str:
     return str(user_id)
 
 
+@bp.route("/<int:user_id>", methods=("GET",))
+@authentication_required
+@requires_permissions("view_users")
+def get_user(user_id: int) -> Any:
+    """Flask view to get a specified user."""
+    user = User.query.get(user_id)
+    if user is None:
+        raise APIError(reason="no_such_user", status_code=400)
+    return UserSchema().dump(user)
+
+
 @bp.route("/me", methods=("GET",))
 @authentication_required
 def get_self() -> Any:

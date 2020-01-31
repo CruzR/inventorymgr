@@ -763,5 +763,37 @@ def test_accesscontrol_honors_changed_permissions(client, auth, app, test_user):
     assert response.is_json
 
 
+def test_get_user_unauthenticated(client):
+    response = client.get("/api/v1/users/1")
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "authentication_required"
+
+
+def test_get_user_insufficient_permissions(client, auth):
+    auth.login("min_permissions_user")
+    response = client.get("/api/v1/users/1")
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "insufficient_permissions"
+
+
+def test_get_nonexistent_user(client, auth):
+    auth.login("test")
+    response = client.get("/api/v1/users/3")
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json["reason"] == "no_such_user"
+
+
+def test_get_user_success(client, auth):
+    auth.login("test")
+    response = client.get("/api/v1/users/2")
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json["username"] == "min_permissions_user"
+    assert response.json["id"] == 2
+
+
 def count_users_with_name(username):
     return User.query.filter_by(username=username).count()
