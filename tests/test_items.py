@@ -229,3 +229,27 @@ def test_delete_item_success(client, auth, app):
 
     with app.app_context():
         assert BorrowableItem.query.filter_by(name="existing_item").count() == 0
+
+
+def test_get_item_unauthenticated(client):
+    response = client.get("/api/v1/items/1")
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "authentication_required"
+
+
+def test_get_nonexistent_item(client, auth):
+    auth.login("min_permissions_user")
+    response = client.get("/api/v1/items/3")
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json["reason"] == "nonexistent_item"
+
+
+def test_get_item_success(client, auth):
+    auth.login("min_permissions_user")
+    response = client.get("/api/v1/items/1")
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json["id"] == 1
+    assert response.json["name"] == "existing_item"

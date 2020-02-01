@@ -88,3 +88,13 @@ def delete_item(item_id: int) -> Dict[str, Any]:
         db.session.delete(item)
         db.session.commit()
     return {"success": True}
+
+
+@bp.route("/<int:item_id>", methods=("GET",))
+@authentication_required
+def get_item(item_id: int) -> Any:
+    """API endpoint for getting a single borrowable item."""
+    item = BorrowableItem.query.get(item_id)
+    if item is None:
+        raise APIError(reason="nonexistent_item", status_code=400)
+    return BorrowableItemSchema().dump(item)
