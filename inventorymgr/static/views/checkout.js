@@ -14,11 +14,15 @@ const template = `
               <label class="label" for="checkout-item">{{ $t('fields.item_barcode') }}</label>
               <div class="field has-addons">
                 <div class="control is-expanded">
+                  <datalist id="checkout-item-names">
+                    <option v-for="item in items" :value="item.name"/>
+                  </datalist>
                   <input
                     id="checkout-item"
                     autofocus
+                    list="checkout-item-names"
                     class="input"
-                    v-model="item_barcode">
+                    v-model="itemBarcodeOrName">
                 </div>
                 <div class="control">
                   <button class="button">{{ $t('actions.add') }}</button>
@@ -47,10 +51,14 @@ const template = `
               <label class="label" for="checkout-user">{{ $t('fields.user_barcode') }}</label>
               <div class="field has-addons">
                 <div class="control is-expanded">
+                  <datalist id="checkout-user-names">
+                    <option v-for="user in users" :value="user.username"/>
+                  </datalist>
                   <input
                     id="checkout-user"
+                    list="checkout-user-names"
                     class="input"
-                    v-model="user_barcode">
+                    v-model="userBarcodeOrName">
                 </div>
                 <div class="control">
                   <button class="button">{{ $t('actions.add') }}</button>
@@ -83,25 +91,23 @@ const template = `
 
 
 function selectItem() {
-    const item_barcode = this.item_barcode.trim();
-    const item = this.items.find(i => i.barcode === item_barcode);
+    const item = this.selectedItem;
     if (item) {
         const index = this.selected_items.findIndex(i => i.id === item.id);
         if (index !== -1) {
             this.selected_items.splice(index, 1);
         }
         this.selected_items.unshift(item);
-        this.item_barcode = '';
+        this.itemBarcodeOrName = '';
     }
 }
 
 
 function selectUser(e) {
-    const barcode = this.user_barcode.trim();
-    const user = this.users.find(u => u.barcode === barcode);
+    const user = this.selectedUser;
     if (user) {
         this.selected_user = user;
-        this.user_barcode = '';
+        this.userBarcodeOrName = '';
     }
 }
 
@@ -142,12 +148,24 @@ export default {
     data: () => {
         return {
             errorMessage: '',
-            item_barcode: '',
-            user_barcode: '',
+            itemBarcodeOrName: '',
+            userBarcodeOrName: '',
             selected_items: [],
             selected_user: null,
         };
     },
-    computed: mapState(['items', 'users']),
+    computed: {
+        selectedItem: function() {
+            const barcodeOrName = this.itemBarcodeOrName.trim();
+            const itemByBarcode = this.items.find(i => i.barcode === barcodeOrName);
+            return itemByBarcode || this.items.find(i => i.name === barcodeOrName);
+        },
+        selectedUser: function() {
+            const barcodeOrName = this.userBarcodeOrName.trim();
+            const userByBarcode = this.users.find(u => u.barcode === barcodeOrName);
+            return userByBarcode || this.users.find(u => u.username === barcodeOrName);
+        },
+        ...mapState(['items', 'users']),
+    },
     methods: { selectItem, selectUser, sendCheckoutRequest },
 }
