@@ -12,11 +12,15 @@ const template = `
           <label class="label" for="checkin-item">{{ $t('fields.item_barcode') }}</label>
           <div class="field has-addons">
             <div class="control is-expanded">
+              <datalist id="checkin-item-names">
+                <option v-for="item in items" :value="item.name"/>
+              </datalist>
               <input
                 id="checkin-item"
                 autofocus
+                list="checkin-item-names"
                 class="input"
-                v-model="item_barcode">
+                v-model="itemBarcodeOrName">
             </div>
             <div class="control">
               <button class="button">{{ $t('actions.add') }}</button>
@@ -49,8 +53,7 @@ const template = `
 
 
 function selectItem() {
-    const selected_barcode = this.item_barcode.trim();
-    const item = this.items.find(i => i.barcode === selected_barcode);
+    const item = this.selectedItem;
     if (!item) {
         this.errorMessage = 'Could not find item with that barcode.';
         return;
@@ -60,7 +63,7 @@ function selectItem() {
       b => b.borrowed_item.id === item.id && b.returned_at === null);
 
     this.selected_borrowstates = borrowstates.concat(this.selected_borrowstates);
-    this.item_barcode = '';
+    this.itemBarcodeOrName = '';
 }
 
 
@@ -87,8 +90,15 @@ function sendCheckinRequest() {
 export default {
     template,
     data: () => {
-        return { errorMessage: '', item_barcode: '', selected_borrowstates: [] };
+        return { errorMessage: '', itemBarcodeOrName: '', selected_borrowstates: [] };
     },
-    computed: mapState(['borrowstates', 'items']),
+    computed: {
+        selectedItem: function() {
+            const barcodeOrName = this.itemBarcodeOrName.trim();
+            const itemByBarcode = this.items.find(i => i.barcode === barcodeOrName);
+            return itemByBarcode || this.items.find(i => i.name === barcodeOrName);
+        },
+        ...mapState(['borrowstates', 'items']),
+    },
     methods: { selectItem, sendCheckinRequest },
 };
