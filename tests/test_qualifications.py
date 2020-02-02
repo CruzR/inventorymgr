@@ -215,3 +215,27 @@ def test_delete_qualification(client, app, auth):
     assert response.json == {"success": True}
     with app.app_context():
         assert Qualification.query.filter_by(name="Driver's License").count() == 0
+
+
+def test_get_qualification_unauthenticated(client):
+    response = client.get("/api/v1/qualifications/1")
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "authentication_required"
+
+
+def test_get_nonexistent_qualification(client, auth):
+    auth.login("min_permissions_user")
+    response = client.get("/api/v1/qualifications/2")
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json["reason"] == "no_such_object"
+
+
+def test_get_qualification_success(client, auth):
+    auth.login("min_permissions_user")
+    response = client.get("/api/v1/qualifications/1")
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json["id"] == 1
+    assert response.json["name"] == "Driver's License"

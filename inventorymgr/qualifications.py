@@ -93,3 +93,13 @@ def delete_qualification(qual_id: int) -> Dict[str, bool]:
     db.session.commit()
 
     return {"success": True}
+
+
+@bp.route("/<int:qual_id>", methods=("GET",))
+@authentication_required
+def get_qualification(qual_id: int) -> Any:
+    """API endpoint to fetch a single qualification."""
+    qualification = Qualification.query.get(qual_id)
+    if qualification is None:
+        raise APIError(reason="no_such_object", status_code=400)
+    return QualificationSchema().dump(qualification)

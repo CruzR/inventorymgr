@@ -89,6 +89,10 @@ export function fetchQualifications() {
     return fetch('/api/v1/qualifications').then(unpackJson);
 }
 
+export function fetchQualification(q_id) {
+    return fetch('/api/v1/qualifications/' + q_id).then(unpackJson);
+}
+
 export function generateRegistrationToken() {
     const params = { method: 'POST' };
     return fetch('/api/v1/registration/tokens', params).then(unpackJson);
