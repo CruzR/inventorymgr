@@ -104,3 +104,13 @@ class CheckinRequestSchema(Schema):
     """Marshmallow schema for checkin requests."""
 
     item_ids = fields.List(fields.Integer, required=True)
+
+
+class LogEntrySchema(Schema):
+    """Marshmallow schema for checkout / checkin logs."""
+
+    id = fields.Integer(required=True)
+    timestamp = fields.DateTime(required=True)
+    action = fields.Str(required=True)
+    subject_id = fields.Integer(required=True)
+    items = fields.Nested(BorrowableItemSchema, required=True, many=True, only=("id",))

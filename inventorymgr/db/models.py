@@ -22,6 +22,13 @@ _REQUIRED_QUALIFICATIONS_TABLE = db.Table(
     db.Column("qualification_id", db.Integer, db.ForeignKey("qualification.id")),
 )
 
+_LOGENTRY_ITEMS_TABLE = db.Table(
+    "logentry_items",
+    db.Model.metadata,
+    db.Column("logentry_id", db.Integer, db.ForeignKey("log_entry.id")),
+    db.Column("item_id", db.Integer, db.ForeignKey("borrowable_item.id")),
+)
+
 
 class User(db.Model):  # type: ignore
 
@@ -43,6 +50,9 @@ class User(db.Model):  # type: ignore
         "BorrowState",
         back_populates="borrowing_user",
         cascade="all, delete, delete-orphan",
+    )
+    log_entries = db.relationship(
+        "LogEntry", back_populates="subject", cascade="all, delete, delete-orphan"
     )
 
 
@@ -87,6 +97,9 @@ class BorrowableItem(db.Model):  # type: ignore
         back_populates="borrowed_item",
         cascade="all, delete, delete-orphan",
     )
+    log_entries = db.relationship(
+        "LogEntry", secondary=_LOGENTRY_ITEMS_TABLE, back_populates="items"
+    )
 
 
 class BorrowState(db.Model):  # type: ignore
@@ -119,3 +132,16 @@ class JavascriptError(db.Model):  # type: ignore
     lineno = db.Column(db.Integer)
     colno = db.Column(db.Integer)
     stack = db.Column(db.String)
+
+
+class LogEntry(db.Model):  # type: ignore
+    """ORM model for checkout / checkin logs."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    action = db.Column(db.String, nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    subject = db.relationship("User", back_populates="log_entries")
+    items = db.relationship(
+        "BorrowableItem", back_populates="log_entries", secondary=_LOGENTRY_ITEMS_TABLE
+    )

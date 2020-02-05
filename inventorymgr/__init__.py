@@ -46,24 +46,6 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
     app.errorhandler(ValidationError)(api.handle_validation_error)
     app.register_blueprint(api.bp)
 
-    from . import auth
-
-    app.register_blueprint(auth.bp)
-
-    from . import registration
-
-    app.register_blueprint(registration.bp)
-    app.cli.add_command(registration.generate_registration_token_command)
-
-    from . import qualifications
-
-    app.register_blueprint(qualifications.bp)
-
-    from . import users
-
-    app.register_blueprint(users.bp)
-    app.cli.add_command(users.create_user_command)
-
     from .db import db, init_db_command
 
     db.init_app(app)
@@ -81,16 +63,41 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
 
     app.register_blueprint(bp)
 
-    from . import items
-
-    app.register_blueprint(items.bp)
-
-    from . import borrowstates
-
-    app.register_blueprint(borrowstates.bp)
-
-    from . import error_reports
-
-    app.register_blueprint(error_reports.bp)
+    _register_api_endpoints(app)
+    _register_cli_commands(app)
 
     return app
+
+
+def _register_api_endpoints(app: Flask) -> None:
+
+    # Lazy-loading of modules is intentional here.
+    # pylint: disable=import-outside-toplevel
+    from . import qualifications
+    from . import auth
+    from . import items
+    from . import borrowstates
+    from . import error_reports
+    from . import logs
+    from . import users
+    from . import registration
+
+    app.register_blueprint(registration.bp)
+    app.register_blueprint(users.bp)
+    app.register_blueprint(qualifications.bp)
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(items.bp)
+    app.register_blueprint(borrowstates.bp)
+    app.register_blueprint(error_reports.bp)
+    app.register_blueprint(logs.bp)
+
+
+def _register_cli_commands(app: Flask) -> None:
+
+    # Lazy-loading of modules is intentional here.
+    # pylint: disable=import-outside-toplevel
+    from . import users
+    from . import registration
+
+    app.cli.add_command(registration.generate_registration_token_command)
+    app.cli.add_command(users.create_user_command)

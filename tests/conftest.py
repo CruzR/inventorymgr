@@ -13,6 +13,7 @@ from inventorymgr.db.models import (
     RegistrationToken,
     BorrowableItem,
     BorrowState,
+    LogEntry,
 )
 
 
@@ -65,6 +66,14 @@ def app():
                 borrowing_user_id=1,
                 borrowed_item_id=1,
                 received_at=datetime.datetime(2020, 1, 2, 12, 34, 56),
+            )
+        )
+        db.session.add(
+            LogEntry(
+                timestamp=datetime.datetime(2020, 1, 2, 12, 34, 56),
+                action="checkout",
+                subject_id=1,
+                items=[BorrowableItem.query.get(1)],
             )
         )
         db.session.commit()
