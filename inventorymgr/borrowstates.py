@@ -13,7 +13,7 @@ from inventorymgr.api.models import (
 )
 from inventorymgr.auth import authentication_required
 from inventorymgr.db import db
-from inventorymgr.db.models import BorrowableItem, BorrowState, User
+from inventorymgr.db.models import BorrowableItem, BorrowState, LogEntry, User
 
 
 bp = Blueprint("borrowstates", __name__, url_prefix="/api/v1/borrowstates")
@@ -70,6 +70,15 @@ def checkout() -> Tuple[Dict[str, Any], int]:
 
     for borrow_state in borrowstates:
         db.session.add(borrow_state)
+
+    db.session.add(
+        LogEntry(
+            action="checkout",
+            timestamp=now,
+            subject=borrowing_user,
+            items=borrowed_items,
+        )
+    )
     db.session.commit()
 
     return {"borrowstates": BorrowStateSchema(many=True).dump(borrowstates)}, 200

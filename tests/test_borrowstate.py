@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from inventorymgr.db.models import BorrowState
+from inventorymgr.db.models import BorrowState, LogEntry
 
 
 def test_fetch_borrowstates_unauthenticated(client):
@@ -131,6 +131,13 @@ def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
         assert borrowstate.borrowing_user_id == 1
         assert borrowstate.borrowed_item_id == 2
         assert borrowstate.received_at == datetime.datetime(2020, 1, 4, 13, 37)
+        logentry = LogEntry.query.filter(
+            LogEntry.items.contains(borrowstate.borrowed_item)
+        ).one()
+        assert logentry.action == "checkout"
+        assert logentry.timestamp == datetime.datetime(2020, 1, 4, 13, 37)
+        assert logentry.subject == borrowstate.borrowing_user
+        assert logentry.items == [borrowstate.borrowed_item]
 
 
 @pytest.fixture
