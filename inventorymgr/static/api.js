@@ -158,3 +158,7 @@ export function checkin(checkinRequest) {
     const params = createRequestParams(checkinRequest);
     return fetch('/api/v1/borrowstates/checkin', params).then(unpackJson);
 }
+
+export function fetchLogs() {
+    return fetch('/api/v1/logs').then(unpackJson);
+}

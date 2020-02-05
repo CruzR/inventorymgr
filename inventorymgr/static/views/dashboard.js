@@ -1,3 +1,7 @@
+import { mapState } from '/static/vuex.esm.browser.js'
+import LogList from '/static/views/log-list.js'
+
+
 const template = `
     <section class="section">
       <nav class="tile is-ancestor has-text-centered">
@@ -23,8 +27,13 @@ const template = `
           </router-link>
         </div>
       </nav>
+      <h3 class="title is-4">{{ $t('fields.recent_activity') }}</h3>
+      <log-list :logs="logs" v-if="users.length"></log-list>
     </section>`
 
+
 export default {
-    template
+    template,
+    computed: mapState(['logs', 'users']),
+    components: { LogList },
 }

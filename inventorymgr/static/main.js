@@ -3,7 +3,7 @@ import Vuex from '/static/vuex.esm.browser.js'
 import { mapState } from '/static/vuex.esm.browser.js'
 import VueI18n from '/static/vue-i18n.esm.browser.js'
 import { messages } from '/static/messages.js'
-import { fetchBorrowStates, fetchItems, fetchQualifications, fetchRegistrationTokens, fetchUser, fetchUsers } from '/static/api.js'
+import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchRegistrationTokens, fetchUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
@@ -71,6 +71,11 @@ const store = new Vuex.Store({
         tokens: [],
         items: [],
         borrowstates: [],
+        logs: [],
+    },
+    getters: {
+        userById: state => id => { return state.users.find(u => u.id === id); },
+        itemById: state => id => { return state.items.find(i => i.id === id); },
     },
     mutations: {
         login: state => { state.isAuthenticated = true },
@@ -82,6 +87,7 @@ const store = new Vuex.Store({
             state.tokens = [];
             state.items = [];
             state.borrowstates = [];
+            state.logs = [];
         },
         setUsers: (state, users) => { state.users = users },
         setQualifications: (state, qualifications) => { state.qualifications = qualifications },
@@ -155,6 +161,7 @@ const store = new Vuex.Store({
                 }
             }
         },
+        setLogs: (state, logs) => { state.logs = logs; },
     }
 });
 
@@ -215,6 +222,15 @@ router.beforeEach((to, from, next) => {
             fetchBorrowStates().then(response => {
                 if (response.success) {
                     store.commit('setBorrowStates', response.data.borrowstates);
+                } else {
+                    console.error(response.error);
+                }
+            });
+        }
+        if (!store.state.logs.length) {
+            fetchLogs().then(response => {
+                if (response.success) {
+                    store.commit('setLogs', response.data.logs);
                 } else {
                     console.error(response.error);
                 }

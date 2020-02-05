@@ -61,6 +61,7 @@ export const messages = {
             qualification: 'Qualification',
             qualifications: 'Qualifications',
             received_at: 'Received at',
+            recent_activity: 'Recent Activity',
             repeat_new_password: 'Repeat new password',
             repeat_password: 'Repeat password',
             required_qualifications: 'Required Qualifications',
@@ -91,6 +92,9 @@ export const messages = {
             delete_item: 'Really delete item {name}? This action cannot be reversed.',
             delete_qualification: 'Really delete qualification {name}? This action cannot be reversed.',
             delete_user: 'Really delete user {name}? This action cannot be reversed.',
+            logs: {
+                checkout: '{subject} borrowed {items}.',
+            },
         },
     },
     de: {
@@ -155,6 +159,7 @@ export const messages = {
             qualification: 'Qualifikation',
             qualifications: 'Qualifikationen',
             received_at: 'Erhalten am',
+            recent_activity: 'Kürzliche Aktivitäten',
             repeat_new_password: 'Neues Paswort wiederholen',
             repeat_password: 'Passwort wiederholen',
             required_qualifications: 'Benötigte Qualifikationen',
@@ -185,6 +190,9 @@ export const messages = {
             delete_item: 'Gegenstand {name} wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
             delete_qualification: 'Qualifikation {name} wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
             delete_user: 'Benutzer {name} wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
+            logs: {
+                checkout: '{subject} lieh sich {items}.',
+            },
         },
     },
 };
