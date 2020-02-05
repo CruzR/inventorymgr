@@ -125,6 +125,12 @@ def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
             "returned_at": None,
         }
     ]
+    with app.app_context():
+        borrowstate = BorrowState.query.get(2)
+        assert borrowstate is not None
+        assert borrowstate.borrowing_user_id == 1
+        assert borrowstate.borrowed_item_id == 2
+        assert borrowstate.received_at == datetime.datetime(2020, 1, 4, 13, 37)
 
 
 @pytest.fixture
