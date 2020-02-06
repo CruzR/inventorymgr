@@ -187,3 +187,9 @@ def test_checkin_successful(client, auth, checkin_request, app, monkeypatch):
     with app.app_context():
         borrowstate = BorrowState.query.get(1)
         assert borrowstate.returned_at == datetime.datetime(2020, 1, 6, 13, 37, 42)
+        logs = LogEntry.query.filter(LogEntry.items.contains(borrowstate.borrowed_item))
+        assert logs.count() == 2
+        logentry = logs.filter_by(action="checkin").one()
+        assert logentry.timestamp == datetime.datetime(2020, 1, 6, 13, 37, 42)
+        assert logentry.subject_id == 1
+        assert logentry.items == [borrowstate.borrowed_item]

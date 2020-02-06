@@ -16,7 +16,9 @@ export default {
     props: ['logs'],
     computed: {
         logsWithKnownType: function() {
-            let filteredLogs = this.logs.filter(l => l.action === 'checkout');
+            let filteredLogs = this.logs.filter(
+                l => l.action === 'checkout' || l.action === 'checkin'
+            );
             filteredLogs.sort((a, b) => {
                 if (a.timestamp > b.timestamp) return -1;
                 if (a.timestamp < b.timestamp) return 1;

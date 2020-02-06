@@ -60,7 +60,7 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     if unqualified_for:
         return {"reason": "missing_qualifications"}, 403
 
-    if any_item_already_borrowed(checkout_request["borrowed_item_ids"]):
+    if any_item_already_borrowed(borrowed_items):
         return {"reason": "already_borrowed"}, 400
 
     borrowstates = [
@@ -91,20 +91,32 @@ def checkin() -> Dict[str, Any]:
     """API endpoint for checkin of borrowed items."""
     checkin_request = CheckinRequestSchema().load(request.json)
     now = _utcnow()
+    returning_user = User.query.get(checkin_request["user_id"])
+    returned_items = [
+        BorrowableItem.query.get(item_id) for item_id in checkin_request["item_ids"]
+    ]
     borrowstates = []
-    for item_id in checkin_request["item_ids"]:
-        for borrow_state in open_borrowstates_for_item(item_id):
+    for item in returned_items:
+        for borrow_state in open_borrowstates_for_item(item):
             borrow_state.returned_at = now
             borrowstates.append(borrow_state)
+    db.session.add(
+        LogEntry(
+            action="checkin",
+            timestamp=now,
+            subject=returning_user,
+            items=returned_items,
+        )
+    )
     db.session.commit()
     return {"borrowstates": BorrowStateSchema(many=True).dump(borrowstates)}
 
 
-def open_borrowstates_for_item(item_id: int) -> Iterable[BorrowState]:
+def open_borrowstates_for_item(item: BorrowableItem) -> Iterable[BorrowState]:
     """Return all borrow states for an item without a return date."""
     return cast(
         Iterable[BorrowState],
-        BorrowState.query.filter_by(borrowed_item_id=item_id, returned_at=None).all(),
+        BorrowState.query.filter_by(borrowed_item=item, returned_at=None).all(),
     )
 
 
@@ -113,6 +125,6 @@ def has_required_qualifications(user: User, item: BorrowableItem) -> bool:
     return all(q in user.qualifications for q in item.required_qualifications)
 
 
-def any_item_already_borrowed(item_ids: Iterable[int]) -> bool:
+def any_item_already_borrowed(items: Iterable[BorrowableItem]) -> bool:
     """Check if any item in item_ids already has an open borrowstate."""
-    return any(bool(open_borrowstates_for_item(item_id)) for item_id in item_ids)
+    return any(bool(open_borrowstates_for_item(item)) for item in items)

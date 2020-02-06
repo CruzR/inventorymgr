@@ -93,6 +93,7 @@ export const messages = {
             delete_qualification: 'Really delete qualification {name}? This action cannot be reversed.',
             delete_user: 'Really delete user {name}? This action cannot be reversed.',
             logs: {
+                checkin: '{subject} returned {items}.',
                 checkout: '{subject} borrowed {items}.',
             },
         },
@@ -191,6 +192,7 @@ export const messages = {
             delete_qualification: 'Qualifikation {name} wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
             delete_user: 'Benutzer {name} wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
             logs: {
+                checkin: '{subject} gab {items} zurück.',
                 checkout: '{subject} lieh sich {items}.',
             },
         },
