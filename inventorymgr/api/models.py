@@ -103,6 +103,7 @@ class CheckoutRequestSchema(Schema):
 class CheckinRequestSchema(Schema):
     """Marshmallow schema for checkin requests."""
 
+    user_id = fields.Integer(required=True)
     item_ids = fields.List(fields.Integer, required=True)
 
 

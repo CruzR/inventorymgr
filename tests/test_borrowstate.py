@@ -142,7 +142,7 @@ def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
 
 @pytest.fixture
 def checkin_request():
-    return {"item_ids": [1]}
+    return {"user_id": 1, "item_ids": [1]}
 
 
 def test_checkin_unauthenticated(client, checkin_request):
