@@ -13,7 +13,13 @@ from inventorymgr.api.models import (
 )
 from inventorymgr.auth import authentication_required
 from inventorymgr.db import db
-from inventorymgr.db.models import BorrowableItem, BorrowState, LogEntry, User
+from inventorymgr.db.models import (
+    BorrowableItem,
+    BorrowState,
+    LogEntry,
+    TransferRequest,
+    User,
+)
 
 
 bp = Blueprint("borrowstates", __name__, url_prefix="/api/v1/borrowstates")
@@ -108,6 +114,10 @@ def checkin() -> Dict[str, Any]:
             items=returned_items,
         )
     )
+    for transfer_request in TransferRequest.query.filter(
+        TransferRequest.borrowstate_id.in_(bs.id for bs in borrowstates)
+    ).all():
+        db.session.delete(transfer_request)
     db.session.commit()
     return {"borrowstates": BorrowStateSchema(many=True).dump(borrowstates)}
 

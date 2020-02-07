@@ -115,3 +115,10 @@ class LogEntrySchema(Schema):
     action = fields.Str(required=True)
     subject_id = fields.Integer(required=True)
     items = fields.Nested(BorrowableItemSchema, required=True, many=True, only=("id",))
+
+
+class TransferRequestSchema(Schema):
+    """Marshmallow schema for transfer requests."""
+
+    id = fields.Integer(required=True)
+    borrowstate_id = fields.Integer(required=True)

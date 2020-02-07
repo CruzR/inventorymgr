@@ -52,7 +52,18 @@ class User(db.Model):  # type: ignore
         cascade="all, delete, delete-orphan",
     )
     log_entries = db.relationship(
-        "LogEntry", back_populates="subject", cascade="all, delete, delete-orphan"
+        "LogEntry",
+        back_populates="subject",
+        cascade="all, delete, delete-orphan",
+        foreign_keys="LogEntry.subject_id",
+    )
+    secondary_log_entries = db.relationship(
+        "LogEntry", back_populates="secondary", foreign_keys="LogEntry.secondary_id"
+    )
+    incoming_transfer_requests = db.relationship(
+        "TransferRequest",
+        back_populates="target_user",
+        cascade="all, delete, delete-orphan",
     )
 
 
@@ -114,6 +125,11 @@ class BorrowState(db.Model):  # type: ignore
     borrowed_item = db.relationship("BorrowableItem", back_populates="borrowstates")
     received_at = db.Column(db.DateTime, nullable=False)
     returned_at = db.Column(db.DateTime)
+    transfer_requests = db.relationship(
+        "TransferRequest",
+        back_populates="borrowstate",
+        cascade="all, delete, delete-orphan",
+    )
 
 
 class JavascriptError(db.Model):  # type: ignore
@@ -141,7 +157,27 @@ class LogEntry(db.Model):  # type: ignore
     timestamp = db.Column(db.DateTime, nullable=False)
     action = db.Column(db.String, nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    subject = db.relationship("User", back_populates="log_entries")
+    secondary_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    subject = db.relationship(
+        "User", back_populates="log_entries", foreign_keys="LogEntry.subject_id"
+    )
+    secondary = db.relationship(
+        "User",
+        back_populates="secondary_log_entries",
+        foreign_keys="LogEntry.secondary_id",
+    )
     items = db.relationship(
         "BorrowableItem", back_populates="log_entries", secondary=_LOGENTRY_ITEMS_TABLE
     )
+
+
+class TransferRequest(db.Model):  # type: ignore
+    """ORM model for transfer requests."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    target_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    borrowstate_id = db.Column(
+        db.Integer, db.ForeignKey("borrow_state.id"), nullable=False
+    )
+    target_user = db.relationship("User", back_populates="incoming_transfer_requests")
+    borrowstate = db.relationship("BorrowState", back_populates="transfer_requests")

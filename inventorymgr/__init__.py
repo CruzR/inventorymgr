@@ -81,6 +81,7 @@ def _register_api_endpoints(app: Flask) -> None:
     from . import logs
     from . import users
     from . import registration
+    from . import transfer_requests
 
     app.register_blueprint(registration.bp)
     app.register_blueprint(users.bp)
@@ -90,6 +91,7 @@ def _register_api_endpoints(app: Flask) -> None:
     app.register_blueprint(borrowstates.bp)
     app.register_blueprint(error_reports.bp)
     app.register_blueprint(logs.bp)
+    app.register_blueprint(transfer_requests.bp)
 
 
 def _register_cli_commands(app: Flask) -> None:

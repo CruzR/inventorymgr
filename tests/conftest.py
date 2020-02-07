@@ -14,6 +14,7 @@ from inventorymgr.db.models import (
     BorrowableItem,
     BorrowState,
     LogEntry,
+    TransferRequest,
 )
 
 
@@ -76,6 +77,7 @@ def app():
                 items=[BorrowableItem.query.get(1)],
             )
         )
+        db.session.add(TransferRequest(target_user_id=2, borrowstate_id=1))
         db.session.commit()
 
     yield app
