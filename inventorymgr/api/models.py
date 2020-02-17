@@ -121,4 +121,5 @@ class TransferRequestSchema(Schema):
     """Marshmallow schema for transfer requests."""
 
     id = fields.Integer(required=True)
+    target_user_id = fields.Integer(required=True)
     borrowstate_id = fields.Integer(required=True)

@@ -9,7 +9,7 @@ from inventorymgr.api import APIError
 from inventorymgr.api.models import TransferRequestSchema
 from inventorymgr.auth import authentication_required
 from inventorymgr.db import db
-from inventorymgr.db.models import LogEntry, TransferRequest, User
+from inventorymgr.db.models import BorrowState, LogEntry, TransferRequest, User
 
 
 bp = Blueprint("transfer_requests", __name__, url_prefix="/api/v1/transferrequests")
@@ -24,6 +24,25 @@ def get_transfer_requests() -> Dict[str, Any]:
             TransferRequest.query.filter_by(target_user_id=session["user_id"])
         )
     }
+
+
+@bp.route("", methods=("POST",))
+@authentication_required
+def create_transfer_request() -> Dict[str, bool]:
+    """API endpoint for creating transfer requests."""
+    transfer_request_json = TransferRequestSchema().load(request.json, partial=("id",))
+    borrowstate = BorrowState.query.get(transfer_request_json["borrowstate_id"])
+    if borrowstate is None:
+        raise APIError(reason="unknown_borrowstate", status_code=400)
+    if borrowstate.borrowing_user_id != session["user_id"]:
+        raise APIError(reason="insufficient_permissions", status_code=403)
+    if borrowstate.returned_at is not None:
+        raise APIError(reason="item_not_borrowed", status_code=400)
+    target_user = User.query.get(transfer_request_json["target_user_id"])
+    transfer_request = TransferRequest(target_user=target_user, borrowstate=borrowstate)
+    db.session.add(transfer_request)
+    db.session.commit()
+    return {"success": True}
 
 
 @bp.route("/<int:request_id>", methods=("DELETE",))

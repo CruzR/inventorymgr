@@ -1,5 +1,8 @@
 import datetime
 
+import pytest
+
+from inventorymgr.db import db
 from inventorymgr.db.models import (
     BorrowableItem,
     BorrowState,
@@ -20,7 +23,9 @@ def test_get_transfer_requests_success(client, auth):
     response = client.get("/api/v1/transferrequests")
     assert response.status_code == 200
     assert response.is_json
-    assert response.json["transferrequests"] == [{"id": 1, "borrowstate_id": 1}]
+    assert response.json["transferrequests"] == [
+        {"id": 1, "borrowstate_id": 1, "target_user_id": 2}
+    ]
 
 
 def test_accept_transfer_request_unauthenticated(client):
@@ -120,3 +125,93 @@ def test_returning_item_deletes_transfer_request(client, auth, app):
     assert response.status_code == 200
     with app.app_context():
         assert TransferRequest.query.filter_by(target_user_id=2).count() == 0
+
+
+@pytest.fixture
+def new_transfer_request_json():
+    return {"target_user_id": 2, "borrowstate_id": 3}
+
+
+@pytest.fixture
+def new_transfer_request(new_transfer_request_json, app):
+    with app.app_context():
+        new_item = BorrowableItem(name="brand_new_item")
+        db.session.add(new_item)
+        db.session.add(
+            BorrowState(
+                borrowing_user_id=1,
+                borrowed_item_id=2,
+                received_at=datetime.datetime(2020, 2, 17, 6, 32),
+                returned_at=datetime.datetime(2020, 2, 17, 6, 34),
+            )
+        )
+        db.session.add(
+            BorrowState(
+                borrowing_user_id=1,
+                borrowed_item=new_item,
+                received_at=datetime.datetime(2020, 2, 17, 6, 32),
+            )
+        )
+        db.session.commit()
+    return new_transfer_request_json
+
+
+def test_issue_transfer_request_unauthenticated(client, new_transfer_request):
+    response = client.post("/api/v1/transferrequests", json=new_transfer_request)
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "authentication_required"
+
+
+def test_issue_transfer_request_for_nonexistent_borrowstate(
+    client, auth, new_transfer_request_json
+):
+    auth.login("test")
+    response = client.post("/api/v1/transferrequests", json=new_transfer_request_json)
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json["reason"] == "unknown_borrowstate"
+
+
+def test_issue_transfer_request_for_returned_item(client, auth, new_transfer_request):
+    auth.login("test")
+    response = client.post(
+        "/api/v1/transferrequests", json={"target_user_id": 2, "borrowstate_id": 2}
+    )
+    assert response.status_code == 400
+    assert response.is_json
+    assert response.json["reason"] == "item_not_borrowed"
+
+
+def test_issue_transfer_request_for_other_user(client, auth, new_transfer_request):
+    auth.login("min_permissions_user")
+    response = client.post("/api/v1/transferrequests", json=new_transfer_request)
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "insufficient_permissions"
+
+
+def test_issue_transfer_request_successful(client, auth, new_transfer_request, app):
+    with app.app_context():
+        assert TransferRequest.query.filter_by(target_user_id=2).count() == 1
+        assert (
+            TransferRequest.query.filter_by(
+                borrowstate_id=new_transfer_request["borrowstate_id"]
+            ).count()
+            == 0
+        )
+
+    auth.login("test")
+    response = client.post("/api/v1/transferrequests", json=new_transfer_request)
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json["success"]
+
+    with app.app_context():
+        assert TransferRequest.query.filter_by(target_user_id=2).count() == 2
+        assert (
+            TransferRequest.query.filter_by(
+                borrowstate_id=new_transfer_request["borrowstate_id"]
+            ).count()
+            == 1
+        )
