@@ -53,6 +53,14 @@ def test_accept_transfer_request_for_other_user(client, auth):
     assert response.json["reason"] == "insufficient_permissions"
 
 
+def test_accept_transfer_request_with_missing_qualifications(client, auth, app):
+    auth.login("min_permissions_user")
+    response = client.delete("/api/v1/transferrequests/2", json={"action": "accept"})
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "missing_qualifications"
+
+
 def test_accept_transfer_request_successful(client, auth, app, monkeypatch):
     def fake_utcnow():
         return datetime.datetime(2020, 2, 7, 7, 53, 12)
@@ -208,6 +216,24 @@ def test_issue_transfer_request_for_other_user(client, auth, new_transfer_reques
     assert response.status_code == 403
     assert response.is_json
     assert response.json["reason"] == "insufficient_permissions"
+
+
+def test_issue_transfer_request_for_user_with_missing_qualifications(client, auth, app):
+    # Clear previous illegal transfer request.
+    with app.app_context():
+        for transfer_request in TransferRequest.query.all():
+            db.session.delete(transfer_request)
+        db.session.commit()
+
+    auth.login("test")
+    # Try to re-create it via API request.
+    response = client.post(
+        "/api/v1/transferrequests", json={"target_user_id": 2, "borrowstate_id": 1}
+    )
+    # Should have failed because user is missing a qualification the item requires.
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "missing_qualifications"
 
 
 def test_issue_transfer_request_successful(client, auth, new_transfer_request, app):
