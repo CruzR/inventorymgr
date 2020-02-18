@@ -23,9 +23,11 @@ def test_get_transfer_requests_success(client, auth):
     response = client.get("/api/v1/transferrequests")
     assert response.status_code == 200
     assert response.is_json
-    assert response.json["transferrequests"] == [
-        {"id": 1, "borrowstate_id": 1, "target_user_id": 2}
-    ]
+    assert response.json["transferrequests"][1] == {
+        "id": 2,
+        "borrowstate_id": 1,
+        "target_user_id": 2,
+    }
 
 
 def test_accept_transfer_request_unauthenticated(client):
@@ -37,7 +39,7 @@ def test_accept_transfer_request_unauthenticated(client):
 
 def test_accept_unknown_transfer_request(client, auth):
     auth.login("min_permissions_user")
-    response = client.delete("/api/v1/transferrequests/2", json={"action": "accept"})
+    response = client.delete("/api/v1/transferrequests/3", json={"action": "accept"})
     assert response.status_code == 404
     assert response.is_json
     assert response.json["reason"] == "unknown_transfer_request"
@@ -57,6 +59,9 @@ def test_accept_transfer_request_successful(client, auth, app, monkeypatch):
 
     monkeypatch.setattr("inventorymgr.transfer_requests._utcnow", fake_utcnow)
     with app.app_context():
+        transfer_request_count = TransferRequest.query.filter_by(
+            target_user_id=2
+        ).count()
         assert BorrowState.query.filter_by(borrowing_user_id=2).count() == 0
         assert LogEntry.query.filter_by(action="transfer").count() == 0
 
@@ -67,13 +72,16 @@ def test_accept_transfer_request_successful(client, auth, app, monkeypatch):
     assert response.json["success"]
 
     with app.app_context():
-        assert TransferRequest.query.filter_by(target_user_id=2).count() == 0
+        assert (
+            TransferRequest.query.filter_by(target_user_id=2).count()
+            == transfer_request_count - 1
+        )
         borrowstate = BorrowState.query.filter_by(borrowing_user_id=2).one()
-        assert borrowstate.borrowed_item_id == 1
+        assert borrowstate.borrowed_item_id == 3
         logentry = LogEntry.query.filter_by(action="transfer").one()
         assert logentry.timestamp == datetime.datetime(2020, 2, 7, 7, 53, 12)
         assert logentry.subject_id == 1
-        assert logentry.items == [BorrowableItem.query.get(1)]
+        assert logentry.items == [BorrowableItem.query.get(3)]
         assert logentry.secondary_id == 2
 
 
@@ -86,7 +94,7 @@ def test_decline_transfer_request_unauthenticated(client):
 
 def test_decline_unknown_transfer_request(client, auth):
     auth.login("min_permissions_user")
-    response = client.delete("/api/v1/transferrequests/2", json={"action": "decline"})
+    response = client.delete("/api/v1/transferrequests/3", json={"action": "decline"})
     assert response.status_code == 404
     assert response.is_json
     assert response.json["reason"] == "unknown_transfer_request"
@@ -102,6 +110,7 @@ def test_decline_transfer_request_for_other_user(client, auth):
 
 def test_decline_transfer_request_successful(client, auth, app):
     with app.app_context():
+        transfer_request_count = TransferRequest.query.count()
         assert BorrowState.query.filter_by(borrowing_user_id=2).count() == 0
         assert LogEntry.query.filter_by(action="transfer").count() == 0
 
@@ -112,24 +121,34 @@ def test_decline_transfer_request_successful(client, auth, app):
     assert response.json["success"]
 
     with app.app_context():
-        assert TransferRequest.query.filter_by(target_user_id=2).count() == 0
+        assert (
+            TransferRequest.query.filter_by(target_user_id=2).count()
+            == transfer_request_count - 1
+        )
         assert BorrowState.query.filter_by(borrowing_user_id=2).count() == 0
         assert LogEntry.query.filter_by(action="transfer").count() == 0
 
 
 def test_returning_item_deletes_transfer_request(client, auth, app):
+    with app.app_context():
+        transfer_request_count = TransferRequest.query.filter_by(
+            target_user_id=2
+        ).count()
     auth.login("test")
     response = client.post(
         "/api/v1/borrowstates/checkin", json={"user_id": 1, "item_ids": [1]}
     )
     assert response.status_code == 200
     with app.app_context():
-        assert TransferRequest.query.filter_by(target_user_id=2).count() == 0
+        assert (
+            TransferRequest.query.filter_by(target_user_id=2).count()
+            == transfer_request_count - 1
+        )
 
 
 @pytest.fixture
 def new_transfer_request_json():
-    return {"target_user_id": 2, "borrowstate_id": 3}
+    return {"target_user_id": 2, "borrowstate_id": 4}
 
 
 @pytest.fixture
@@ -176,7 +195,7 @@ def test_issue_transfer_request_for_nonexistent_borrowstate(
 def test_issue_transfer_request_for_returned_item(client, auth, new_transfer_request):
     auth.login("test")
     response = client.post(
-        "/api/v1/transferrequests", json={"target_user_id": 2, "borrowstate_id": 2}
+        "/api/v1/transferrequests", json={"target_user_id": 2, "borrowstate_id": 3}
     )
     assert response.status_code == 400
     assert response.is_json
@@ -193,7 +212,9 @@ def test_issue_transfer_request_for_other_user(client, auth, new_transfer_reques
 
 def test_issue_transfer_request_successful(client, auth, new_transfer_request, app):
     with app.app_context():
-        assert TransferRequest.query.filter_by(target_user_id=2).count() == 1
+        transfer_request_count = TransferRequest.query.filter_by(
+            target_user_id=2
+        ).count()
         assert (
             TransferRequest.query.filter_by(
                 borrowstate_id=new_transfer_request["borrowstate_id"]
@@ -208,7 +229,10 @@ def test_issue_transfer_request_successful(client, auth, new_transfer_request, a
     assert response.json["success"]
 
     with app.app_context():
-        assert TransferRequest.query.filter_by(target_user_id=2).count() == 2
+        assert (
+            TransferRequest.query.filter_by(target_user_id=2).count()
+            == transfer_request_count + 1
+        )
         assert (
             TransferRequest.query.filter_by(
                 borrowstate_id=new_transfer_request["borrowstate_id"]

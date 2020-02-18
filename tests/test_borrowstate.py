@@ -25,19 +25,17 @@ def test_fetch_borrowstates_success(client, auth):
     response = client.get("/api/v1/borrowstates")
     assert response.status_code == 200
     assert response.is_json
-    assert response.json["borrowstates"] == [
-        {
+    assert response.json["borrowstates"][0] == {
+        "id": 1,
+        "borrowing_user": {"id": 1, "username": "test", "barcode": "0000009000001"},
+        "borrowed_item": {
             "id": 1,
-            "borrowing_user": {"id": 1, "username": "test", "barcode": "0000009000001"},
-            "borrowed_item": {
-                "id": 1,
-                "name": "existing_item",
-                "barcode": "0000000000001",
-            },
-            "received_at": "2020-01-02T12:34:56",
-            "returned_at": None,
-        }
-    ]
+            "name": "existing_item",
+            "barcode": "0000000000001",
+        },
+        "received_at": "2020-01-02T12:34:56",
+        "returned_at": None,
+    }
 
 
 @pytest.fixture
@@ -84,7 +82,7 @@ def test_checkout_nonexistent_item(client, auth):
     auth.login("test")
     response = client.post(
         "/api/v1/borrowstates/checkout",
-        json={"borrowing_user_id": 1, "borrowed_item_ids": [3]},
+        json={"borrowing_user_id": 1, "borrowed_item_ids": [5]},
     )
     assert response.status_code == 400
     assert response.is_json
@@ -103,6 +101,9 @@ def test_checkout_nonexistent_user(client, auth):
 
 
 def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
+    with app.app_context():
+        borrowstate_count = BorrowState.query.count()
+
     def fake_utcnow():
         return datetime.datetime(2020, 1, 4, 13, 37)
 
@@ -114,7 +115,7 @@ def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
     assert response.is_json
     assert response.json["borrowstates"] == [
         {
-            "id": 2,
+            "id": borrowstate_count + 1,
             "borrowing_user": {"id": 1, "username": "test", "barcode": "0000009000001"},
             "borrowed_item": {
                 "id": 2,
@@ -126,7 +127,7 @@ def test_checkout_successful(client, auth, checkout_request, monkeypatch, app):
         }
     ]
     with app.app_context():
-        borrowstate = BorrowState.query.get(2)
+        borrowstate = BorrowState.query.get(borrowstate_count + 1)
         assert borrowstate is not None
         assert borrowstate.borrowing_user_id == 1
         assert borrowstate.borrowed_item_id == 2

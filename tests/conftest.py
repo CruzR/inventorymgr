@@ -62,11 +62,20 @@ def app():
                 name="another_item", required_qualifications=[drivers_license]
             )
         )
+        db.session.add(BorrowableItem(name="borrowed_noq", required_qualifications=[]))
+        db.session.add(BorrowableItem(name="available_noq", required_qualifications=[]))
         db.session.add(
             BorrowState(
                 borrowing_user_id=1,
                 borrowed_item_id=1,
                 received_at=datetime.datetime(2020, 1, 2, 12, 34, 56),
+            )
+        )
+        db.session.add(
+            BorrowState(
+                borrowing_user_id=1,
+                borrowed_item_id=3,
+                received_at=datetime.datetime(2020, 1, 2, 12, 34, 57),
             )
         )
         db.session.add(
@@ -77,6 +86,7 @@ def app():
                 items=[BorrowableItem.query.get(1)],
             )
         )
+        db.session.add(TransferRequest(target_user_id=2, borrowstate_id=2))
         db.session.add(TransferRequest(target_user_id=2, borrowstate_id=1))
         db.session.commit()
 

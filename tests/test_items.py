@@ -57,6 +57,8 @@ def test_create_item_unknown_qualification(client, auth):
 
 
 def test_create_item_success(client, auth, app):
+    with app.app_context():
+        item_count = BorrowableItem.query.count()
     auth.login("test")
     response = client.post(
         "/api/v1/items",
@@ -67,16 +69,16 @@ def test_create_item_success(client, auth, app):
     )
     assert response.status_code == 200
     assert response.is_json
-    assert response.json["id"] == 3
+    assert response.json["id"] == 5
     assert response.json["name"] == "new_item"
-    assert response.json["barcode"] == "0000000000003"
+    assert response.json["barcode"] == "0000000000005"
     assert response.json["required_qualifications"] == [
         {"id": 1, "name": "Driver's License"}
     ]
 
     with app.app_context():
-        assert BorrowableItem.query.count() == 3
-        item = BorrowableItem.query.get(3)
+        assert BorrowableItem.query.count() == item_count + 1
+        item = BorrowableItem.query.get(item_count + 1)
         assert item.name == "new_item"
         assert item.required_qualifications[0].id == 1
         assert item.required_qualifications[0].name == "Driver's License"
@@ -94,7 +96,7 @@ def test_list_items_success(client, auth):
     response = client.get("/api/v1/items")
     assert response.status_code == 200
     assert response.is_json
-    assert response.json["items"] == [
+    assert response.json["items"][:2] == [
         {
             "id": 1,
             "name": "existing_item",
@@ -145,8 +147,8 @@ def test_update_item_id_mismatch(client, auth):
 def test_update_item_nonexistent_item(client, auth):
     auth.login("test")
     response = client.put(
-        "/api/v1/items/3",
-        json={"id": 3, "name": "new_item_name", "required_qualifications": []},
+        "/api/v1/items/5",
+        json={"id": 5, "name": "new_item_name", "required_qualifications": []},
     )
     assert response.status_code == 400
     assert response.is_json
@@ -180,6 +182,8 @@ def test_update_item_to_existing_name(client, auth):
 
 
 def test_update_item_success(client, auth, app):
+    with app.app_context():
+        item_count = BorrowableItem.query.count()
     auth.login("test")
     response = client.put(
         "/api/v1/items/1",
@@ -193,7 +197,7 @@ def test_update_item_success(client, auth, app):
     assert response.json["required_qualifications"] == []
 
     with app.app_context():
-        assert BorrowableItem.query.count() == 2
+        assert BorrowableItem.query.count() == item_count
         assert BorrowableItem.query.filter_by(name="new_item_name").count() == 1
 
 
@@ -240,7 +244,7 @@ def test_get_item_unauthenticated(client):
 
 def test_get_nonexistent_item(client, auth):
     auth.login("min_permissions_user")
-    response = client.get("/api/v1/items/3")
+    response = client.get("/api/v1/items/5")
     assert response.status_code == 400
     assert response.is_json
     assert response.json["reason"] == "nonexistent_item"
