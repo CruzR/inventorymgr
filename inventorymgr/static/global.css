@@ -32,3 +32,28 @@
         margin: 0.5rem;
     }
 }
+
+.indicator-box {
+    display: flex;
+    align-items: baseline;
+}
+
+.indicator-label {
+    flex-grow: 1;
+}
+
+.indicator {
+    display: block;
+    box-sizing: border-box;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 0.4rem;
+}
+
+.indicator.available {
+    background-color: rgb(69, 111, 208);
+}
+
+.indicator.borrowed {
+    border: medium solid rgb(200, 134, 10);
+}

@@ -76,6 +76,11 @@ const store = new Vuex.Store({
     getters: {
         userById: state => id => { return state.users.find(u => u.id === id); },
         itemById: state => id => { return state.items.find(i => i.id === id); },
+        isBorrowed: state => itemId => {
+            return state.borrowstates.filter(
+                bs => bs.borrowed_item.id === itemId && bs.returned_at === null
+            ).length > 0;
+        },
     },
     mutations: {
         login: state => { state.isAuthenticated = true },

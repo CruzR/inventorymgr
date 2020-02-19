@@ -1,4 +1,4 @@
-import { mapState } from '/static/vuex.esm.browser.js'
+import { mapGetters, mapState } from '/static/vuex.esm.browser.js'
 import RouterButton from '/static/views/routerbutton.js'
 
 
@@ -15,7 +15,14 @@ const template = `
         </thead>
         <tbody>
           <tr v-for="item in items">
-            <td :data-label="$t('fields.item')">{{ item.name }}</td>
+            <td :data-label="$t('fields.item')">
+              <div class="indicator-box">
+                <span class="indicator-label">
+                  {{ item.name }}
+                </span>
+                <span :class="['indicator', borrowState(item)]"></span>
+              </div>
+            </td>
             <td :data-label="$t('fields.barcode')">{{ item.barcode }}</td>
             <td :data-label="$t('fields.required_qualifications')">
               <div class="tags">
@@ -48,6 +55,14 @@ const template = `
 
 export default {
     template,
-    computed: mapState(['items']),
+    computed: {
+        ...mapState(['items']),
+        ...mapGetters(['isBorrowed']),
+    },
+    methods: {
+        borrowState: function(item) {
+            return this.isBorrowed(item.id) ? 'borrowed' : 'available';
+        },
+    },
     components: { RouterButton },
 }
