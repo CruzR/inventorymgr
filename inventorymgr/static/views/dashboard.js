@@ -1,5 +1,6 @@
 import { mapState } from '/static/vuex.esm.browser.js'
 import LogList from '/static/views/log-list.js'
+import UserBorrowedItems from '/static/views/user-borrowed-items.js'
 
 
 const template = `
@@ -27,6 +28,8 @@ const template = `
           </router-link>
         </div>
       </nav>
+      <h3 class="title is-4">{{ $t('fields.your_borrowed_items') }}</h3>
+      <user-borrowed-items></user-borrowed-items>
       <h3 class="title is-4">{{ $t('fields.recent_activity') }}</h3>
       <log-list :logs="logs" v-if="users.length"></log-list>
     </section>`
@@ -35,5 +38,5 @@ const template = `
 export default {
     template,
     computed: mapState(['logs', 'users']),
-    components: { LogList },
+    components: { LogList, UserBorrowedItems },
 }

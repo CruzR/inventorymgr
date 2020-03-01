@@ -162,3 +162,8 @@ export function checkin(checkinRequest) {
 export function fetchLogs() {
     return fetch('/api/v1/logs').then(unpackJson);
 }
+
+export function transferItem(transferRequest) {
+    const params = createRequestParams(transferRequest);
+    return fetch('/api/v1/transferrequests', params).then(unpackJson);
+}

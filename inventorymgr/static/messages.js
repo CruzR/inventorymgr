@@ -19,6 +19,7 @@ export const messages = {
             register: 'Register',
             save: 'Save',
             show_returned: 'Show returned',
+            transfer: 'Transfer',
             view: 'View',
         },
         errors: {
@@ -70,6 +71,7 @@ export const messages = {
             user: 'User',
             user_barcode: 'User Barcode',
             username: 'Username',
+            your_borrowed_items: 'Your Borrowed Items',
         },
         page: {
             borrowed_items: 'Borrowed Items',
@@ -118,6 +120,7 @@ export const messages = {
             register: 'Registrieren',
             save: 'Speichern',
             show_returned: 'Zurückgegebene anzeigen',
+            transfer: 'Weitergeben',
             view: 'Anzeigen',
         },
         errors: {
@@ -169,6 +172,7 @@ export const messages = {
             user: 'Benutzer',
             user_barcode: 'Benutzer-Barcode',
             username: 'Benutzername',
+            your_borrowed_items: 'Deine entliehenen Objekte',
         },
         page: {
             borrowed_items: 'Entliehene Objekte',
