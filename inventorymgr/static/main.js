@@ -3,7 +3,7 @@ import Vuex from '/static/vuex.esm.browser.js'
 import { mapState } from '/static/vuex.esm.browser.js'
 import VueI18n from '/static/vue-i18n.esm.browser.js'
 import { messages } from '/static/messages.js'
-import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchRegistrationTokens, fetchUser, fetchUsers } from '/static/api.js'
+import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchRegistrationTokens, fetchTransferRequests, fetchUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
@@ -72,10 +72,12 @@ const store = new Vuex.Store({
         items: [],
         borrowstates: [],
         logs: [],
+        transferRequests: [],
     },
     getters: {
         userById: state => id => { return state.users.find(u => u.id === id); },
         itemById: state => id => { return state.items.find(i => i.id === id); },
+        borrowstateById: state => id => { return state.borrowstates.find(bs => bs.id === id); },
         isBorrowed: state => itemId => {
             return state.borrowstates.filter(
                 bs => bs.borrowed_item.id === itemId && bs.returned_at === null
@@ -93,6 +95,7 @@ const store = new Vuex.Store({
             state.items = [];
             state.borrowstates = [];
             state.logs = [];
+            state.transferRequests = [];
         },
         setUsers: (state, users) => { state.users = users },
         setQualifications: (state, qualifications) => { state.qualifications = qualifications },
@@ -167,6 +170,9 @@ const store = new Vuex.Store({
             }
         },
         setLogs: (state, logs) => { state.logs = logs; },
+        setTransferRequests: (state, transferRequests) => {
+            state.transferRequests = transferRequests;
+        },
     }
 });
 
@@ -236,6 +242,15 @@ router.beforeEach((to, from, next) => {
             fetchLogs().then(response => {
                 if (response.success) {
                     store.commit('setLogs', response.data.logs);
+                } else {
+                    console.error(response.error);
+                }
+            });
+        }
+        if (!store.state.transferRequests.length) {
+            fetchTransferRequests().then(response => {
+                if (response.success) {
+                    store.commit('setTransferRequests', response.data.transferrequests);
                 } else {
                     console.error(response.error);
                 }

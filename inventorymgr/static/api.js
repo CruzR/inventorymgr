@@ -24,6 +24,16 @@ function updateRequestParams(obj) {
     return params;
 }
 
+function deleteRequestParams(obj) {
+    const headers = contentTypeJson();
+    const params = {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify(obj),
+    };
+    return params;
+}
+
 function isJsonResponse(response) {
     const contentType = response.headers.get('Content-Type');
     return contentType.split(';')[0].trim() === 'application/json';
@@ -76,12 +86,7 @@ export function updateQualification(qualification) {
 }
 
 export function deleteQualification(qualification) {
-    const headers = contentTypeJson();
-    const params = {
-        method: 'DELETE',
-        headers,
-        body: JSON.stringify(qualification),
-    };
+    const params = deleteRequestParams(qualification);
     return fetch('/api/v1/qualifications/' + qualification.id, params).then(unpackJson);
 }
 
@@ -166,4 +171,18 @@ export function fetchLogs() {
 export function transferItem(transferRequest) {
     const params = createRequestParams(transferRequest);
     return fetch('/api/v1/transferrequests', params).then(unpackJson);
+}
+
+export function fetchTransferRequests() {
+    return fetch('/api/v1/transferrequests').then(unpackJson);
+}
+
+export function acceptTransferRequest(transferRequest) {
+    const params = deleteRequestParams({ action: 'accept' });
+    return fetch('/api/v1/transferrequests/' + transferRequest.id, params).then(unpackJson);
+}
+
+export function declineTransferRequest(transferRequest) {
+    const params = deleteRequestParams({ action: 'decline' });
+    return fetch('/api/v1/transferrequests/' + transferRequest.id, params).then(unpackJson);
 }

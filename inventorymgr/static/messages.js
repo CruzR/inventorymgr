@@ -1,6 +1,7 @@
 export const messages = {
     en: {
         actions: {
+            accept: 'Accept',
             add: 'Add',
             cancel: 'Cancel',
             change_password: 'Change Password',
@@ -11,6 +12,7 @@ export const messages = {
             create_item: 'Create Item',
             create_qualification: 'Create Qualification',
             create_user: 'Create User',
+            decline: 'Decline',
             delete: 'Delete',
             edit: 'Edit',
             generate_token: 'Generate Token',
@@ -54,6 +56,7 @@ export const messages = {
             barcode: 'Barcode',
             borrowed_by: 'Borrowed by',
             expires: 'Expires',
+            incoming_transfer_requests: 'Incoming Transfer Requests',
             item: 'Item',
             item_barcode: 'Item Barcode',
             new_password: 'New password',
@@ -102,6 +105,7 @@ export const messages = {
     },
     de: {
         actions: {
+            accept: 'Annehmen',
             add: 'Hinzufügen',
             cancel: 'Abbrechen',
             change_password: 'Passwort ändern',
@@ -112,6 +116,7 @@ export const messages = {
             create_item: 'Objekt erstellen',
             create_qualification: 'Qualifikation erstellen',
             create_user: 'Benutzer erstellen',
+            decline: 'Ablehnen',
             delete: 'Löschen',
             edit: 'Bearbeiten',
             generate_token: 'Token generieren',
@@ -155,6 +160,7 @@ export const messages = {
             barcode: 'Barcode',
             borrowed_by: 'Ausgeliehen von',
             expires: 'Gültig bis',
+            incoming_transfer_requests: 'Eingehende Weitergabe-Anfragen',
             item: 'Objekt',
             item_barcode: 'Objekt-Barcode',
             new_password: 'Neues Passwort',
