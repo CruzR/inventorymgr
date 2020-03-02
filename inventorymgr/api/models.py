@@ -114,6 +114,7 @@ class LogEntrySchema(Schema):
     timestamp = fields.DateTime(required=True)
     action = fields.Str(required=True)
     subject_id = fields.Integer(required=True)
+    secondary_id = fields.Integer()
     items = fields.Nested(BorrowableItemSchema, required=True, many=True, only=("id",))
 
 

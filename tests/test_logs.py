@@ -20,6 +20,7 @@ def test_get_logs(client, auth):
             "timestamp": "2020-01-02T12:34:56",
             "action": "checkout",
             "subject_id": 1,
+            "secondary_id": None,
             "items": [{"id": 1, "barcode": "0000000000001"}],
         }
     ]

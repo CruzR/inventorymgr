@@ -100,6 +100,7 @@ export const messages = {
             logs: {
                 checkin: '{subject} returned {items}.',
                 checkout: '{subject} borrowed {items}.',
+                transfer: '{subject} gave {items} to {secondary}.',
             },
         },
     },
@@ -204,6 +205,7 @@ export const messages = {
             logs: {
                 checkin: '{subject} gab {items} zurück.',
                 checkout: '{subject} lieh sich {items}.',
+                transfer: '{subject} gab {items} an {secondary} weiter.',
             },
         },
     },
