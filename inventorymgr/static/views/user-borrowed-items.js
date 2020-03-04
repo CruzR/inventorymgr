@@ -31,7 +31,7 @@ const template = `
         <div class="modal-card">
           <header class="modal-card-head">
             <p class="modal-card-title">Transfer {{ itemToTransfer.name }}</p>
-            <button class="delete" aria-label="close" @click="itemToTransfer = null"></button>
+            <button class="delete" aria-label="close" @click="closeDialog"></button>
           </header>
           <section class="modal-card-body">
             <form id="user-borrowed-items-form" @submit.prevent="sendTransferItemRequest">
@@ -45,7 +45,7 @@ const template = `
           </section>
           <footer class="modal-card-foot">
             <button form="user-borrowed-items-form" class="button is-primary">Transfer</button>
-            <button class="button" @click="itemToTransfer = null">Cancel</button>
+            <button class="button" @click="closeDialog">Cancel</button>
           </footer>
         </div>
       </div>
@@ -57,6 +57,10 @@ function showTransferDialog(item) {
     this.itemToTransfer = item;
 }
 
+function closeDialog() {
+    this.itemToTransfer = null;
+    this.targetUserNameOrBarcode = "";
+}
 
 function sendTransferItemRequest() {
     let selectedUser = this.users.find(u => u.barcode === this.targetUserNameOrBarcode);
@@ -67,13 +71,14 @@ function sendTransferItemRequest() {
         return;
     }
 
+    const this_ = this;
     transferItem({ borrowstate_id: this.itemToTransfer.borrowstate_id, target_user_id: selectedUser.id }).then(data => {
-        if (data.error) {
+        if (!data.error) {
+            this_.closeDialog();
+        } else {
             console.error(data.error);
         }
     });
-
-    this.itemToTransfer = null;
 }
 
 
@@ -100,6 +105,7 @@ export default {
         },
     },
     methods: {
+        closeDialog,
         showTransferDialog,
         sendTransferItemRequest,
     },
