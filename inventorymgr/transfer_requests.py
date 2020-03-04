@@ -32,9 +32,10 @@ def create_transfer_request() -> Dict[str, bool]:
     """API endpoint for creating transfer requests."""
     transfer_request_json = TransferRequestSchema().load(request.json, partial=("id",))
     borrowstate = BorrowState.query.get(transfer_request_json["borrowstate_id"])
+    issuing_user = User.query.get(session["user_id"])
     if borrowstate is None:
         raise APIError(reason="unknown_borrowstate", status_code=400)
-    if borrowstate.borrowing_user_id != session["user_id"]:
+    if borrowstate.borrowing_user_id != issuing_user.id:
         raise APIError(reason="insufficient_permissions", status_code=403)
     if borrowstate.returned_at is not None:
         raise APIError(reason="item_not_borrowed", status_code=400)
@@ -42,7 +43,9 @@ def create_transfer_request() -> Dict[str, bool]:
     item = borrowstate.borrowed_item
     if not set(item.required_qualifications) <= set(target_user.qualifications):
         raise APIError(reason="missing_qualifications", status_code=403)
-    transfer_request = TransferRequest(target_user=target_user, borrowstate=borrowstate)
+    transfer_request = TransferRequest(
+        target_user=target_user, issuing_user=issuing_user, borrowstate=borrowstate
+    )
     db.session.add(transfer_request)
     db.session.commit()
     return {"success": True}
@@ -57,6 +60,13 @@ def accept_or_decline_transfer_request(request_id: int) -> Dict[str, bool]:
     if transfer_request is None:
         raise APIError(reason="unknown_transfer_request", status_code=404)
     if user.id != transfer_request.target_user_id:
+        raise APIError(reason="insufficient_permissions", status_code=403)
+    if (
+        transfer_request.borrowstate.borrowing_user_id
+        != transfer_request.issuing_user_id
+    ):
+        db.session.delete(transfer_request)
+        db.session.commit()
         raise APIError(reason="insufficient_permissions", status_code=403)
     if request.json["action"] == "accept":
         item = transfer_request.borrowstate.borrowed_item

@@ -8,6 +8,7 @@ from inventorymgr.db.models import (
     BorrowState,
     LogEntry,
     TransferRequest,
+    User,
 )
 
 
@@ -59,6 +60,27 @@ def test_accept_transfer_request_with_missing_qualifications(client, auth, app):
     assert response.status_code == 403
     assert response.is_json
     assert response.json["reason"] == "missing_qualifications"
+
+
+def test_cannot_accept_transfer_request_for_item_not_borrowed_by_issuer(
+    client, auth, app
+):
+    with app.app_context():
+        new_user = User(username="another_user", password="")
+        tf = TransferRequest.query.get(1)
+        bs = tf.borrowstate
+        # Transfer borrowstate to another user to simulate item having changed hands
+        new_user.borrowstates = [bs]
+        db.session.add(new_user)
+        db.session.commit()
+        new_user_id = new_user.id
+    auth.login("min_permissions_user")
+    response = client.delete("/api/v1/transferrequests/1", json={"action": "accept"})
+    assert response.status_code == 403
+    assert response.is_json
+    assert response.json["reason"] == "insufficient_permissions"
+    with app.app_context():
+        assert BorrowState.query.get(2).borrowing_user_id == new_user_id
 
 
 def test_accept_transfer_request_successful(client, auth, app, monkeypatch):

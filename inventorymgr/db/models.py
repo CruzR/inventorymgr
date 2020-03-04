@@ -60,10 +60,17 @@ class User(db.Model):  # type: ignore
     secondary_log_entries = db.relationship(
         "LogEntry", back_populates="secondary", foreign_keys="LogEntry.secondary_id"
     )
+    outgoing_transfer_requests = db.relationship(
+        "TransferRequest",
+        back_populates="issuing_user",
+        cascade="all, delete, delete-orphan",
+        foreign_keys="TransferRequest.issuing_user_id",
+    )
     incoming_transfer_requests = db.relationship(
         "TransferRequest",
         back_populates="target_user",
         cascade="all, delete, delete-orphan",
+        foreign_keys="TransferRequest.target_user_id",
     )
 
 
@@ -175,9 +182,19 @@ class TransferRequest(db.Model):  # type: ignore
     """ORM model for transfer requests."""
 
     id = db.Column(db.Integer, primary_key=True)
+    issuing_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     target_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     borrowstate_id = db.Column(
         db.Integer, db.ForeignKey("borrow_state.id"), nullable=False
     )
-    target_user = db.relationship("User", back_populates="incoming_transfer_requests")
+    issuing_user = db.relationship(
+        "User",
+        back_populates="outgoing_transfer_requests",
+        foreign_keys=[issuing_user_id],
+    )
+    target_user = db.relationship(
+        "User",
+        back_populates="incoming_transfer_requests",
+        foreign_keys=[target_user_id],
+    )
     borrowstate = db.relationship("BorrowState", back_populates="transfer_requests")
