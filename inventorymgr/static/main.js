@@ -173,6 +173,14 @@ const store = new Vuex.Store({
         setTransferRequests: (state, transferRequests) => {
             state.transferRequests = transferRequests;
         },
+        deleteTransferRequest: (state, transferRequest) => {
+            const index = state.transferRequests.findIndex(
+                tr => tr.id === transferRequest.id
+            );
+            if (index !== -1) {
+                state.transferRequests.splice(index, 1);
+            }
+        },
     }
 });
 

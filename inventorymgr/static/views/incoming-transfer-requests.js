@@ -25,7 +25,7 @@ const template = `
                 <button
                   type="button"
                   class="button is-small"
-                  @click="onDeclineTransferRequest(transferRequest)">
+                  @click="onDeclineTransferRequest(row.transferRequest)">
                   {{ $t('actions.decline') }}
                 </button>
               </div>
@@ -39,7 +39,9 @@ const template = `
 
 function onAcceptTransferRequest(transferRequest) {
     acceptTransferRequest(transferRequest).then(response => {
-        if (!response.success) {
+        if (response.success) {
+            this.$store.commit('deleteTransferRequest', transferRequest);
+        } else {
             console.error(response.error);
         }
     });
@@ -47,7 +49,9 @@ function onAcceptTransferRequest(transferRequest) {
 
 function onDeclineTransferRequest(transferRequest) {
     declineTransferRequest(transferRequest).then(response => {
-        if (!response.success) {
+        if (response.success) {
+            this.$store.commit('deleteTransferRequest', transferRequest);
+        } else {
             console.error(response.error);
         }
     });
