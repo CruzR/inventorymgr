@@ -19,7 +19,7 @@ const template = `
                 <button
                   type="button"
                   class="button is-primary is-small"
-                  @click="onAcceptTransferRequest(row.transferRequest)">
+                  @click="onAcceptTransferRequest(row)">
                   {{ $t('actions.accept') }}
                 </button>
                 <button
@@ -37,10 +37,18 @@ const template = `
     `
 
 
-function onAcceptTransferRequest(transferRequest) {
+function onAcceptTransferRequest(row) {
+    const transferRequest = row.transferRequest;
+    const borrowState = row.borrowState;
+    const user = {
+        id: this.sessionUser.id,
+        barcode: this.sessionUser.barcode,
+        username: this.sessionUser.username,
+    };
     acceptTransferRequest(transferRequest).then(response => {
         if (response.success) {
             this.$store.commit('deleteTransferRequest', transferRequest);
+            this.$store.commit('addBorrowStates', [{ ...borrowState, borrowing_user: user}]);
         } else {
             console.error(response.error);
         }
@@ -61,7 +69,7 @@ function onDeclineTransferRequest(transferRequest) {
 export default {
     template,
     computed: {
-        ...mapState(['transferRequests']),
+        ...mapState(['sessionUser', 'transferRequests']),
         ...mapGetters(['borrowstateById', 'itemById']),
         transferRequestsTable: function() {
             return this.transferRequests.map(tr => {
@@ -69,6 +77,7 @@ export default {
                 const item = this.itemById(borrowState.borrowed_item.id);
                 return {
                     transferRequest: tr,
+                    borrowState,
                     item,
                 };
             });
