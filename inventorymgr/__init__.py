@@ -56,11 +56,13 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
         def _sqlite_enforce_foreign_keys(dbapi_con: Any, _con_record: Any) -> None:
             dbapi_con.execute("PRAGMA foreign_keys=ON;")
 
-        with app.app_context():  # type: ignore
+        with app.app_context():
             event.listen(db.engine, "connect", _sqlite_enforce_foreign_keys)
 
+    from .views import views_blueprint
     from .app import bp
 
+    app.register_blueprint(views_blueprint)
     app.register_blueprint(bp)
 
     _register_api_endpoints(app)

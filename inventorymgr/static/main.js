@@ -5,7 +5,6 @@ import VueI18n from '/static/vue-i18n.esm.browser.js'
 import { messages } from '/static/messages.js'
 import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchRegistrationTokens, fetchTransferRequests, fetchUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
-import LoginView from '/static/views/login.js'
 import CreateUserView from '/static/views/createuser.js'
 import CreateQualificationView from '/static/views/createqualification.js'
 import UsersView from '/static/views/users.js'
@@ -36,7 +35,6 @@ Vue.use(Vuex);
 Vue.use(VueI18n);
 
 const routes = [
-    { path: '/login', component: LoginView },
     { path: '/register/:token', component: RegistrationView },
     { path: '/', component: DashboardView },
     { path: '/users/new', component: CreateUserView },
@@ -186,8 +184,8 @@ const store = new Vuex.Store({
 
 router.beforeEach((to, from, next) => {
     if (!store.state.isAuthenticated) {
-        if (to.path !== '/login' && !to.path.startsWith('/register')) {
-            next({ path: '/login', query: { next: to.path } });
+        if (!to.path.startsWith('/register')) {
+            location = location.origin + '/login';
         } else {
             next();
         }

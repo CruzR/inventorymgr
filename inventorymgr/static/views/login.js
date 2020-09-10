@@ -49,9 +49,7 @@ function sendLoginRequest() {
 
     login(user).then(response => {
         if (response.success) {
-            this.$store.commit('login');
-            const nextRoute = this.$route.query['next'] || '/';
-            this.$router.push(nextRoute);
+            location = location.origin;
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);
