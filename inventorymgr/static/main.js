@@ -15,7 +15,6 @@ import EditUserView from '/static/views/edituser.js'
 import UserDetailView from '/static/views/viewuser.js'
 import QualificationDetailView from '/static/views/viewqualification.js'
 import EditQualificationView from '/static/views/editqualification.js'
-import RegistrationView from '/static/views/registration.js'
 import RegistrationTokensView from '/static/views/tokens.js'
 import BorrowableItemsView from '/static/views/borrowableitems.js'
 import ItemDetailView from '/static/views/viewitem.js'
@@ -35,7 +34,6 @@ Vue.use(Vuex);
 Vue.use(VueI18n);
 
 const routes = [
-    { path: '/register/:token', component: RegistrationView },
     { path: '/', component: DashboardView },
     { path: '/users/new', component: CreateUserView },
     { path: '/users/:id', component: UserDetailView },
@@ -184,11 +182,7 @@ const store = new Vuex.Store({
 
 router.beforeEach((to, from, next) => {
     if (!store.state.isAuthenticated) {
-        if (!to.path.startsWith('/register')) {
-            location = location.origin + '/login';
-        } else {
-            next();
-        }
+        location = location.origin + '/login';
     } else {
         if (store.state.sessionUser === null) {
             fetchUser('me').then(response => {

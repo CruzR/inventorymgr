@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Registration - inventorymgr</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/bulma.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <registration-view></registration-view>
+      </div>
+    </div>
+    <script type="application/javascript" src="/static/errors.js"></script>
+    <script type="module">
+import Vue from '/static/vue.esm.browser.js'
+import VueI18n from '/static/vue-i18n.esm.browser.js'
+import { messages } from '/static/messages.js'
+import RegistrationView from '/static/views/registration.js'
+
+Vue.use(VueI18n);
+
+const i18n = new VueI18n({
+    locale: navigator.language.slice(0, 2),
+    messages,
+});
+
+const vm = new Vue({
+    i18n,
+    el: '#app',
+    components: {
+        RegistrationView,
+    }
+});
+    </script>
+  </body>
+</html>

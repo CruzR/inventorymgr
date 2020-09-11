@@ -68,11 +68,11 @@ function formatError(error) {
 }
 
 function sendRegistrationRequest() {
-    const token = this.$route.params.token;
+    const token = location.pathname.match(/[/]register[/](\w*)/)[1];
 
     register(token, this.newuser).then(response => {
         if (response.success) {
-            this.$router.push('/login');
+          location = location.origin + '/login';
         } else {
             console.error(response.error);
             this.error = this.$t(`errors.${response.error.reason}`);
