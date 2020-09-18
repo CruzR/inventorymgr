@@ -9,7 +9,7 @@
   </head>
   <body>
     <div id="app">
-      <navigation-bar v-if="isAuthenticated"></navigation-bar>
+      <navigation-bar v-if="isAuthenticated" :session-user="$store.state.sessionUser"></navigation-bar>
       <div class="container">
         <router-view></router-view>
       </div>

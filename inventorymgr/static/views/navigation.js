@@ -1,30 +1,31 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { logout } from '/static/api.js'
 
 
 const navbarLinkTemplate = `
-    <router-link :to="href" v-slot="{ href, navigate, isActive }">
-      <a
-        :href="href"
-        :class="{ 'navbar-item': true, 'is-active': isActive }"
-        @click="navigate"><slot></slot></a>
-    </router-link>`
+    <a
+      :href="href"
+      :class="{ 'navbar-item': true, 'is-active': isActive }">
+      <slot></slot>
+    </a>`
 
 
 const NavbarLink = {
   props: ['href'],
   template: navbarLinkTemplate,
+  computed: {
+    isActive: function() {
+      return location.pathname.startsWith(this.href);
+    },
+  },
 };
 
 
 const template = `
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <router-link to="/" v-slot="{ href, navigate, isExactActive }">
-          <a :class="{ 'navbar-item': true, 'is-active': isExactActive }" :href="href" @click="navigate">
-            inventorymgr
-          </a>
-        </router-link>
+        <a :class="{ 'navbar-item': true, 'is-active': isDashboard }" href="/">
+          inventorymgr
+        </a>
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" @click="showMenu = !showMenu">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
@@ -55,8 +56,7 @@ const template = `
 function sendLogoutRequest() {
     logout().then(response => {
         if (response.success) {
-            this.$store.commit('logout');
-            this.$router.push('/login');
+            location = location.origin + '/login';
         } else {
             console.error(response.error);
         }
@@ -65,14 +65,17 @@ function sendLogoutRequest() {
 
 export default {
     template,
+    props: ['sessionUser'],
     data: () => {
         return {
             showMenu: false,
         }
     },
-    computed: mapState(['sessionUser']),
     methods: {
         sendLogoutRequest
+    },
+    computed: {
+      isDashboard: () => location.pathname === '/',
     },
     components: { NavbarLink },
 }
