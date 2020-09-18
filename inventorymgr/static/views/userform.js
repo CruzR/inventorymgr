@@ -153,13 +153,9 @@ const template = `
       </div>
       <div class="field is-grouped" v-else-if="isViewContext">
         <div class="control">
-          <router-link
-            :to="editUserUrl"
-            v-slot="{ href, navigate }">
-            <a class="button is-primary" :href="href" @click="navigate">
-             {{ $t('actions.edit') }}
-            </a>
-          </router-link>
+          <a class="button is-primary" :href="editUserUrl">
+            {{ $t('actions.edit') }}
+          </a>
         </div>
         <div class="control">
           <button type="button" class="button is-danger"
@@ -180,7 +176,7 @@ function editUserUrl() {
 
 export default {
     template,
-    props: ['current', 'context', 'error'],
+    props: ['current', 'context', 'error', 'qualifications', 'sessionUser'],
     data: function() {
         const user = (typeof(this.current) !== 'undefined')
             ? JSON.parse(JSON.stringify(this.current))
@@ -213,7 +209,6 @@ export default {
             return this.context === 'create';
         },
         editUserUrl,
-        ...mapState(['qualifications', 'sessionUser']),
     },
     components: { TagSelectBox }
 }

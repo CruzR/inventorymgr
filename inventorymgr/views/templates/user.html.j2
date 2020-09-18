@@ -1,0 +1,13 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<user-detail-view :session-user="sessionUser" :qualifications="qualifications" :users="users"></user-detail-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import UserDetailView from '/static/views/viewuser.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+UserDetailView,
+{%endblock additional_components %}

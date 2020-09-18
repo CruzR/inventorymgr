@@ -12,7 +12,6 @@ import QualificationsView from '/static/views/qualifications.js'
 import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
 import EditUserView from '/static/views/edituser.js'
-import UserDetailView from '/static/views/viewuser.js'
 import QualificationDetailView from '/static/views/viewqualification.js'
 import EditQualificationView from '/static/views/editqualification.js'
 import RegistrationTokensView from '/static/views/tokens.js'
@@ -36,7 +35,6 @@ Vue.use(VueI18n);
 const routes = [
     { path: '/', component: DashboardView },
     { path: '/users/new', component: CreateUserView },
-    { path: '/users/:id', component: UserDetailView },
     { path: '/users/:id/edit', component: EditUserView },
     { path: '/users', component: UsersView },
     { path: '/qualifications/new', component: CreateQualificationView },

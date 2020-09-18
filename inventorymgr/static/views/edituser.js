@@ -7,6 +7,8 @@ const template = `
     <user-form
       v-if="currentUser"
       :current="currentUser"
+      :sessionUser="sessionUser"
+      :qualifications="qualifications"
       :error="errorMessage"
       context="edit"
       @commit-user-change="sendUpdateUserRequest"
@@ -54,7 +56,7 @@ export default {
             const id = parseInt(this.$route.params.id);
             return this.users.find(u => u.id === id);
         },
-        ...mapState(['users', 'sessionUser']),
+        ...mapState(['users', 'sessionUser', 'qualifications']),
     },
     methods: {
         sendUpdateUserRequest,

@@ -56,9 +56,9 @@ const template = `
                   :to="'/users/' + user.id + '/edit'" kind="is-primary is-small">
                   {{ $t('actions.edit') }}
                 </router-button>
-                <router-button :to="'/users/' + user.id" kind="is-small">
+                <a :href="'/users/' + user.id" class="button is-small">
                   {{ $t('actions.view') }}
-                </router-button>
+                </a>
               </div>
             </td>
           </tr>

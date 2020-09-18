@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>inventorymgr</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/bulma.css">
+    <link rel="stylesheet" href="/static/global.css">
+  </head>
+  <body>
+    <div id="app">
+      <navigation-bar :session-user="sessionUser"></navigation-bar>
+      <div class="container">
+        {% block content %}
+        {% endblock content %}
+      </div>
+    </div>
+    <script type="application/javascript" src="/static/errors.js"></script>
+    <script type="module">
+import Vue from '/static/vue.esm.browser.js'
+import VueI18n from '/static/vue-i18n.esm.browser.js'
+import { messages } from '/static/messages.js'
+import { fetchQualifications, fetchUser, fetchUsers } from '/static/api.js'
+import NavigationBar from '/static/views/navigation.js'
+{% block additional_imports %}
+{% endblock additional_imports %}
+
+
+Vue.use(VueI18n);
+
+const i18n = new VueI18n({
+    locale: navigator.language.slice(0, 2),
+    messages,
+});
+
+const components = {
+    NavigationBar,
+    {% block additional_components %}
+    {% endblock additional_components %}
+};
+
+Promise.all([fetchUser('me'), fetchQualifications(), fetchUsers()]).then(responses => {
+    if (responses.every(r => r.success)) {
+        const [userResponse, qualificationsResponse, usersResponse] = responses;
+        const vm = new Vue({
+            i18n,
+            el: '#app',
+            data: {
+                sessionUser: userResponse.data,
+                qualifications: qualificationsResponse.data,
+                users: usersResponse.data.users,
+            },
+            methods: {
+                sendLogoutRequest: function() {},
+            },
+            components: components,
+        });
+    } else {
+        console.error(response.error);
+    }
+})
+
+    </script>
+    {% block additional_scripts %}
+    {% endblock additional_scripts %}
+  </body>
+</html>
+<!-- vim: set ts=2 sw=2 et: -->
