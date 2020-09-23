@@ -1,6 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
-
-
 const template = `
     <div>
       <table class="table is-fullwidth responsive-table">
@@ -35,5 +32,5 @@ const template = `
 
 export default {
     template,
-    computed: mapState(['qualifications']),
+    props: ['qualifications'],
 }
