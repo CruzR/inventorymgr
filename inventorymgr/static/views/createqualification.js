@@ -11,8 +11,7 @@ const template = `
 function sendCreateQualificationRequest(qualification) {
     createQualification(qualification).then(response => {
         if (response.success) {
-            this.$store.commit('updateQualification', response.data);
-            this.$router.push('/qualifications');
+            location = location.origin + '/qualifications';
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);

@@ -1,5 +1,4 @@
 import { mapState } from '/static/vuex.esm.browser.js'
-import RouterButton from '/static/views/routerbutton.js'
 
 
 const template = `
@@ -27,9 +26,9 @@ const template = `
           </tr>
         </tbody>
       </table>
-      <router-button to="/qualifications/new">
+      <a href="/qualifications/new" class="button">
         {{ $t('actions.create_qualification') }}
-      </router-button>
+      </a>
     </div>
     `
 
@@ -37,5 +36,4 @@ const template = `
 export default {
     template,
     computed: mapState(['qualifications']),
-    components: { RouterButton },
 }

@@ -7,6 +7,12 @@ from flask import render_template
 from inventorymgr.views.blueprint import views_blueprint
 
 
+@views_blueprint.route("/qualifications/new")
+def qualification_new() -> Any:
+    """Return a view for creating a new qualification."""
+    return render_template("qualification_new.html.j2")
+
+
 @views_blueprint.route("/qualifications/<qualification_id>")
 def qualification_detail(
     qualification_id: str,  # pylint: disable=unused-argument

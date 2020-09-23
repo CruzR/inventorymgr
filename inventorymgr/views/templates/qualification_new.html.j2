@@ -1,0 +1,13 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<create-qualification-view></create-qualification-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import CreateQualificationView from '/static/views/createqualification.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+CreateQualificationView,
+{%endblock additional_components %}

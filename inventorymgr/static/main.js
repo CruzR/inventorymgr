@@ -6,7 +6,6 @@ import { messages } from '/static/messages.js'
 import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchRegistrationTokens, fetchTransferRequests, fetchUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
 import CreateUserView from '/static/views/createuser.js'
-import CreateQualificationView from '/static/views/createqualification.js'
 import UsersView from '/static/views/users.js'
 import QualificationsView from '/static/views/qualifications.js'
 import NavigationBar from '/static/views/navigation.js'
@@ -35,7 +34,6 @@ const routes = [
     { path: '/users/new', component: CreateUserView },
     { path: '/users/:id/edit', component: EditUserView },
     { path: '/users', component: UsersView },
-    { path: '/qualifications/new', component: CreateQualificationView },
     { path: '/qualifications', component: QualificationsView },
     { path: '/tokens', component: RegistrationTokensView },
     { path: '/items', component: BorrowableItemsView },
