@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { deleteQualification } from '/static/api.js'
 import DeleteDialog from '/static/views/delete-dialog.js'
 import QualificationForm from '/static/views/qualificationform.js'
@@ -22,15 +21,16 @@ const template = `
     `
 
 function currentQualification() {
-    const id = parseInt(this.$route.params.id);
+    const path = location.pathname.split('/');
+    const idComponent = path[path.length - 1];
+    const id = parseInt(idComponent);
     return this.qualifications.find(q => q.id === id);
 }
 
 function sendDeleteQualificationRequest(qualification) {
     deleteQualification(qualification).then(response => {
         if (response.success) {
-            this.$store.commit('deleteQualification', qualification);
-            this.$router.push('/qualifications');
+            location = location.origin + '/qualifications';
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);
@@ -40,12 +40,12 @@ function sendDeleteQualificationRequest(qualification) {
 
 export default {
     template,
+    props: ['qualifications'],
     data: () => {
         return { errorMessage: '', showDeleteDialog: false }
     },
     computed: {
         currentQualification,
-        ...mapState(['qualifications']),
     },
     methods: {
         sendDeleteQualificationRequest

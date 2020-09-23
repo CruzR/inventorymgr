@@ -41,13 +41,9 @@ const template = `
         </div>
         <div class="field is-grouped" v-else-if="isViewContext">
           <div class="control">
-           <router-link
-             :to="'/qualifications/' + current.id + '/edit'"
-             v-slot="{ href, navigate }">
-             <a :href="href" class="button is-primary" @click="navigate">
+           <a :href="'/qualifications/' + current.id + '/edit'" class="button is-primary">
                {{ $t('actions.edit') }}
-             </a>
-           </router-link>
+           </a>
           </div>
           <div class="control">
             <button type="button" class="button is-danger"

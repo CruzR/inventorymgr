@@ -21,10 +21,9 @@ const template = `
                   kind="is-primary is-small">
                   {{ $t('actions.edit') }}
                 </router-button>
-                <router-button
-                  :to="'/qualifications/' + qualification.id" kind="is-small">
+                <a :href="'/qualifications/' + qualification.id" class="button is-small">
                   {{ $t('actions.view') }}
-                </router-button>
+                </a>
               </div>
             </td>
           </tr>
