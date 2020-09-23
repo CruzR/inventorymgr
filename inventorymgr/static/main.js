@@ -12,7 +12,6 @@ import QualificationsView from '/static/views/qualifications.js'
 import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
 import EditUserView from '/static/views/edituser.js'
-import EditQualificationView from '/static/views/editqualification.js'
 import RegistrationTokensView from '/static/views/tokens.js'
 import BorrowableItemsView from '/static/views/borrowableitems.js'
 import ItemDetailView from '/static/views/viewitem.js'
@@ -37,7 +36,6 @@ const routes = [
     { path: '/users/:id/edit', component: EditUserView },
     { path: '/users', component: UsersView },
     { path: '/qualifications/new', component: CreateQualificationView },
-    { path: '/qualifications/:id/edit', component: EditQualificationView },
     { path: '/qualifications', component: QualificationsView },
     { path: '/tokens', component: RegistrationTokensView },
     { path: '/items', component: BorrowableItemsView },

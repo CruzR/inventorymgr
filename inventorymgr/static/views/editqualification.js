@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { updateQualification } from '/static/api.js'
 import QualificationForm from '/static/views/qualificationform.js'
 
@@ -16,8 +15,7 @@ const template = `
 function sendUpdateQualificationRequest(qualification) {
     updateQualification(qualification).then(response => {
         if (response.success) {
-            this.$store.commit('updateQualification', response.data);
-            this.$router.push('/qualifications');
+            location = location.origin + '/qualifications';
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);
@@ -26,22 +24,29 @@ function sendUpdateQualificationRequest(qualification) {
 }
 
 function returnToView() {
-    this.$router.push('/qualifications/' + this.$route.params.id);
+    location = location.origin + '/qualifications/' + this.qualificationId;
+}
+
+function qualificationId() {
+    const path = location.pathname.split('/');
+    const idComponent = path[path.length - 2];
+    return parseInt(idComponent);
 }
 
 function currentQualification() {
-    const id = parseInt(this.$route.params.id);
+    const id = this.qualificationId;
     return this.qualifications.find(q => q.id === id);
 }
 
 export default {
     template,
+    props: ['qualifications'],
     data: () => {
         return { errorMessage: '' }
     },
     computed: {
         currentQualification,
-        ...mapState(['qualifications']),
+        qualificationId,
     },
     methods: {
         sendUpdateQualificationRequest,

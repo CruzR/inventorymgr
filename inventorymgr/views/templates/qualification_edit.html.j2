@@ -1,0 +1,13 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<edit-qualification-view :qualifications="qualifications"></edit-qualification-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import EditQualificationView from '/static/views/editqualification.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+EditQualificationView,
+{%endblock additional_components %}

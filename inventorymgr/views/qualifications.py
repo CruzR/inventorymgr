@@ -13,3 +13,9 @@ def qualification_detail(
 ) -> Any:
     """Return a detail view for a qualification."""
     return render_template("qualification_detail.html.j2")
+
+
+@views_blueprint.route("/qualifications/<qualification_id>/edit")
+def qualification_edit(qualification_id: str) -> Any:  # pylint: disable=unused-argument
+    """Return an edit view for a qualification."""
+    return render_template("qualification_edit.html.j2")

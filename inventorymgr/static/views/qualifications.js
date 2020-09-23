@@ -16,11 +16,9 @@ const template = `
             <td :data-label="$t('fields.qualification')">{{ qualification.name }}</td>
             <td :data-label="$t('fields.actions')">
               <div class="buttons">
-                <router-button
-                  :to="'/qualifications/' + qualification.id + '/edit'"
-                  kind="is-primary is-small">
+                <a :href="'/qualifications/' + qualification.id + '/edit'" class="button is-primary is-small">
                   {{ $t('actions.edit') }}
-                </router-button>
+                </a>
                 <a :href="'/qualifications/' + qualification.id" class="button is-small">
                   {{ $t('actions.view') }}
                 </a>
