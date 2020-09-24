@@ -6,6 +6,12 @@ from flask import render_template
 from inventorymgr.views.blueprint import views_blueprint
 
 
+@views_blueprint.route("/users")
+def users() -> Any:
+    """List view of all users."""
+    return render_template("users.html.j2")
+
+
 @views_blueprint.route("/users/new")
 def user_new() -> Any:
     """View for creating new users."""

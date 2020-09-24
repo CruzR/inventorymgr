@@ -1,0 +1,13 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<users-view :users="users"></users-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import UsersView from '/static/views/users.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+UsersView,
+{%endblock additional_components %}

@@ -1,7 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
-import RouterButton from '/static/views/routerbutton.js'
-
-
 const template = `
     <div>
       <table class="table is-fullwidth responsive-table">
@@ -52,10 +48,9 @@ const template = `
             </td>
             <td :data-label="$t('fields.actions')">
               <div class="buttons">
-                <router-button
-                  :to="'/users/' + user.id + '/edit'" kind="is-primary is-small">
+                <a :href="'/users/' + user.id + '/edit'" class="button is-primary is-small">
                   {{ $t('actions.edit') }}
-                </router-button>
+                </a>
                 <a :href="'/users/' + user.id" class="button is-small">
                   {{ $t('actions.view') }}
                 </a>
@@ -73,6 +68,5 @@ const template = `
 
 export default {
     template,
-    computed: mapState(['users']),
-    components: { RouterButton },
+    props: ['users'],
 }
