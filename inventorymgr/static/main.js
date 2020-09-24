@@ -7,7 +7,6 @@ import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchReg
 import VueRouter from '/static/vue-router.esm.browser.js'
 import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
-import EditUserView from '/static/views/edituser.js'
 import RegistrationTokensView from '/static/views/tokens.js'
 import BorrowableItemsView from '/static/views/borrowableitems.js'
 import ItemDetailView from '/static/views/viewitem.js'
@@ -28,7 +27,6 @@ Vue.use(VueI18n);
 
 const routes = [
     { path: '/', component: DashboardView },
-    { path: '/users/:id/edit', component: EditUserView },
     { path: '/tokens', component: RegistrationTokensView },
     { path: '/items', component: BorrowableItemsView },
     { path: '/items/new', component: ItemCreateView },

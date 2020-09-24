@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { updateUser } from '/static/api.js'
 import UserForm from '/static/views/userform.js'
 
@@ -25,13 +24,9 @@ function sendUpdateUserRequest(user, repeatedPassword) {
         delete user.password;
     }
 
-    updateUser(this.$route.params.id, user).then(response => {
+    updateUser(this.userId, user).then(response => {
         if (response.success) {
-            this.$store.commit('updateUser', response.data);
-            if (this.$route.params.id === 'me') {
-                this.$store.commit('setSessionUser', response.data);
-            }
-            this.$router.push('/users');
+            location = location.origin + '/users';
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);
@@ -40,23 +35,28 @@ function sendUpdateUserRequest(user, repeatedPassword) {
 }
 
 function returnToUsers() {
-    this.$router.push('/users/' + this.$route.params.id);
+    location = location.origin + '/users/' + this.userId;
 }
 
 export default {
     template,
+    props: ['sessionUser', 'qualifications', 'users'],
     data: () => {
         return { errorMessage: '' }
     },
     computed: {
+        userId: function() {
+            const path = location.pathname.split('/');
+            const idComponent = path[path.length - 2];
+            return (idComponent === 'me') ? idComponent : parseInt(idComponent);
+        },
         currentUser: function() {
-            if (this.$route.params.id === 'me') {
+            if (this.userId === 'me') {
                 return this.sessionUser;
             }
-            const id = parseInt(this.$route.params.id);
+            const id = this.userId;
             return this.users.find(u => u.id === id);
         },
-        ...mapState(['users', 'sessionUser', 'qualifications']),
     },
     methods: {
         sendUpdateUserRequest,

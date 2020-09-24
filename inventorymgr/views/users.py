@@ -22,3 +22,9 @@ def user_new() -> Any:
 def user_detail(user_id: str) -> Any:  # pylint: disable=unused-argument
     """Server-side rendered detail view for users."""
     return render_template("user.html.j2")
+
+
+@views_blueprint.route("/users/<user_id>/edit")
+def user_edit(user_id: str) -> Any:  # pylint: disable=unused-argument
+    """View for editing an existing user."""
+    return render_template("user_edit.html.j2")

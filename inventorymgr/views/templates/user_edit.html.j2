@@ -1,0 +1,13 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<edit-user-view :session-user="sessionUser" :qualifications="qualifications" :users="users"></edit-user-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import EditUserView from '/static/views/edituser.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+EditUserView,
+{%endblock additional_components %}
