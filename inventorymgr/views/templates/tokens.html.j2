@@ -1,0 +1,22 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<registration-tokens-view :tokens="tokens"></registration-tokens-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import RegistrationTokensView from '/static/views/tokens.js'
+import { fetchRegistrationTokens } from '/static/api.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+RegistrationTokensView,
+{% endblock additional_components %}
+
+{% block additional_fetches %}
+fetchRegistrationTokens(),
+{% endblock additional_fetches %}
+
+{% block additional_data %}
+tokens: additionalResponses[0].data.tokens,
+{% endblock additional_data %}

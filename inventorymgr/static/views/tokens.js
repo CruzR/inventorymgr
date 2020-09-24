@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { generateRegistrationToken, deleteRegistrationToken } from '/static/api.js'
 
 
@@ -50,7 +49,7 @@ function copyTokenUrl(token) {
 function deleteToken(token) {
     deleteRegistrationToken(token).then(response => {
         if (response.success) {
-            this.$store.commit('deleteToken', token);
+            location = location;
         } else {
             console.error(response.error);
             this.error = this.$t(`errors.${response.error.reason}`);
@@ -62,7 +61,7 @@ function deleteToken(token) {
 function sendGenerateTokenRequest() {
     generateRegistrationToken().then(response => {
         if (response.success) {
-            this.$store.commit('addToken', response.data);
+            location = location;
         } else {
             console.error(response.error);
         }
@@ -72,9 +71,9 @@ function sendGenerateTokenRequest() {
 
 export default {
     template,
+    props:['tokens'],
     data: () => {
         return { error: '' }
     },
-    computed: mapState(['tokens']),
     methods: { copyTokenUrl, deleteToken, sendGenerateTokenRequest },
 }

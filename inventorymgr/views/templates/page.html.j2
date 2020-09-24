@@ -39,9 +39,19 @@ const components = {
     {% endblock additional_components %}
 };
 
-Promise.all([fetchUser('me'), fetchQualifications(), fetchUsers()]).then(responses => {
+Promise.all([
+    fetchUser('me'),
+    fetchQualifications(),
+    fetchUsers(),
+    {% block additional_fetches %}
+    {% endblock additional_fetches %}
+]).then(responses => {
     if (responses.every(r => r.success)) {
-        const [userResponse, qualificationsResponse, usersResponse] = responses;
+        const [userResponse, qualificationsResponse, usersResponse, ...additionalResponses] = responses;
+        const additionalData = {
+            {% block additional_data %}
+            {% endblock additional_data %}
+        };
         const vm = new Vue({
             i18n,
             el: '#app',
@@ -49,6 +59,7 @@ Promise.all([fetchUser('me'), fetchQualifications(), fetchUsers()]).then(respons
                 sessionUser: userResponse.data,
                 qualifications: qualificationsResponse.data,
                 users: usersResponse.data.users,
+                ...additionalData
             },
             methods: {
                 sendLogoutRequest: function() {},
