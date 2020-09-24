@@ -5,7 +5,6 @@ import VueI18n from '/static/vue-i18n.esm.browser.js'
 import { messages } from '/static/messages.js'
 import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchRegistrationTokens, fetchTransferRequests, fetchUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
-import CreateUserView from '/static/views/createuser.js'
 import UsersView from '/static/views/users.js'
 import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
@@ -30,7 +29,6 @@ Vue.use(VueI18n);
 
 const routes = [
     { path: '/', component: DashboardView },
-    { path: '/users/new', component: CreateUserView },
     { path: '/users/:id/edit', component: EditUserView },
     { path: '/users', component: UsersView },
     { path: '/tokens', component: RegistrationTokensView },

@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import TagSelectBox from '/static/views/tagselectbox.js'
 
 const template = `

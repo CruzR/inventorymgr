@@ -5,6 +5,7 @@ const template = `
     <user-form
       context="create"
       :error="errorMessage"
+      :qualifications="qualifications"
       @commit-user-change="sendCreateUserRequest">
     </user-form>`
 
@@ -21,8 +22,7 @@ function sendCreateUserRequest(user, repeatedPassword) {
 
     createUser(user).then(response => {
         if (response.success) {
-            this.$store.commit('updateUser', response.data);
-            this.$router.push('/users');
+            location = location.origin + '/users';
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);
@@ -32,6 +32,7 @@ function sendCreateUserRequest(user, repeatedPassword) {
 
 export default {
     template,
+    props: ['qualifications'],
     data: () => {
         return { errorMessage: '' }
     },

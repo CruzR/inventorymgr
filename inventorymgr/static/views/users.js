@@ -64,9 +64,9 @@ const template = `
           </tr>
         </tbody>
       </table>
-      <router-button to="/users/new">
+      <a href="/users/new" class="button">
         {{ $t('actions.create_user') }}
-      </router-button>
+      </a>
     </div>
     `
 

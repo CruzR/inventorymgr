@@ -1,0 +1,13 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<create-user-view :qualifications="qualifications"></user-detail-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import CreateUserView from '/static/views/createuser.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+CreateUserView,
+{%endblock additional_components %}
