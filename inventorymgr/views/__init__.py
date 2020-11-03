@@ -2,6 +2,7 @@
 
 
 import inventorymgr.views.auth
+import inventorymgr.views.items
 import inventorymgr.views.qualifications
 import inventorymgr.views.registration
 import inventorymgr.views.users

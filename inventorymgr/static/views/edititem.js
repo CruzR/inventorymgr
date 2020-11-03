@@ -24,7 +24,7 @@ function sendUpdateItemRequest(item) {
     updateItem(item).then(response => {
         if (response.success) {
             this.$store.commit('addItem', response.data);
-            this.$router.push('/items');
+            location = location.origin + '/items';
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);

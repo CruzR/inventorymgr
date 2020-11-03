@@ -1,7 +1,3 @@
-import { mapGetters, mapState } from '/static/vuex.esm.browser.js'
-import RouterButton from '/static/views/routerbutton.js'
-
-
 const template = `
     <div>
       <table class="table is-fullwidth responsive-table">
@@ -35,34 +31,34 @@ const template = `
             </td>
             <td :data-label="$t('fields.actions')">
               <div class="buttons">
-                <router-button
-                  :to="'/items/' + item.id + '/edit'" kind="is-primary is-small">
+                <a :href="'/items/' + item.id + '/edit'" class="button is-primary is-small">
                   {{ $t('actions.edit') }}
-                </router-button>
-                <router-button :to="'/items/' + item.id" kind="is-small">
+                </a>
+                <a :href="'/items/' + item.id" class="button is-small">
                   {{ $t('actions.view') }}
-                </router-button>
+                </a>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
-      <router-button to="/items/new">
+      <a href="/items/new" class="button">
         {{ $t('actions.create_item') }}
-      </router-button>
+      </a>
     </div>`
 
 
 export default {
     template,
-    computed: {
-        ...mapState(['items']),
-        ...mapGetters(['isBorrowed']),
-    },
+    props: ['items', 'borrowstates'],
     methods: {
+        isBorrowed: function(itemId) {
+            return this.borrowstates.filter(
+                bs => bs.borrowed_item.id === itemId && bs.returned_at === null
+            ).length > 0;
+        },
         borrowState: function(item) {
             return this.isBorrowed(item.id) ? 'borrowed' : 'available';
         },
     },
-    components: { RouterButton },
 }

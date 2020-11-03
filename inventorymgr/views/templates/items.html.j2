@@ -1,0 +1,24 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<borrowable-items-view :borrowstates="borrowstates" :items="items"></borrowable-items-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import BorrowableItemsView from '/static/views/borrowableitems.js'
+import { fetchBorrowStates, fetchItems } from '/static/api.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+BorrowableItemsView,
+{% endblock additional_components %}
+
+{% block additional_fetches %}
+fetchBorrowStates(),
+fetchItems(),
+{% endblock additional_fetches %}
+
+{% block additional_data %}
+borrowstates: additionalResponses[0].data.borrowstates,
+items: additionalResponses[1].data.items,
+{% endblock additional_data %}
