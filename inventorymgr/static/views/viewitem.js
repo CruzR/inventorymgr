@@ -15,6 +15,7 @@ const template = `
         v-if="currentItem"
         context="view"
         :current="currentItem"
+        :qualifications="qualifications"
         :error="errorMessage"
         @delete-item="showDeleteDialog = true">
       </item-form>
@@ -44,7 +45,7 @@ function sendDeleteItemRequest(item) {
 export default {
     template,
     data: () => { return { errorMessage: '', showDeleteDialog: false } },
-    computed: { currentItem, ...mapState(['items']) },
+    computed: { currentItem, ...mapState(['items']), ...mapState(['qualifications']) },
     methods: { sendDeleteItemRequest },
     components: { ItemForm, DeleteDialog },
 }

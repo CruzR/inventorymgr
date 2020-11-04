@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { updateItem } from '/static/api.js'
 import ItemForm from '/static/views/itemform.js'
 
@@ -8,14 +7,21 @@ const template = `
       v-if="currentItem"
       context="edit"
       :current="currentItem"
+      :qualifications="qualifications"
       :error="errorMessage"
       @commit-item-change="sendUpdateItemRequest"
       @cancel-item-change="cancelEdit">
     </item-form>`
 
 
+function itemId() {
+    const path = location.pathname.split('/');
+    const idComponent = path[path.length - 2];
+    return parseInt(idComponent);
+}
+
 function currentItem() {
-    const id = parseInt(this.$route.params.id);
+    const id = itemId();
     return this.items.find(i => i.id === id);
 }
 
@@ -23,7 +29,6 @@ function currentItem() {
 function sendUpdateItemRequest(item) {
     updateItem(item).then(response => {
         if (response.success) {
-            this.$store.commit('addItem', response.data);
             location = location.origin + '/items';
         } else {
             console.error(response.error);
@@ -34,15 +39,16 @@ function sendUpdateItemRequest(item) {
 
 
 function cancelEdit() {
-    this.$router.push('/items/' + this.$route.params['id'])
+    location = location.origin + '/items/' + this.currentItem.id;
 }
 
 export default {
     template,
+    props: ['items', 'qualifications'],
     data: () => {
         return { errorMessage: '' }
     },
-    computed: { currentItem, ...mapState(['items']) },
+    computed: { currentItem },
     methods: { sendUpdateItemRequest, cancelEdit },
     components: { ItemForm },
 }

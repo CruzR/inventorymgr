@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import TagSelectBox from '/static/views/tagselectbox.js'
 
 const template = `
@@ -47,13 +46,11 @@ const template = `
         </div>
         <div v-else-if="isViewContext" class="field is-grouped">
           <div class="control">
-            <router-link
-              :to="'/items/' + current.id + '/edit'" v-slot="{ href, navigate }">
-              <a
-                :href="href"
-                class="button is-primary"
-                @click="navigate">{{ $t('actions.edit') }}</a>
-            </router-link>
+            <a
+              :href="'/items/' + current.id + '/edit'"
+              class="button is-primary">
+              {{ $t('actions.edit') }}
+            </a>
           </div>
           <div class="control">
             <button
@@ -76,7 +73,7 @@ const template = `
 
 
 export default {
-    props: ['current', 'context', 'error'],
+    props: ['current', 'context', 'error', 'qualifications'],
     template,
     data: function() {
         const item = (typeof(this.current) !== 'undefined')
@@ -94,7 +91,6 @@ export default {
         isCreateContext: function() {
             return this.context === 'create';
         },
-        ...mapState(['qualifications']),
     },
     components: { TagSelectBox },
 }
