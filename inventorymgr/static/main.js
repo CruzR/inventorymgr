@@ -8,7 +8,6 @@ import VueRouter from '/static/vue-router.esm.browser.js'
 import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
 import ItemDetailView from '/static/views/viewitem.js'
-import ItemCreateView from '/static/views/createitem.js'
 import BorrowStatesList from '/static/views/borrowstates.js'
 import CheckoutView from '/static/views/checkout.js'
 import CheckinView from '/static/views/checkin.js'
@@ -24,7 +23,6 @@ Vue.use(VueI18n);
 
 const routes = [
     { path: '/', component: DashboardView },
-    { path: '/items/new', component: ItemCreateView },
     { path: '/items/:id', component: ItemDetailView },
     { path: '/borrowstates', component: BorrowStatesList },
     { path: '/checkout', component: CheckoutView },

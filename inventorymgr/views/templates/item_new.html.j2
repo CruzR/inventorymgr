@@ -1,0 +1,13 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<item-create-view :qualifications="qualifications"></item-create-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import ItemCreateView from '/static/views/createitem.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+ItemCreateView,
+{% endblock additional_components %}

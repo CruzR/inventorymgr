@@ -6,6 +6,7 @@ const template = `
     <item-form
       context="create"
       :error="errorMessage"
+      :qualifications="qualifications"
       @commit-item-change="sendCreateItemRequest"
       @cancel-item-change="returnToDashboard">
     </item-form>`
@@ -14,7 +15,6 @@ const template = `
 function sendCreateItemRequest(item) {
     createItem(item).then(response => {
         if (response.success) {
-            this.$store.commit('addItem', response.data);
             location = location.origin + '/items';
         } else {
             console.error(response.error);
@@ -25,12 +25,13 @@ function sendCreateItemRequest(item) {
 
 
 function returnToDashboard() {
-    this.$router.push('/');
+    location = location.origin + '/';
 }
 
 
 export default {
     template,
+    props: ['qualifications'],
     data: () => { return { errorMessage: '' } },
     methods: { sendCreateItemRequest, returnToDashboard },
     components: { ItemForm },
