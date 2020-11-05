@@ -23,3 +23,9 @@ def edit_item(item_id: str) -> Any:  # pylint: disable=unused-argument
 def item_new() -> Any:
     """View for creating new items."""
     return render_template("item_new.html.j2")
+
+
+@views_blueprint.route("/items/<item_id>")
+def item_detail(item_id: str) -> Any:  # pylint: disable="unused-argument"
+    """Detail view for an item."""
+    return render_template("item_detail.html.j2")

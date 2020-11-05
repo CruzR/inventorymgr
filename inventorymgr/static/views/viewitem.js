@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { deleteItem } from '/static/api.js'
 import DeleteDialog from '/static/views/delete-dialog.js'
 import ItemForm from '/static/views/itemform.js'
@@ -23,8 +22,14 @@ const template = `
     `
 
 
+function itemId() {
+    const path = location.pathname.split("/");
+    return parseInt(path[path.length - 1]);
+}
+
+
 function currentItem() {
-    const id = parseInt(this.$route.params.id);
+    const id = itemId();
     return this.items.find(i => i.id === id);
 }
 
@@ -32,7 +37,6 @@ function currentItem() {
 function sendDeleteItemRequest(item) {
     deleteItem(item).then(response => {
         if (response.success) {
-            this.$store.commit('deleteItem', item);
             location = location.origin + '/items';
         } else {
             console.error(response.error);
@@ -44,8 +48,9 @@ function sendDeleteItemRequest(item) {
 
 export default {
     template,
+    props: ['items', 'qualifications'],
     data: () => { return { errorMessage: '', showDeleteDialog: false } },
-    computed: { currentItem, ...mapState(['items']), ...mapState(['qualifications']) },
+    computed: { currentItem },
     methods: { sendDeleteItemRequest },
     components: { ItemForm, DeleteDialog },
 }
