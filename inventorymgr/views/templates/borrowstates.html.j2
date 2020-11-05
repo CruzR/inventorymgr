@@ -1,0 +1,22 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<borrow-states-list :borrowstates="borrowstates"></borrow-states-list>
+{% endblock content %}
+
+{% block additional_imports %}
+import BorrowStatesList from '/static/views/borrowstates.js'
+import { fetchBorrowStates } from '/static/api.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+BorrowStatesList,
+{% endblock additional_components %}
+
+{% block additional_fetches %}
+fetchBorrowStates(),
+{% endblock additional_fetches %}
+
+{% block additional_data %}
+borrowstates: additionalResponses[0].data.borrowstates,
+{% endblock additional_data %}

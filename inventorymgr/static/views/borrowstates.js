@@ -1,6 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
-
-
 const template = `
     <div>
       <div class="field is-grouped is-grouped-right">
@@ -40,6 +37,7 @@ const template = `
 
 export default {
     template,
+    props: ['borrowstates'],
     data: () => { return { showReturned: false } },
     computed: {
         filteredItems: function() {
@@ -48,6 +46,5 @@ export default {
             }
             return this.borrowstates.filter(b => b.returned_at === null);
         },
-        ...mapState(['borrowstates']),
     },
 }
