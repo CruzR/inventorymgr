@@ -1,0 +1,22 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<checkout-view :users="users" :items="items"></checkout-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import CheckoutView from '/static/views/checkout.js'
+import { fetchItems } from '/static/api.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+CheckoutView,
+{% endblock additional_components %}
+
+{% block additional_fetches %}
+fetchItems(),
+{% endblock additional_fetches %}
+
+{% block additional_data %}
+items: additionalResponses[0].data.items,
+{% endblock additional_data %}

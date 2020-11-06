@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { checkout } from '/static/api.js'
 
 
@@ -132,7 +131,6 @@ function sendCheckoutRequest() {
 
     checkout(checkoutRequest).then(response => {
         if (response.success) {
-            this.$store.commit('addBorrowStates', response.data.borrowstates);
             this.selected_items = [];
             this.selected_user = null;
         } else {
@@ -145,6 +143,7 @@ function sendCheckoutRequest() {
 
 export default {
     template,
+    props: ['users', 'items'],
     data: () => {
         return {
             errorMessage: '',
@@ -165,7 +164,6 @@ export default {
             const userByBarcode = this.users.find(u => u.barcode === barcodeOrName);
             return userByBarcode || this.users.find(u => u.username === barcodeOrName);
         },
-        ...mapState(['items', 'users']),
     },
     methods: { selectItem, selectUser, sendCheckoutRequest },
 }

@@ -7,7 +7,6 @@ import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchReg
 import VueRouter from '/static/vue-router.esm.browser.js'
 import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
-import CheckoutView from '/static/views/checkout.js'
 import CheckinView from '/static/views/checkin.js'
 
 
@@ -21,7 +20,6 @@ Vue.use(VueI18n);
 
 const routes = [
     { path: '/', component: DashboardView },
-    { path: '/checkout', component: CheckoutView },
     { path: '/checkin', component: CheckinView },
 ];
 
