@@ -1,4 +1,3 @@
-import { mapState } from '/static/vuex.esm.browser.js'
 import { checkin } from '/static/api.js'
 
 
@@ -130,8 +129,7 @@ function sendCheckinRequest() {
     const checkinRequest = { user_id, item_ids };
     checkin(checkinRequest).then(response => {
         if (response.success) {
-            this.$store.commit('addBorrowStates', response.data.borrowstates);
-            this.$router.push('/borrowstates');
+            location = location.origin + '/borrowstates';
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);
@@ -142,6 +140,7 @@ function sendCheckinRequest() {
 
 export default {
     template,
+    props: ['borrowstates', 'items', 'users'],
     data: () => {
         return {
           errorMessage: '',
@@ -162,7 +161,6 @@ export default {
             const userByBarcode = this.users.find(u => u.barcode === barcodeOrName);
             return userByBarcode || this.users.find(u => u.username === barcodeOrName);
         },
-        ...mapState(['borrowstates', 'items', 'users']),
     },
     methods: { selectItem, selectUser, sendCheckinRequest },
 };

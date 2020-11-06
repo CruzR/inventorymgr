@@ -17,3 +17,9 @@ def borrowstates_list() -> Any:
 def borrowstates_checkout() -> Any:
     """View that allows checkout of items."""
     return render_template("borrowstates_checkout.html.j2")
+
+
+@views_blueprint.route("/checkin")
+def borrowstates_checkin() -> Any:
+    """View that allows checkin of items."""
+    return render_template("borrowstates_checkin.html.j2")

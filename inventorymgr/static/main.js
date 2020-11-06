@@ -7,7 +7,6 @@ import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchReg
 import VueRouter from '/static/vue-router.esm.browser.js'
 import NavigationBar from '/static/views/navigation.js'
 import DashboardView from '/static/views/dashboard.js'
-import CheckinView from '/static/views/checkin.js'
 
 
 Vue.config.errorHandler = (err, vm, info) => {
@@ -20,7 +19,6 @@ Vue.use(VueI18n);
 
 const routes = [
     { path: '/', component: DashboardView },
-    { path: '/checkin', component: CheckinView },
 ];
 
 const router = new VueRouter({

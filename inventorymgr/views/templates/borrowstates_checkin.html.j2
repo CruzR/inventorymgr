@@ -1,0 +1,24 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<checkin-view :borrowstates="borrowstates" :items="items" :users="users"></checkin-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import CheckinView from '/static/views/checkin.js'
+import { fetchBorrowStates, fetchItems } from '/static/api.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+CheckinView,
+{% endblock additional_components %}
+
+{% block additional_fetches %}
+fetchBorrowStates(),
+fetchItems(),
+{% endblock additional_fetches %}
+
+{% block additional_data %}
+borrowstates: additionalResponses[0].data.borrowstates,
+items: additionalResponses[1].data.items,
+{% endblock additional_data %}
