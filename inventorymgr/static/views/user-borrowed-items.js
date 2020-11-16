@@ -1,9 +1,8 @@
-import { mapGetters, mapState } from '/static/vuex.esm.browser.js'
 import { transferItem } from '/static/api.js'
 
 
 const template = `
-    <div v-if="sessionUser !== null && borrowstates.length > 0 && $store.state.items.length > 0">
+    <div v-if="sessionUser !== null && borrowstates.length > 0 && items.length > 0">
       <table class="table is-fullwidth responsive-table">
         <thead>
           <tr>
@@ -82,14 +81,17 @@ function sendTransferItemRequest() {
 }
 
 
+function itemById(item_id) {
+  return this.items.find(i => i.id === item_id);
+}
+
 export default {
     template,
+    props: ['borrowstates', 'sessionUser', 'users', 'items'],
     data: function() {
         return { itemToTransfer: null, targetUserNameOrBarcode: '' };
     },
     computed: {
-        ...mapState(['borrowstates', 'sessionUser', 'users']),
-        ...mapGetters(['itemById']),
         borrowedItems: function() {
             const userId = this.sessionUser.id;
             const itemById = this.itemById;
@@ -108,5 +110,6 @@ export default {
         closeDialog,
         showTransferDialog,
         sendTransferItemRequest,
+        itemById,
     },
 }

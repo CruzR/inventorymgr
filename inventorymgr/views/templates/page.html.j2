@@ -67,7 +67,8 @@ Promise.all([
             components: components,
         });
     } else {
-        console.error(response.error);
+        const errors = responses.filter(r => typeof r.error !== "undefined").map(r => r.error);
+        console.error(errors);
     }
 })
 

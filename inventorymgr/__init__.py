@@ -60,10 +60,8 @@ def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
             event.listen(db.engine, "connect", _sqlite_enforce_foreign_keys)
 
     from .views import views_blueprint
-    from .app import bp
 
     app.register_blueprint(views_blueprint)
-    app.register_blueprint(bp)
 
     _register_api_endpoints(app)
     _register_cli_commands(app)

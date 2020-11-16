@@ -1,0 +1,35 @@
+{% extends "page.html.j2" %}
+
+{% block content %}
+<dashboard-view
+    :logs="logs"
+    :users="users"
+    :session-user="sessionUser"
+    :transfer-requests="transferRequests"
+    :borrowstates="borrowstates"
+    :items="items">
+</dashboard-view>
+{% endblock content %}
+
+{% block additional_imports %}
+import DashboardView from '/static/views/dashboard.js'
+import { fetchLogs, fetchTransferRequests, fetchBorrowStates, fetchItems } from '/static/api.js'
+{% endblock additional_imports %}
+
+{% block additional_components %}
+DashboardView,
+{% endblock additional_components %}
+
+{% block additional_fetches %}
+fetchLogs(),
+fetchTransferRequests(),
+fetchBorrowStates(),
+fetchItems(),
+{% endblock additional_fetches %}
+
+{% block additional_data %}
+logs: additionalResponses[0].data.logs,
+transferRequests: additionalResponses[1].data.transferrequests,
+borrowstates: additionalResponses[2].data.borrowstates,
+items: additionalResponses[3].data.items,
+{% endblock additional_data %}

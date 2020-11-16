@@ -1,6 +1,3 @@
-import { mapGetters } from '/static/vuex.esm.browser.js'
-
-
 const template = `
     <ul>
       <li v-for="logentry in logsWithKnownType">
@@ -11,9 +8,18 @@ const template = `
     `
 
 
+function itemById(item_id) {
+    return this.items.find(i => i.id === item_id);
+}
+
+function userById(user_id) {
+    return this.users.find(u => u.id === user_id);
+}
+
+
 export default {
     template,
-    props: ['logs'],
+    props: ['logs', 'items', 'users'],
     computed: {
         logsWithKnownType: function() {
             let filteredLogs = this.logs.filter(
@@ -26,7 +32,6 @@ export default {
             });
             return filteredLogs;
         },
-        ...mapGetters(['itemById', 'userById']),
     },
     methods: {
         formatLog: function(logentry) {
@@ -38,5 +43,7 @@ export default {
                 secondary: secondary_name,
             };
         },
+        itemById,
+        userById,
     },
 }

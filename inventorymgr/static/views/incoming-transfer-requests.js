@@ -1,4 +1,3 @@
-import { mapGetters, mapState } from '/static/vuex.esm.browser.js'
 import { acceptTransferRequest, declineTransferRequest } from '/static/api.js'
 
 
@@ -19,7 +18,7 @@ const template = `
                 <button
                   type="button"
                   class="button is-primary is-small"
-                  @click="onAcceptTransferRequest(row)">
+                  @click="onAcceptTransferRequest(row.transferRequest)">
                   {{ $t('actions.accept') }}
                 </button>
                 <button
@@ -37,18 +36,10 @@ const template = `
     `
 
 
-function onAcceptTransferRequest(row) {
-    const transferRequest = row.transferRequest;
-    const borrowState = row.borrowState;
-    const user = {
-        id: this.sessionUser.id,
-        barcode: this.sessionUser.barcode,
-        username: this.sessionUser.username,
-    };
+function onAcceptTransferRequest(transferRequest) {
     acceptTransferRequest(transferRequest).then(response => {
         if (response.success) {
-            this.$store.commit('deleteTransferRequest', transferRequest);
-            this.$store.commit('addBorrowStates', [{ ...borrowState, borrowing_user: user}]);
+            location = location.origin + '/';
         } else {
             console.error(response.error);
         }
@@ -58,7 +49,7 @@ function onAcceptTransferRequest(row) {
 function onDeclineTransferRequest(transferRequest) {
     declineTransferRequest(transferRequest).then(response => {
         if (response.success) {
-            this.$store.commit('deleteTransferRequest', transferRequest);
+            location = location.origin + '/';
         } else {
             console.error(response.error);
         }
@@ -66,11 +57,18 @@ function onDeclineTransferRequest(transferRequest) {
 }
 
 
+function itemById(item_id) {
+  return this.items.find(i => i.id === item_id);
+}
+
+function borrowstateById(id) {
+  return this.borrowstates.find(bs => bs.id === id);
+}
+
 export default {
     template,
+    props: ['sessionUser', 'transferRequests', 'items', 'borrowstates'],
     computed: {
-        ...mapState(['sessionUser', 'transferRequests']),
-        ...mapGetters(['borrowstateById', 'itemById']),
         transferRequestsTable: function() {
             return this.transferRequests.map(tr => {
                 const borrowState = this.borrowstateById(tr.borrowstate_id);
@@ -86,5 +84,7 @@ export default {
     methods: {
         onAcceptTransferRequest,
         onDeclineTransferRequest,
+        itemById,
+        borrowstateById,
     },
 }
