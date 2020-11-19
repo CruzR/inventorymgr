@@ -6,7 +6,7 @@ from typing import Any, Dict
 from flask import Blueprint, request, session
 
 from inventorymgr.api import APIError
-from inventorymgr.api.models import TransferRequestSchema
+from inventorymgr.api.models import TransferRequestCollection, NewTransferRequest
 from inventorymgr.auth import authentication_required
 from inventorymgr.db import db
 from inventorymgr.db.models import BorrowState, LogEntry, TransferRequest, User
@@ -19,19 +19,19 @@ bp = Blueprint("transfer_requests", __name__, url_prefix="/api/v1/transferreques
 @authentication_required
 def get_transfer_requests() -> Dict[str, Any]:
     """Returns a list of transfer requests for the current user."""
-    return {
-        "transferrequests": TransferRequestSchema(many=True).dump(
+    return TransferRequestCollection(
+        transferrequests=list(
             TransferRequest.query.filter_by(target_user_id=session["user_id"])
         )
-    }
+    ).dict()
 
 
 @bp.route("", methods=("POST",))
 @authentication_required
 def create_transfer_request() -> Dict[str, bool]:
     """API endpoint for creating transfer requests."""
-    transfer_request_json = TransferRequestSchema().load(request.json, partial=("id",))
-    borrowstate = BorrowState.query.get(transfer_request_json["borrowstate_id"])
+    transfer_request_data = NewTransferRequest.parse_obj(request.json)
+    borrowstate = BorrowState.query.get(transfer_request_data.borrowstate_id)
     issuing_user = User.query.get(session["user_id"])
     if borrowstate is None:
         raise APIError(reason="unknown_borrowstate", status_code=400)
@@ -39,7 +39,7 @@ def create_transfer_request() -> Dict[str, bool]:
         raise APIError(reason="insufficient_permissions", status_code=403)
     if borrowstate.returned_at is not None:
         raise APIError(reason="item_not_borrowed", status_code=400)
-    target_user = User.query.get(transfer_request_json["target_user_id"])
+    target_user = User.query.get(transfer_request_data.target_user_id)
     item = borrowstate.borrowed_item
     if not set(item.required_qualifications) <= set(target_user.qualifications):
         raise APIError(reason="missing_qualifications", status_code=403)

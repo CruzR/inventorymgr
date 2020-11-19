@@ -1,8 +1,9 @@
 """Schemas for validating JSON objects."""
 
 
-from typing import Any, Callable, TypeVar, cast
+from typing import Any, Callable, List, TypeVar, cast
 
+import pydantic
 from marshmallow import Schema, fields, post_dump, pre_load
 
 
@@ -118,9 +119,27 @@ class LogEntrySchema(Schema):
     items = fields.Nested(BorrowableItemSchema, required=True, many=True, only=("id",))
 
 
-class TransferRequestSchema(Schema):
-    """Marshmallow schema for transfer requests."""
+class NewTransferRequest(pydantic.BaseModel):
+    """Schema for creating transfer requests."""
 
-    id = fields.Integer(required=True)
-    target_user_id = fields.Integer(required=True)
-    borrowstate_id = fields.Integer(required=True)
+    target_user_id: int
+    borrowstate_id: int
+
+
+class TransferRequest(pydantic.BaseModel):
+    """Schema for existing transfer requests."""
+
+    id: int
+    target_user_id: int
+    borrowstate_id: int
+
+    class Config:
+        """Enable ORM mode to allow converting SQLAlchemy models."""
+
+        orm_mode = True
+
+
+class TransferRequestCollection(pydantic.BaseModel):
+    """Schema for a collection of transfer requests."""
+
+    transferrequests: List[TransferRequest]
