@@ -3,12 +3,13 @@ Utility functions for access control.
 """
 
 import functools
-from typing import Any, Callable, Dict, cast
+from typing import Any, Callable, Union, cast
 
 from flask import session
 
-from .api import APIError
-from .db.models import User
+from inventorymgr import api
+from inventorymgr.api import APIError
+from inventorymgr.db.models import User
 
 
 PERMISSIONS = (
@@ -21,14 +22,16 @@ PERMISSIONS = (
 )
 
 
-def can_set_permissions(user_dict: Dict[str, Any]) -> bool:
+def can_set_permissions(
+    user_obj: Union[api.User, api.NewUser, api.UpdatedUser]
+) -> bool:
     """
     Check if current session's user can set permissions in user_dict.
 
     A user can set permissions if they are a subset of their own permissions.
     """
     user = get_session_user()
-    return all(getattr(user, k) or not user_dict[k] for k in PERMISSIONS)
+    return all(getattr(user, k) or not getattr(user_obj, k) for k in PERMISSIONS)
 
 
 def can_set_qualifications() -> bool:

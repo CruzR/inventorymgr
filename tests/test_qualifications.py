@@ -14,7 +14,7 @@ def test_list_qualifications(client, auth):
     response = client.get("http://localhost:5000/api/v1/qualifications")
     assert response.status_code == 200
     assert response.is_json
-    assert response.json == [{"id": 1, "name": "Driver's License"}]
+    assert response.json == {"qualifications": [{"id": 1, "name": "Driver's License"}]}
 
 
 def test_create_qualification_unauthenticated(client, app):
@@ -55,16 +55,16 @@ def test_create_qualification(client, app, auth):
         assert Qualification.query.filter_by(name="Driver's License").count() == 1
 
 
-def test_create_qualification_with_id_set(client, app, auth):
+def test_create_qualification_id_is_ignored(client, app, auth):
     auth.login("test")
     response = client.post(
         "http://localhost:5000/api/v1/qualifications", json={"name": "test", "id": 1}
     )
-    assert response.status_code == 400
+    assert response.status_code == 200
     assert response.is_json
-    assert response.json["reason"] == "id_specified"
+    assert response.json == {"id": 2, "name": "test"}
     with app.app_context():
-        assert Qualification.query.filter_by(name="test").count() == 0
+        assert Qualification.query.filter_by(name="test").count() == 1
 
 
 def test_create_qualification_with_existing_object(client, app, auth):

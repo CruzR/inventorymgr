@@ -11,9 +11,9 @@ from typing import Any, Callable, cast, Dict
 from flask import Blueprint, make_response, request, session
 from werkzeug.security import check_password_hash as _check_password_hash
 
-from .accesscontrol import PERMISSIONS
-from .api import APIError, UserSchema
-from .db.models import User
+from inventorymgr import api
+from inventorymgr.api import APIError
+from inventorymgr.db.models import User
 
 
 bp = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
@@ -28,11 +28,9 @@ check_password_hash: Callable[[str, str], bool] = cast(
 @bp.route("/login", methods=("POST",))
 def login() -> Any:
     """Flask view for logging a user in."""
-    user_dict = UserSchema().load(
-        request.json, partial=("id", "qualifications") + PERMISSIONS
-    )
-    username = user_dict["username"]
-    password = user_dict["password"]
+    user_obj = api.LoginRequest.parse_obj(request.json)
+    username = user_obj.username
+    password = user_obj.password
 
     if is_password_correct(username, password):
         user = fetch_user(username)
@@ -70,7 +68,7 @@ def is_password_correct(username: str, password: str) -> bool:
 def fetch_user(username: str) -> Dict[str, Any]:
     """Look up a user as a dictionary from the DB."""
     user = User.query.filter_by(username=username).first()
-    return cast(Dict[str, Any], UserSchema().dump(user))
+    return api.User.from_orm(user).dict()
 
 
 def authentication_required(to_be_wrapped: Callable[..., Any]) -> Callable[..., Any]:

@@ -1,16 +1,12 @@
 """API endpoints for handling borrow states."""
 
 import datetime
-from typing import Any, Dict, Iterable, Tuple, cast
+from typing import Iterable, cast
 
-from flask import Blueprint, request
+from flask import Blueprint, Response, make_response, request
 
+from inventorymgr import api
 from inventorymgr.accesscontrol import requires_permissions
-from inventorymgr.api.models import (
-    BorrowStateSchema,
-    CheckinRequestSchema,
-    CheckoutRequestSchema,
-)
 from inventorymgr.auth import authentication_required
 from inventorymgr.db import db
 from inventorymgr.db.models import (
@@ -31,31 +27,35 @@ _utcnow = datetime.datetime.utcnow  # pylint: disable=invalid-name
 @bp.route("", methods=("GET",))
 @authentication_required
 @requires_permissions("manage_checkouts")
-def fetch_borrowstates() -> Dict[str, Any]:
+def fetch_borrowstates() -> Response:
     """Fetch all borrowstates."""
-    borrowstates = BorrowStateSchema(many=True).dump(BorrowState.query.all())
-    return {"borrowstates": borrowstates}
+    borrowstates = list(BorrowState.query.all())
+    response = make_response(
+        api.BorrowStateCollection(borrowstates=borrowstates).json(), 200
+    )
+    response.headers["Content-Type"] = "application/json; encoding=utf-8"
+    return response
 
 
 @bp.route("/checkout", methods=("POST",))
 @authentication_required
 @requires_permissions("manage_checkouts")
-def checkout() -> Tuple[Dict[str, Any], int]:
+def checkout() -> Response:
     """API endpoint to checkout a list of items to a user."""
-    checkout_request = CheckoutRequestSchema().load(request.json)
+    checkout_request = api.CheckoutRequest.parse_obj(request.json)
     now = _utcnow()
 
-    borrowing_user = User.query.get(checkout_request["borrowing_user_id"])
+    borrowing_user = User.query.get(checkout_request.borrowing_user_id)
     if borrowing_user is None:
-        return {"reason": "no_such_user"}, 400
+        return make_response({"reason": "no_such_user"}, 400)
 
     borrowed_items = [
         BorrowableItem.query.get(item_id)
-        for item_id in checkout_request["borrowed_item_ids"]
+        for item_id in checkout_request.borrowed_item_ids
     ]
 
     if any(item is None for item in borrowed_items):
-        return {"reason": "nonexistent_item"}, 400
+        return make_response({"reason": "nonexistent_item"}, 400)
 
     unqualified_for = [
         item
@@ -64,10 +64,10 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     ]
 
     if unqualified_for:
-        return {"reason": "missing_qualifications"}, 403
+        return make_response({"reason": "missing_qualifications"}, 403)
 
     if any_item_already_borrowed(borrowed_items):
-        return {"reason": "already_borrowed"}, 400
+        return make_response({"reason": "already_borrowed"}, 400)
 
     borrowstates = [
         BorrowState(borrowing_user=borrowing_user, borrowed_item=item, received_at=now)
@@ -87,19 +87,23 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     )
     db.session.commit()
 
-    return {"borrowstates": BorrowStateSchema(many=True).dump(borrowstates)}, 200
+    response = make_response(
+        api.BorrowStateCollection(borrowstates=borrowstates).json(), 200
+    )
+    response.headers["Content-Type"] = "application/json; encoding=utf-8"
+    return response
 
 
 @bp.route("/checkin", methods=("POST",))
 @authentication_required
 @requires_permissions("manage_checkouts")
-def checkin() -> Dict[str, Any]:
+def checkin() -> Response:
     """API endpoint for checkin of borrowed items."""
-    checkin_request = CheckinRequestSchema().load(request.json)
+    checkin_request = api.CheckinRequest.parse_obj(request.json)
     now = _utcnow()
-    returning_user = User.query.get(checkin_request["user_id"])
+    returning_user = User.query.get(checkin_request.user_id)
     returned_items = [
-        BorrowableItem.query.get(item_id) for item_id in checkin_request["item_ids"]
+        BorrowableItem.query.get(item_id) for item_id in checkin_request.item_ids
     ]
     borrowstates = []
     for item in returned_items:
@@ -119,7 +123,11 @@ def checkin() -> Dict[str, Any]:
     ).all():
         db.session.delete(transfer_request)
     db.session.commit()
-    return {"borrowstates": BorrowStateSchema(many=True).dump(borrowstates)}
+    response = make_response(
+        api.BorrowStateCollection(borrowstates=borrowstates).json()
+    )
+    response.headers["Content-Type"] = "application/json; encoding=utf-8"
+    return response
 
 
 def open_borrowstates_for_item(item: BorrowableItem) -> Iterable[BorrowState]:

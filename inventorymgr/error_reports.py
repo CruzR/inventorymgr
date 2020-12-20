@@ -14,10 +14,10 @@ bp = Blueprint("errorreports", __name__, url_prefix="/api/v1/errors")
 def javascript_error() -> str:
     """API endpoint to store a JS error report."""
     if request.is_json:
-        platform = request.user_agent.platform  # type: ignore
-        browser = request.user_agent.browser  # type: ignore
-        browser_version = request.user_agent.version  # type: ignore
-        browser_language = request.user_agent.language  # type: ignore
+        platform = request.user_agent.platform
+        browser = request.user_agent.browser
+        browser_version = request.user_agent.version
+        browser_language = request.user_agent.language
         row = {
             "timestamp": datetime.datetime.utcnow(),
             "user_agent_raw": request.user_agent.string,

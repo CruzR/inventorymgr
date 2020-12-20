@@ -10,7 +10,7 @@ import os
 from typing import Any, Dict, Optional
 
 from flask import Flask
-from marshmallow import ValidationError
+from pydantic import ValidationError
 from sqlalchemy import event  # type: ignore
 
 

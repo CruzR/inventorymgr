@@ -73,6 +73,15 @@ class User(db.Model):  # type: ignore
         foreign_keys="TransferRequest.target_user_id",
     )
 
+    @property
+    def barcode(self) -> str:
+        """
+        The barcode associated with this user.
+
+        Currently, this is hard-coded to 9000000 + the user's id.
+        """
+        return "{:013d}".format(9_000_000 + self.id)
+
 
 class RegistrationToken(db.Model):  # type: ignore
 
@@ -118,6 +127,18 @@ class BorrowableItem(db.Model):  # type: ignore
     log_entries = db.relationship(
         "LogEntry", secondary=_LOGENTRY_ITEMS_TABLE, back_populates="items"
     )
+
+    @property
+    def barcode(self) -> str:
+        """
+        The barcode associated with this item.
+
+        Currently, this is identical with the item's id.
+        User barcodes and item barcodes are separated by a fixed offset
+        of 9000000, so if you plan on creating a huge number of unique items,
+        you might run into conflicts.
+        """
+        return "{:013d}".format(self.id)
 
 
 class BorrowState(db.Model):  # type: ignore

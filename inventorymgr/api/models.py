@@ -1,122 +1,251 @@
 """Schemas for validating JSON objects."""
 
 
-from typing import Any, Callable, List, TypeVar, cast
+from datetime import datetime
+from typing import List, Optional
 
 import pydantic
-from marshmallow import Schema, fields, post_dump, pre_load
+
+__all__ = [
+    "Qualification",
+    "QualificationCollection",
+    "NewQualification",
+    "LoginRequest",
+    "User",
+    "UserCollection",
+    "UserInfo",
+    "NewUser",
+    "UpdatedUser",
+    "RegistrationToken",
+    "RegistrationTokenCollection",
+    "BorrowableItem",
+    "BorrowableItemCollection",
+    "NewItem",
+    "UpdatedItem",
+    "BorrowState",
+    "BorrowStateCollection",
+    "CheckoutRequest",
+    "CheckinRequest",
+    "LogEntry",
+    "LogEntryCollection",
+    "NewTransferRequest",
+    "TransferRequest",
+    "TransferRequestCollection",
+]
 
 
-class QualificationSchema(Schema):
-    """Marshmallow schema to validate qualification JSON objects."""
+class ExportModel(pydantic.BaseModel):
+    """Pydantic base model for models loaded from DB objects."""
 
-    id = fields.Integer(required=True)
-    name = fields.Str(required=True, validate=bool)
+    class Config:  #  pylint: disable=too-few-public-methods
+        """Enable ORM mode."""
 
-
-_T = TypeVar("_T")
-_post_dump = cast(Callable[[_T], _T], post_dump)  # pylint: disable=invalid-name
-_pre_load = cast(Callable[[_T], _T], pre_load)  # pylint: disable=invalid-name
+        orm_mode = True
 
 
-class UserSchema(Schema):
-    """Marshmallow schema to validate user JSON objects."""
+class Qualification(ExportModel):
+    """Schema to validate qualification JSON objects."""
 
-    id = fields.Integer(required=True)
-    username = fields.Str(required=True, validate=bool)
-    password = fields.Str(required=True, load_only=True, validate=bool)
-    create_users = fields.Bool(required=True)
-    view_users = fields.Bool(required=True)
-    update_users = fields.Bool(required=True)
-    edit_qualifications = fields.Bool(required=True)
-    create_items = fields.Bool(required=True)
-    manage_checkouts = fields.Bool(required=True)
-    qualifications = fields.Nested(QualificationSchema, required=True, many=True)
-
-    @_post_dump
-    def add_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
-        """Generate GTIN13 string from user id."""
-        # pylint: disable=no-self-use,unused-argument
-        data["barcode"] = "{:013d}".format(9_000_000 + data["id"])
-        return data
-
-    @_pre_load
-    def remove_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
-        """Remove GTIN13 string before deserializing."""
-        # pylint: disable=no-self-use,unused-argument
-        if "barcode" in data:
-            del data["barcode"]
-        return data
+    id: int
+    name: str
 
 
-class RegistrationTokenSchema(Schema):
-    """Marshmallow schema to validate registration tokens."""
+class QualificationCollection(pydantic.BaseModel):
+    """Schema to validate collections of qualification objects."""
 
-    id = fields.Integer(required=True)
-    token = fields.Str(required=True, validate=bool)
-    expires = fields.DateTime(required=True)
+    qualifications: List[Qualification]
 
 
-class BorrowableItemSchema(Schema):
-    """Marshmallow schema to validate borrowable items."""
+class NewQualification(pydantic.BaseModel):
+    """Schema to validate to-be-created qualification objects."""
 
-    id = fields.Integer(required=True)
-    name = fields.Str(required=True, validate=bool)
-    required_qualifications = fields.Nested(
-        QualificationSchema, required=True, many=True
-    )
-
-    @_post_dump
-    def add_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
-        """Generate GTIN13 string from item id."""
-        # pylint: disable=no-self-use,unused-argument
-        data["barcode"] = "{:013d}".format(data["id"])
-        return data
-
-    @_pre_load
-    def remove_gtin13_field(self, data: Any, **kwargs: Any) -> Any:
-        """Remove GTIN13 string before deserializing."""
-        # pylint: disable=no-self-use,unused-argument
-        if "barcode" in data:
-            del data["barcode"]
-        return data
+    name: str
 
 
-class BorrowStateSchema(Schema):
-    """Marshmallow schema for borrow state objects."""
+class LoginRequest(pydantic.BaseModel):
+    """Schema to validate login requests."""
 
-    id = fields.Integer(required=True)
-    borrowing_user = fields.Nested(UserSchema, required=True, only=("id", "username"))
-    borrowed_item = fields.Nested(
-        BorrowableItemSchema, required=True, only=("id", "name")
-    )
-    received_at = fields.DateTime(required=True)
-    returned_at = fields.DateTime(required=True, allow_none=True)
+    username: str
+    password: str
 
 
-class CheckoutRequestSchema(Schema):
-    """Marshmallow schema for checkout requests."""
+class User(ExportModel):
+    """
+    Schema to validate user JSON objects.
 
-    borrowing_user_id = fields.Integer(required=True)
-    borrowed_item_ids = fields.List(fields.Integer, required=True)
+    Since this is also used to expose user objects in the JSON API,
+    the password field is not included.
+    """
+
+    id: int
+    username: str
+    create_users: bool
+    view_users: bool
+    update_users: bool
+    edit_qualifications: bool
+    create_items: bool
+    manage_checkouts: bool
+    qualifications: List[Qualification]
+    barcode: str
 
 
-class CheckinRequestSchema(Schema):
+class UserCollection(pydantic.BaseModel):
+    """Schema to validate collections of user objects."""
+
+    users: List[User]
+
+
+class UserInfo(ExportModel):
+    """Schema to validate user objects where only basic info is required."""
+
+    id: int
+    username: str
+    barcode: str
+
+
+class NewUser(pydantic.BaseModel):
+    """
+    Schema to validate to-be-created user objects.
+
+    Unlike :class:`User`, this does not contain an id, since a new one
+    will be generated. It does however require a password.
+    """
+
+    username: str
+    password: str
+    create_users: bool
+    view_users: bool
+    update_users: bool
+    edit_qualifications: bool
+    create_items: bool
+    manage_checkouts: bool
+    qualifications: List[Qualification]
+
+
+class UpdatedUser(pydantic.BaseModel):
+    """
+    Schema to validate user update requests.
+
+    Unlike the schema for creating new users, this requires the user's id,
+    but providing a new password is optional.
+    """
+
+    id: int
+    username: str
+    password: Optional[str]
+    create_users: bool
+    view_users: bool
+    update_users: bool
+    edit_qualifications: bool
+    create_items: bool
+    manage_checkouts: bool
+    qualifications: List[Qualification]
+
+
+class RegistrationToken(ExportModel):
+    """Schema to validate registration tokens."""
+
+    id: int
+    token: str
+    expires: datetime
+
+
+class RegistrationTokenCollection(pydantic.BaseModel):
+    """Schema for a collection of registration tokens."""
+
+    tokens: List[RegistrationToken]
+
+
+class BorrowableItem(ExportModel):
+    """Schema to validate borrowable items."""
+
+    id: int
+    name: str
+    barcode: str
+    required_qualifications: List[Qualification]
+
+
+class BorrowableItemCollection(pydantic.BaseModel):
+    """Schema for a collection of borrowable items."""
+
+    items: List[BorrowableItem]
+
+
+class ItemInfo(ExportModel):
+    """Item schema for when less information is required."""
+
+    id: int
+    name: str
+    barcode: str
+
+
+class ShortItemInfo(ExportModel):
+    """Item schema for when just id and barcode are required."""
+
+    id: int
+    barcode: str
+
+
+class NewItem(pydantic.BaseModel):
+    """Schema for to-be-created items."""
+
+    name: str
+    required_qualifications: List[Qualification]
+
+
+class UpdatedItem(pydantic.BaseModel):
+    """Schema for updating items."""
+
+    id: int
+    name: str
+    required_qualifications: List[Qualification]
+
+
+class BorrowState(ExportModel):
+    """Schema for borrow state objects."""
+
+    id: int
+    borrowing_user: UserInfo
+    borrowed_item: ItemInfo
+    received_at: datetime
+    returned_at: Optional[datetime]
+
+
+class BorrowStateCollection(pydantic.BaseModel):
+    """Schema for a collection of borrow states."""
+
+    borrowstates: List[BorrowState]
+
+
+class CheckoutRequest(pydantic.BaseModel):
+    """Schema for checkout requests."""
+
+    borrowing_user_id: int
+    borrowed_item_ids: List[int]
+
+
+class CheckinRequest(pydantic.BaseModel):
     """Marshmallow schema for checkin requests."""
 
-    user_id = fields.Integer(required=True)
-    item_ids = fields.List(fields.Integer, required=True)
+    user_id: int
+    item_ids: List[int]
 
 
-class LogEntrySchema(Schema):
-    """Marshmallow schema for checkout / checkin logs."""
+class LogEntry(ExportModel):
+    """Schema for checkout / checkin logs."""
 
-    id = fields.Integer(required=True)
-    timestamp = fields.DateTime(required=True)
-    action = fields.Str(required=True)
-    subject_id = fields.Integer(required=True)
-    secondary_id = fields.Integer()
-    items = fields.Nested(BorrowableItemSchema, required=True, many=True, only=("id",))
+    id: int
+    timestamp: datetime
+    action: str
+    subject_id: int
+    secondary_id: Optional[int]
+    items: List[ShortItemInfo]
+
+
+class LogEntryCollection(pydantic.BaseModel):
+    """Schema for a collection of log entries."""
+
+    logs: List[LogEntry]
 
 
 class NewTransferRequest(pydantic.BaseModel):
@@ -126,17 +255,12 @@ class NewTransferRequest(pydantic.BaseModel):
     borrowstate_id: int
 
 
-class TransferRequest(pydantic.BaseModel):
+class TransferRequest(ExportModel):
     """Schema for existing transfer requests."""
 
     id: int
     target_user_id: int
     borrowstate_id: int
-
-    class Config:
-        """Enable ORM mode to allow converting SQLAlchemy models."""
-
-        orm_mode = True
 
 
 class TransferRequestCollection(pydantic.BaseModel):

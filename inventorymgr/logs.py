@@ -1,10 +1,8 @@
 """API endpoints for getting checkout / checkin logs."""
 
-from typing import Any, Dict
+from flask import Blueprint, Response, make_response
 
-from flask import Blueprint
-
-from inventorymgr.api.models import LogEntrySchema
+from inventorymgr import api
 from inventorymgr.auth import authentication_required
 from inventorymgr.db.models import LogEntry
 
@@ -14,6 +12,10 @@ bp = Blueprint("logs", __name__, url_prefix="/api/v1/logs")
 
 @bp.route("", methods=("GET",))
 @authentication_required
-def get_logs() -> Dict[str, Any]:
+def get_logs() -> Response:
     """API endpoint for getting checkout / checkin logs."""
-    return {"logs": LogEntrySchema(many=True).dump(LogEntry.query.all())}
+    response = make_response(
+        api.LogEntryCollection(logs=list(LogEntry.query.all())).json()
+    )
+    response.headers["Content-Type"] = "application/json; encoding=utf-8"
+    return response

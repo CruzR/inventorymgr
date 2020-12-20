@@ -22,7 +22,7 @@ Server-side:
 
 * [Flask](https://palletsprojects.com/p/flask/)
 * [Flask-SQLAlchemy](https://github.com/pallets/flask-sqlalchemy)
-* [marshmallow](https://github.com/marshmallow-code/marshmallow)
+* [pydantic](https://github.com/samuelcolvin/pydantic/)
 
 Client-side (bundled with inventorymgr):
 

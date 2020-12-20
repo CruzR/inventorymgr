@@ -14,7 +14,7 @@ handle_validation_error()
 from typing import cast, Dict
 
 from flask import jsonify, Response
-from marshmallow import ValidationError
+from pydantic import ValidationError
 
 
 class APIError(Exception):
@@ -42,6 +42,6 @@ def handle_api_error(error: APIError) -> Response:
 
 def handle_validation_error(error: ValidationError) -> Response:
     """Convert a ValidationError from parsing JSON input to a error response."""
-    response = jsonify({"reason": "validation_failed", "errors": error.messages})
+    response = jsonify({"reason": "validation_failed", "errors": error.errors()})
     response.status_code = 400
     return cast(Response, response)

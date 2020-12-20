@@ -57,7 +57,7 @@ Promise.all([
             el: '#app',
             data: {
                 sessionUser: userResponse.data,
-                qualifications: qualificationsResponse.data,
+                qualifications: qualificationsResponse.data.qualifications,
                 users: usersResponse.data.users,
                 ...additionalData
             },

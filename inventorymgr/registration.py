@@ -6,16 +6,16 @@ import secrets
 from typing import Any, Dict, Tuple
 
 import click
-from flask import Blueprint, request
+from flask import Blueprint, Response, make_response, request
 from flask.cli import with_appcontext
 from sqlalchemy.exc import IntegrityError  # type: ignore
 from werkzeug.security import generate_password_hash
 
-from .accesscontrol import requires_permissions
-from .api.models import RegistrationTokenSchema
-from .auth import authentication_required
-from .db import db
-from .db.models import RegistrationToken, User
+from inventorymgr import api
+from inventorymgr.accesscontrol import requires_permissions
+from inventorymgr.auth import authentication_required
+from inventorymgr.db import db
+from inventorymgr.db.models import RegistrationToken, User
 
 
 bp = Blueprint("registration", __name__, url_prefix="/api/v1/registration")
@@ -64,11 +64,12 @@ def handle_registration_request(token: str) -> Tuple[Dict[str, Any], int]:
 @bp.route("/tokens", methods=("GET",))
 @authentication_required
 @requires_permissions("create_users")
-def get_tokens() -> Tuple[Dict[str, Any], int]:
+def get_tokens() -> Response:
     """Fetch a list of current registration tokens."""
-    token_schema = RegistrationTokenSchema(many=True)
-    tokens = RegistrationToken.query.all()
-    return {"tokens": token_schema.dump(tokens)}, 200
+    tokens = list(RegistrationToken.query.all())
+    response = make_response(api.RegistrationTokenCollection(tokens=tokens).json(), 200)
+    response.headers["Content-Type"] = "application/json; encoding=utf-8"
+    return response
 
 
 @bp.route("/tokens", methods=("POST",))
@@ -76,9 +77,8 @@ def get_tokens() -> Tuple[Dict[str, Any], int]:
 @requires_permissions("create_users")
 def create_token() -> Tuple[Dict[str, Any], int]:
     """Create a new registration token."""
-    token_schema = RegistrationTokenSchema()
     token = generate_registration_token()
-    return token_schema.dump(token), 200
+    return api.RegistrationToken.from_orm(token).dict(), 200
 
 
 @bp.route("/tokens/<int:token_id>", methods=("DELETE",))

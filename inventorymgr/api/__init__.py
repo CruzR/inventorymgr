@@ -4,17 +4,39 @@ from typing import Dict, Tuple
 
 from flask import Blueprint
 
-from .error import APIError, handle_api_error, handle_validation_error
-from .models import QualificationSchema, UserSchema
-
+from inventorymgr.api import models
+from inventorymgr.api.error import APIError, handle_api_error, handle_validation_error
+from inventorymgr.api.models import *
 
 __all__ = [
     "APIError",
     "handle_api_error",
     "handle_validation_error",
-    "QualificationSchema",
-    "UserSchema",
     "bp",
+    "Qualification",
+    "QualificationCollection",
+    "NewQualification",
+    "LoginRequest",
+    "User",
+    "UserCollection",
+    "UserInfo",
+    "NewUser",
+    "UpdatedUser",
+    "RegistrationToken",
+    "RegistrationTokenCollection",
+    "BorrowableItem",
+    "BorrowableItemCollection",
+    "NewItem",
+    "UpdatedItem",
+    "BorrowState",
+    "BorrowStateCollection",
+    "CheckoutRequest",
+    "CheckinRequest",
+    "LogEntry",
+    "LogEntryCollection",
+    "NewTransferRequest",
+    "TransferRequest",
+    "TransferRequestCollection",
 ]
 
 

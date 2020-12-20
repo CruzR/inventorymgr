@@ -11,7 +11,7 @@ list_users()
     Flask view to get a list of users using GET.
 """
 
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List
 
 import click
 from flask import Blueprint, request, session
@@ -19,16 +19,17 @@ from flask.cli import with_appcontext
 from sqlalchemy.exc import IntegrityError  # type: ignore
 from werkzeug.security import generate_password_hash
 
-from .accesscontrol import (
+from inventorymgr import api
+from inventorymgr.accesscontrol import (
     PERMISSIONS,
     can_set_permissions,
     can_set_qualifications,
     requires_permissions,
 )
-from .api import APIError, UserSchema
-from .auth import authentication_required, logout
-from .db import db
-from .db.models import User, Qualification
+from inventorymgr.api import APIError
+from inventorymgr.auth import authentication_required, logout
+from inventorymgr.db import db
+from inventorymgr.db.models import User, Qualification
 
 
 bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
@@ -39,32 +40,29 @@ bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
 @requires_permissions("create_users")
 def new_user() -> Dict[str, Any]:
     """Flask view to create a new user using POST."""
-    user_schema = UserSchema()
-    user_dict = user_schema.load(request.json, partial=("id",))
-    username = user_dict["username"]
-    password = user_dict["password"]
+    user_obj = api.NewUser.parse_obj(request.json)
+    username = user_obj.username
+    password = user_obj.password
 
-    if user_dict["qualifications"] and not can_set_qualifications():
+    if user_obj.qualifications and not can_set_qualifications():
         raise insufficient_permissions()
 
-    if not can_set_permissions(user_dict):
+    if not can_set_permissions(user_obj):
         raise APIError(reason="permissions_not_subset", status_code=403)
 
-    qualifications = [
-        Qualification.query.get(q["id"]) for q in user_dict["qualifications"]
-    ]
+    qualifications = [Qualification.query.get(q.id) for q in user_obj.qualifications]
 
     try:
         user = User(
             username=username,
             password=generate_password_hash(password),
             qualifications=qualifications,
-            **{k: user_dict[k] for k in PERMISSIONS},
+            **{k: getattr(user_obj, k) for k in PERMISSIONS},
         )
 
         db.session.add(user)
         db.session.commit()
-        return cast(Dict[str, Any], user_schema.dump(user))
+        return api.User.from_orm(user).dict()
 
     except IntegrityError as exc:
         raise APIError(reason="user_exists", status_code=400) from exc
@@ -75,10 +73,9 @@ def new_user() -> Dict[str, Any]:
 @requires_permissions("view_users", "update_users")
 def update_user(user_id: int) -> Dict[str, Any]:
     """Flask view to update a user using PUT."""
-    user_schema = UserSchema()
-    user_dict = user_schema.load(request.json, partial=("password",))
+    user_obj = api.UpdatedUser.parse_obj(request.json)
 
-    if user_dict["id"] != user_id:
+    if user_obj.id != user_id:
         raise APIError(reason="incorrect_id", status_code=400)
 
     user = User.query.get(user_id)
@@ -86,22 +83,22 @@ def update_user(user_id: int) -> Dict[str, Any]:
         raise APIError(reason="no_such_user", status_code=400)
 
     try:
-        update_user_qualifications(user, user_dict)
-        update_user_permissions(user, user_dict)
-        update_user_username(user, user_dict)
-        update_user_password(user, user_dict)
+        update_user_qualifications(user, user_obj)
+        update_user_permissions(user, user_obj)
+        update_user_username(user, user_obj)
+        update_user_password(user, user_obj)
         db.session.commit()
-    except IntegrityError:
+    except IntegrityError as exc:
         db.session.rollback()
-        raise APIError(reason="user_exists", status_code=400)
+        raise APIError(reason="user_exists", status_code=400) from exc
 
-    return cast(Dict[str, Any], user_schema.dump(user))
+    return api.User.from_orm(user).dict()
 
 
-def update_user_qualifications(user: User, user_dict: Dict[str, Any]) -> None:
+def update_user_qualifications(user: User, user_obj: api.UpdatedUser) -> None:
     """Update user qualifications."""
     current_qualifications = {q.id for q in user.qualifications}
-    new_qualifications = {q["id"] for q in user_dict["qualifications"]}
+    new_qualifications = {q.id for q in user_obj.qualifications}
 
     if current_qualifications != new_qualifications:
         if not can_set_qualifications():
@@ -112,24 +109,24 @@ def update_user_qualifications(user: User, user_dict: Dict[str, Any]) -> None:
         user.qualifications = qualifications
 
 
-def update_user_permissions(user: User, user_dict: Dict[str, Any]) -> None:
+def update_user_permissions(user: User, user_obj: api.UpdatedUser) -> None:
     """Update user permissions."""
-    if wants_to_update_permissions(user, user_dict):
-        if not can_set_permissions(user_dict):
+    if wants_to_update_permissions(user, user_obj):
+        if not can_set_permissions(user_obj):
             raise APIError(reason="permissions_not_subset", status_code=403)
         for perm in PERMISSIONS:
-            setattr(user, perm, user_dict[perm])
+            setattr(user, perm, getattr(user_obj, perm))
 
 
-def update_user_username(user: User, user_dict: Dict[str, Any]) -> None:
+def update_user_username(user: User, user_obj: api.UpdatedUser) -> None:
     """Update username."""
-    user.username = user_dict["username"]
+    user.username = user_obj.username
 
 
-def update_user_password(user: User, user_dict: Dict[str, Any]) -> None:
+def update_user_password(user: User, user_obj: api.UpdatedUser) -> None:
     """Update user password."""
-    if "password" in user_dict:
-        user.password = generate_password_hash(user_dict["password"])
+    if user_obj.password is not None:
+        user.password = generate_password_hash(user_obj.password)
 
 
 @bp.route("/<int:user_id>", methods=("DELETE",))
@@ -154,7 +151,7 @@ def get_user(user_id: int) -> Any:
     user = User.query.get(user_id)
     if user is None:
         raise APIError(reason="no_such_user", status_code=400)
-    return UserSchema().dump(user)
+    return api.User.from_orm(user).dict()
 
 
 @bp.route("/me", methods=("GET",))
@@ -165,39 +162,38 @@ def get_self() -> Any:
     self_user = User.query.get(self_id)
     if self_user is None:
         raise APIError(reason="no_such_user", status_code=400)
-    return UserSchema().dump(self_user)
+    return api.User.from_orm(self_user).dict()
 
 
 @bp.route("/me", methods=("PUT",))
 @authentication_required
 def update_self() -> Any:
     """Flask view to update current session's user as JSON."""
-    user_schema = UserSchema()
-    user_dict = user_schema.load(request.json, partial=("password",))
+    user_obj = api.UpdatedUser.parse_obj(request.json)
 
-    if user_dict["id"] != session["user_id"]:
+    if user_obj.id != session["user_id"]:
         raise APIError(reason="incorrect_id", status_code=400)
 
-    user = User.query.get(user_dict["id"])
+    user = User.query.get(user_obj.id)
     if user is None:
         raise APIError(reason="no_such_user", status_code=400)
 
     if user.edit_qualifications:
-        update_user_qualifications(user, user_dict)
-    elif wants_to_update_qualifications(user, user_dict):
+        update_user_qualifications(user, user_obj)
+    elif wants_to_update_qualifications(user, user_obj):
         raise insufficient_permissions()
 
     if user.update_users:
-        update_user_permissions(user, user_dict)
-    elif wants_to_update_permissions(user, user_dict):
+        update_user_permissions(user, user_obj)
+    elif wants_to_update_permissions(user, user_obj):
         raise insufficient_permissions()
 
-    update_user_username(user, user_dict)
-    update_user_password(user, user_dict)
+    update_user_username(user, user_obj)
+    update_user_password(user, user_obj)
 
     db.session.commit()
 
-    return cast(Dict[str, Any], user_schema.dump(user))
+    return api.User.from_orm(user).dict()
 
 
 def insufficient_permissions() -> APIError:
@@ -205,16 +201,16 @@ def insufficient_permissions() -> APIError:
     return APIError(reason="insufficient_permissions", status_code=403)
 
 
-def wants_to_update_qualifications(user: User, user_dict: Dict[str, Any]) -> bool:
+def wants_to_update_qualifications(user: User, user_obj: api.UpdatedUser) -> bool:
     """Check if qualifications need updating."""
     current_qualifications = {q.id for q in user.qualifications}
-    new_qualifications = {q["id"] for q in user_dict["qualifications"]}
+    new_qualifications = {q.id for q in user_obj.qualifications}
     return current_qualifications != new_qualifications
 
 
-def wants_to_update_permissions(user: User, user_dict: Dict[str, Any]) -> bool:
+def wants_to_update_permissions(user: User, user_obj: api.UpdatedUser) -> bool:
     """Check if permissions need updating."""
-    return any(user_dict[p] != getattr(user, p) for p in PERMISSIONS)
+    return any(getattr(user_obj, p) != getattr(user, p) for p in PERMISSIONS)
 
 
 @bp.route("/me", methods=("DELETE",))
@@ -235,8 +231,8 @@ def delete_self() -> Any:
 @requires_permissions("view_users")
 def list_users() -> Dict[str, List[str]]:
     """Flask view to get a list of users using GET."""
-    users = UserSchema(many=True).dump(User.query.all())
-    return {"users": users}
+    users = list(User.query.all())
+    return api.UserCollection(users=users).dict()
 
 
 @click.command("create-user")
