@@ -14,7 +14,6 @@ from inventorymgr.db.models import User
 
 PERMISSIONS = (
     "create_users",
-    "view_users",
     "update_users",
     "edit_qualifications",
     "create_items",

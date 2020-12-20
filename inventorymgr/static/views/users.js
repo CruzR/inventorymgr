@@ -6,7 +6,6 @@ const template = `
             <th>{{ $t('fields.username') }}</th>
             <th>{{ $t('fields.barcode') }}</th>
             <th><abbr :title="$t('permissions.create_users')">👤✨</abbr></th>
-            <th><abbr :title="$t('permissions.view_users')">👤🔍</abbr></th>
             <th><abbr :title="$t('permissions.update_users')">👤✏️</abbr></th>
             <th><abbr :title="$t('permissions.edit_qualifications')">🎓✏️</abbr></th>
             <th><abbr :title="$t('permissions.create_items')">🧰✏️</abbr></th>
@@ -21,9 +20,6 @@ const template = `
             <td :data-label="$t('fields.barcode')">{{ user.barcode }}</td>
             <td :data-label="$t('permissions.create_users')">
               <input type="checkbox" :checked="user.create_users" disabled>
-            </td>
-            <td :data-label="$t('permissions.view_users')">
-              <input type="checkbox" :checked="user.view_users" disabled>
             </td>
             <td :data-label="$t('permissions.update_users')">
               <input type="checkbox" :checked="user.update_users" disabled>

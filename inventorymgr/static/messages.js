@@ -87,7 +87,6 @@ export const messages = {
         },
         permissions: {
             create_users: 'Create Users',
-            view_users: 'View Users',
             update_users: 'Edit Users',
             edit_qualifications: 'Edit Qualifications',
             create_items: 'Edit Inventory',
@@ -192,7 +191,6 @@ export const messages = {
         },
         permissions: {
             create_users: 'Benutzer anlegen',
-            view_users: 'Benutzer anzeigen',
             update_users: 'Benutzer bearbeiten',
             edit_qualifications: 'Qualifikationen bearbeiten',
             create_items: 'Inventar bearbeiten',

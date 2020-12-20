@@ -12,7 +12,6 @@ def test_user():
         "username": "test",
         "password": "test",
         "create_users": True,
-        "view_users": True,
         "update_users": True,
         "edit_qualifications": True,
         "create_items": True,
@@ -52,7 +51,7 @@ def test_creating_new_users(client, app, test_user, auth):
     assert response.is_json
     assert response.json["username"] == "a_new_user"
     assert response.json["qualifications"] == [{"id": 1, "name": "Driver's License"}]
-    assert response.json["view_users"]
+    assert response.json["update_users"]
     assert "password" not in response.json
 
     with app.app_context():
@@ -66,7 +65,7 @@ def test_creating_new_users(client, app, test_user, auth):
 def test_creating_new_users_permissions_not_subset(client, app, test_user, auth):
     with app.app_context():
         user = User.query.get(1)
-        user.view_users = False
+        user.update_users = False
         db.session.commit()
 
     auth.login("test")
@@ -102,7 +101,6 @@ def test_creating_new_unqualified_users_without_edit_qualifications(
     assert response.is_json
     assert response.json["username"] == "a_new_user"
     assert response.json["qualifications"] == []
-    assert response.json["view_users"]
     assert not response.json["edit_qualifications"]
     assert "password" not in response.json
 
@@ -154,7 +152,7 @@ def test_updating_user(client, app, test_user, auth):
     assert response.is_json
     assert response.json["username"] == "test_1"
     assert response.json["qualifications"] == [{"id": 1, "name": "Driver's License"}]
-    assert response.json["view_users"]
+    assert response.json["update_users"]
     assert "password" not in response.json
 
     with app.app_context():
@@ -172,7 +170,7 @@ def test_updating_user_except_password(client, app, test_user, auth):
     assert response.is_json
     assert response.json["username"] == "test_1"
     assert response.json["qualifications"] == [{"id": 1, "name": "Driver's License"}]
-    assert response.json["view_users"]
+    assert response.json["update_users"]
     assert "password" not in response.json
 
     with app.app_context():
@@ -215,7 +213,7 @@ def test_updating_user_permissions_subset(client, app, test_user, auth):
     assert response.is_json
     assert response.json["username"] == "test"
     assert response.json["qualifications"] == [{"id": 1, "name": "Driver's License"}]
-    assert response.json["view_users"]
+    assert not response.json["update_users"]
     assert not response.json["edit_qualifications"]
     assert "password" not in response.json
 
@@ -229,7 +227,6 @@ def test_updating_user_permissions_subset(client, app, test_user, auth):
 def test_updating_user_with_more_permissions(client, app, test_user, auth):
     with app.app_context():
         user = User.query.get(2)
-        user.view_users = True
         user.update_users = True
         db.session.commit()
 
@@ -242,7 +239,6 @@ def test_updating_user_with_more_permissions(client, app, test_user, auth):
     assert response.is_json
     assert response.json["username"] == "changed"
     assert response.json["qualifications"] == [{"id": 1, "name": "Driver's License"}]
-    assert response.json["view_users"]
     assert response.json["edit_qualifications"]
     assert "password" not in response.json
 
@@ -332,7 +328,6 @@ def test_updating_unqualified_users_without_edit_qualifications(
             "id": 2,
             "username": "changed",
             "create_users": False,
-            "view_users": False,
             "update_users": False,
             "edit_qualifications": False,
             "qualifications": [],
@@ -343,7 +338,6 @@ def test_updating_unqualified_users_without_edit_qualifications(
     assert response.is_json
     assert response.json["username"] == "changed"
     assert response.json["qualifications"] == []
-    assert not response.json["view_users"]
     assert not response.json["edit_qualifications"]
     assert "password" not in response.json
 
@@ -366,7 +360,6 @@ def test_updating_qualified_users_without_edit_qualifications(
             "id": 2,
             "username": "changed",
             "create_users": False,
-            "view_users": False,
             "update_users": False,
             "edit_qualifications": False,
         }
@@ -390,7 +383,6 @@ def test_updating_qualified_users_with_edit_qualifications(
             "id": 2,
             "username": "changed",
             "create_users": False,
-            "view_users": False,
             "update_users": False,
             "edit_qualifications": False,
             "qualifications": [{"id": 1, "name": "Driver's License"}],
@@ -401,7 +393,6 @@ def test_updating_qualified_users_with_edit_qualifications(
     assert response.is_json
     assert response.json["username"] == "changed"
     assert response.json["qualifications"] == [{"id": 1, "name": "Driver's License"}]
-    assert not response.json["view_users"]
     assert not response.json["edit_qualifications"]
     assert "password" not in response.json
 
@@ -427,14 +418,6 @@ def test_list_users_unauthenticated(client):
     assert response.status_code == 403
     assert response.is_json
     assert response.json["reason"] == "authentication_required"
-
-
-def test_list_users_with_insufficient_permissions(client, auth):
-    auth.login("min_permissions_user")
-    response = client.get("/api/v1/users")
-    assert response.status_code == 403
-    assert response.is_json
-    assert response.json["reason"] == "insufficient_permissions"
 
 
 def test_delete_user_unauthenticated(client, app):
@@ -486,8 +469,6 @@ def test_create_user_command(runner, app):
             "123456",
             "--create-users",
             "no",
-            "--view-users",
-            "yes",
             "--update-users=1",
             "--edit-qualifications",
             "false",
@@ -502,7 +483,6 @@ def test_create_user_command(runner, app):
         assert user is not None
         assert is_password_correct("test2", "123456")
         assert not user.create_users
-        assert user.view_users
         assert user.update_users
         assert not user.edit_qualifications
         assert not user.create_items
@@ -532,7 +512,6 @@ def test_update_self_unauthenticated(client, app):
             "id": 1,
             "username": "other_user",
             "create_users": False,
-            "view_users": False,
             "update_users": False,
             "edit_qualifications": False,
             "create_items": False,
@@ -553,7 +532,6 @@ def test_abuse_update_self_to_update_other_user(client, app, auth):
             "id": 1,
             "username": "other_user",
             "create_users": False,
-            "view_users": False,
             "update_users": False,
             "edit_qualifications": False,
             "create_items": False,
@@ -578,7 +556,6 @@ def test_update_self_username(client, app, auth):
             "id": 2,
             "username": "other_user",
             "create_users": False,
-            "view_users": False,
             "update_users": False,
             "edit_qualifications": False,
             "create_items": False,
@@ -604,7 +581,6 @@ def test_update_self_password(client, app, auth):
             "username": "min_permissions_user",
             "password": "a_new_password",
             "create_users": False,
-            "view_users": False,
             "update_users": False,
             "edit_qualifications": False,
             "create_items": False,
@@ -629,7 +605,6 @@ def test_update_self_set_permissions_fail(client, app, auth):
             "id": 2,
             "username": "min_permissions_user",
             "create_users": False,
-            "view_users": False,
             "update_users": True,
             "edit_qualifications": False,
             "create_items": False,
@@ -653,7 +628,6 @@ def test_update_self_set_permissions_and_qualifications(client, app, auth):
             "id": 1,
             "username": "test",
             "create_users": True,
-            "view_users": True,
             "update_users": True,
             "edit_qualifications": False,
             "create_items": False,
@@ -678,7 +652,6 @@ def test_update_self_give_more_qualifications_fail(client, app, auth):
             "id": 2,
             "username": "min_permissions_user",
             "create_users": False,
-            "view_users": False,
             "update_users": False,
             "edit_qualifications": False,
             "create_items": False,
@@ -743,7 +716,6 @@ def test_accesscontrol_honors_changed_permissions(client, auth, app, test_user):
     # Permissions are updated in the meantime
     with app.app_context():
         user = User.query.get(2)
-        user.view_users = True
         user.update_users = True
         user.edit_qualifications = True
         db.session.commit()
@@ -768,14 +740,6 @@ def test_get_user_unauthenticated(client):
     assert response.status_code == 403
     assert response.is_json
     assert response.json["reason"] == "authentication_required"
-
-
-def test_get_user_insufficient_permissions(client, auth):
-    auth.login("min_permissions_user")
-    response = client.get("/api/v1/users/1")
-    assert response.status_code == 403
-    assert response.is_json
-    assert response.json["reason"] == "insufficient_permissions"
 
 
 def test_get_nonexistent_user(client, auth):

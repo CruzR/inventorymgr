@@ -70,7 +70,7 @@ def new_user() -> Dict[str, Any]:
 
 @bp.route("/<int:user_id>", methods=("PUT",))
 @authentication_required
-@requires_permissions("view_users", "update_users")
+@requires_permissions("update_users")
 def update_user(user_id: int) -> Dict[str, Any]:
     """Flask view to update a user using PUT."""
     user_obj = api.UpdatedUser.parse_obj(request.json)
@@ -131,7 +131,7 @@ def update_user_password(user: User, user_obj: api.UpdatedUser) -> None:
 
 @bp.route("/<int:user_id>", methods=("DELETE",))
 @authentication_required
-@requires_permissions("view_users", "update_users")
+@requires_permissions("update_users")
 def delete_user(user_id: int) -> str:
     """Flask view to delete a user with DELETE."""
 
@@ -145,7 +145,6 @@ def delete_user(user_id: int) -> str:
 
 @bp.route("/<int:user_id>", methods=("GET",))
 @authentication_required
-@requires_permissions("view_users")
 def get_user(user_id: int) -> Any:
     """Flask view to get a specified user."""
     user = User.query.get(user_id)
@@ -228,7 +227,6 @@ def delete_self() -> Any:
 
 @bp.route("", methods=("GET",))
 @authentication_required
-@requires_permissions("view_users")
 def list_users() -> Dict[str, List[str]]:
     """Flask view to get a list of users using GET."""
     users = list(User.query.all())
@@ -241,7 +239,6 @@ def list_users() -> Dict[str, List[str]]:
     "--password", prompt="Password", confirmation_prompt=True, hide_input=True
 )
 @click.option("--create-users", prompt="Permission create_users [y/n]", type=bool)
-@click.option("--view-users", prompt="Permission view_users [y/n]", type=bool)
 @click.option("--update-users", prompt="Permission update_users [y/n]", type=bool)
 @click.option(
     "--edit-qualifications", prompt="Permission edit_qualifications [y/n]", type=bool

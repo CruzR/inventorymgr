@@ -32,7 +32,6 @@ def app():
             username="test",
             password=generate_password_hash("test"),
             create_users=True,
-            view_users=True,
             update_users=True,
             edit_qualifications=True,
             create_items=True,

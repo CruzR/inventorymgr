@@ -80,7 +80,6 @@ class User(ExportModel):
     id: int
     username: str
     create_users: bool
-    view_users: bool
     update_users: bool
     edit_qualifications: bool
     create_items: bool
@@ -114,7 +113,6 @@ class NewUser(pydantic.BaseModel):
     username: str
     password: str
     create_users: bool
-    view_users: bool
     update_users: bool
     edit_qualifications: bool
     create_items: bool
@@ -134,7 +132,6 @@ class UpdatedUser(pydantic.BaseModel):
     username: str
     password: Optional[str]
     create_users: bool
-    view_users: bool
     update_users: bool
     edit_qualifications: bool
     create_items: bool

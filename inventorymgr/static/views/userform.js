@@ -82,15 +82,6 @@ const template = `
             <input
               type="checkbox"
               :disabled="isViewContext"
-              v-model="user.view_users">
-            {{ $t('permissions.view_users') }}
-          </label>
-        </div>
-        <div class="field">
-          <label class="checkbox">
-            <input
-              type="checkbox"
-              :disabled="isViewContext"
               v-model="user.update_users">
             {{ $t('permissions.update_users') }}
           </label>
@@ -183,7 +174,6 @@ export default {
                 username: '',
                 password: '',
                 create_users: false,
-                view_users: false,
                 update_users: false,
                 edit_qualifications: false,
                 create_items: false,
