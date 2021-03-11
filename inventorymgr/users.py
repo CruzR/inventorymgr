@@ -19,7 +19,7 @@ from flask.cli import with_appcontext
 from sqlalchemy.exc import IntegrityError  # type: ignore
 from werkzeug.security import generate_password_hash
 
-from inventorymgr import api
+from inventorymgr import api, service
 from inventorymgr.accesscontrol import (
     PERMISSIONS,
     can_set_permissions,
@@ -41,29 +41,10 @@ bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
 def new_user() -> Dict[str, Any]:
     """Flask view to create a new user using POST."""
     user_obj = api.NewUser.parse_obj(request.json)
-    username = user_obj.username
-    password = user_obj.password
-
-    if user_obj.qualifications and not can_set_qualifications():
-        raise insufficient_permissions()
-
-    if not can_set_permissions(user_obj):
-        raise APIError(reason="permissions_not_subset", status_code=403)
-
-    qualifications = [Qualification.query.get(q.id) for q in user_obj.qualifications]
 
     try:
-        user = User(
-            username=username,
-            password=generate_password_hash(password),
-            qualifications=qualifications,
-            **{k: getattr(user_obj, k) for k in PERMISSIONS},
-        )
-
-        db.session.add(user)
-        db.session.commit()
+        user = service.create_user(user_obj)
         return api.User.from_orm(user).dict()
-
     except IntegrityError as exc:
         raise APIError(reason="user_exists", status_code=400) from exc
 
