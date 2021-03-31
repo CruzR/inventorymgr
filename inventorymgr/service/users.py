@@ -15,7 +15,13 @@ from inventorymgr.accesscontrol import (
 from inventorymgr.db import db
 from inventorymgr.db.models import Qualification, User
 
-__all__ = ["create_user", "read_user", "update_user", "delete_user"]
+__all__ = [
+    "create_user",
+    "read_user",
+    "update_user",
+    "update_session_user",
+    "delete_user",
+]
 
 
 def create_user(user_obj: api.NewUser) -> User:
@@ -73,6 +79,33 @@ def update_user(user_id: int, user_obj: api.UpdatedUser) -> User:
     return cast(User, user)
 
 
+def update_session_user(user_id: int, user_obj: api.UpdatedUser) -> User:
+    """Special case for updating the current session user."""
+    if user_obj.id != user_id:
+        raise api.APIError(reason="incorrect_id", status_code=400)
+
+    user = User.query.get(user_obj.id)
+    if user is None:
+        raise api.APIError(reason="no_such_user", status_code=400)
+
+    if user.edit_qualifications:
+        update_user_qualifications(user, user_obj)
+    elif wants_to_update_qualifications(user, user_obj):
+        raise insufficient_permissions()
+
+    if user.update_users:
+        update_user_permissions(user, user_obj)
+    elif wants_to_update_permissions(user, user_obj):
+        raise insufficient_permissions()
+
+    update_user_username(user, user_obj)
+    update_user_password(user, user_obj)
+
+    db.session.commit()
+
+    return cast(User, user)
+
+
 def delete_user(user_id: int) -> None:
     """Delete a user if they exist."""
     user = User.query.get(user_id)
@@ -123,3 +156,10 @@ def insufficient_permissions() -> api.APIError:
 def wants_to_update_permissions(user: User, user_obj: api.UpdatedUser) -> bool:
     """Check if permissions need updating."""
     return any(getattr(user_obj, p) != getattr(user, p) for p in PERMISSIONS)
+
+
+def wants_to_update_qualifications(user: User, user_obj: api.UpdatedUser) -> bool:
+    """Check if qualifications need updating."""
+    current_qualifications = {q.id for q in user.qualifications}
+    new_qualifications = {q.id for q in user_obj.qualifications}
+    return current_qualifications != new_qualifications

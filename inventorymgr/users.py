@@ -20,16 +20,11 @@ from sqlalchemy.exc import IntegrityError  # type: ignore
 from werkzeug.security import generate_password_hash
 
 from inventorymgr import api, service
-from inventorymgr.accesscontrol import (
-    PERMISSIONS,
-    can_set_permissions,
-    can_set_qualifications,
-    requires_permissions,
-)
+from inventorymgr.accesscontrol import requires_permissions
 from inventorymgr.api import APIError
 from inventorymgr.auth import authentication_required, logout
 from inventorymgr.db import db
-from inventorymgr.db.models import User, Qualification
+from inventorymgr.db.models import User
 
 
 bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
@@ -57,40 +52,6 @@ def update_user(user_id: int) -> Dict[str, Any]:
     user_obj = api.UpdatedUser.parse_obj(request.json)
     user = service.update_user(user_id, user_obj)
     return api.User.from_orm(user).dict()
-
-
-def update_user_qualifications(user: User, user_obj: api.UpdatedUser) -> None:
-    """Update user qualifications."""
-    current_qualifications = {q.id for q in user.qualifications}
-    new_qualifications = {q.id for q in user_obj.qualifications}
-
-    if current_qualifications != new_qualifications:
-        if not can_set_qualifications():
-            raise insufficient_permissions()
-        qualifications = [Qualification.query.get(q_id) for q_id in new_qualifications]
-        if any(q is None for q in qualifications):
-            raise APIError(reason="unknown_qualification", status_code=400)
-        user.qualifications = qualifications
-
-
-def update_user_permissions(user: User, user_obj: api.UpdatedUser) -> None:
-    """Update user permissions."""
-    if wants_to_update_permissions(user, user_obj):
-        if not can_set_permissions(user_obj):
-            raise APIError(reason="permissions_not_subset", status_code=403)
-        for perm in PERMISSIONS:
-            setattr(user, perm, getattr(user_obj, perm))
-
-
-def update_user_username(user: User, user_obj: api.UpdatedUser) -> None:
-    """Update username."""
-    user.username = user_obj.username
-
-
-def update_user_password(user: User, user_obj: api.UpdatedUser) -> None:
-    """Update user password."""
-    if user_obj.password is not None:
-        user.password = generate_password_hash(user_obj.password)
 
 
 @bp.route("/<int:user_id>", methods=("DELETE",))
@@ -124,47 +85,8 @@ def get_self() -> Any:
 def update_self() -> Any:
     """Flask view to update current session's user as JSON."""
     user_obj = api.UpdatedUser.parse_obj(request.json)
-
-    if user_obj.id != session["user_id"]:
-        raise APIError(reason="incorrect_id", status_code=400)
-
-    user = User.query.get(user_obj.id)
-    if user is None:
-        raise APIError(reason="no_such_user", status_code=400)
-
-    if user.edit_qualifications:
-        update_user_qualifications(user, user_obj)
-    elif wants_to_update_qualifications(user, user_obj):
-        raise insufficient_permissions()
-
-    if user.update_users:
-        update_user_permissions(user, user_obj)
-    elif wants_to_update_permissions(user, user_obj):
-        raise insufficient_permissions()
-
-    update_user_username(user, user_obj)
-    update_user_password(user, user_obj)
-
-    db.session.commit()
-
+    user = service.update_session_user(session["user_id"], user_obj)
     return api.User.from_orm(user).dict()
-
-
-def insufficient_permissions() -> APIError:
-    """Return an API error for insufficient permissions."""
-    return APIError(reason="insufficient_permissions", status_code=403)
-
-
-def wants_to_update_qualifications(user: User, user_obj: api.UpdatedUser) -> bool:
-    """Check if qualifications need updating."""
-    current_qualifications = {q.id for q in user.qualifications}
-    new_qualifications = {q.id for q in user_obj.qualifications}
-    return current_qualifications != new_qualifications
-
-
-def wants_to_update_permissions(user: User, user_obj: api.UpdatedUser) -> bool:
-    """Check if permissions need updating."""
-    return any(getattr(user_obj, p) != getattr(user, p) for p in PERMISSIONS)
 
 
 @bp.route("/me", methods=("DELETE",))
