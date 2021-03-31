@@ -13,4 +13,5 @@ __all__ = [
     "update_user",
     "update_session_user",
     "delete_user",
+    "iterate_users",
 ]

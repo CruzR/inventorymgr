@@ -102,7 +102,7 @@ def delete_self() -> Any:
 @authentication_required
 def list_users() -> Dict[str, List[str]]:
     """Flask view to get a list of users using GET."""
-    users = list(User.query.all())
+    users = list(service.iterate_users())
     return api.UserCollection(users=users).dict()
 
 

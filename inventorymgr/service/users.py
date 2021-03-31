@@ -1,7 +1,7 @@
 """Business logic regarding users."""
 
 
-from typing import cast
+from typing import Iterable, cast
 
 from sqlalchemy.exc import IntegrityError  # type: ignore
 from werkzeug.security import generate_password_hash
@@ -21,6 +21,7 @@ __all__ = [
     "update_user",
     "update_session_user",
     "delete_user",
+    "iterate_users",
 ]
 
 
@@ -112,6 +113,11 @@ def delete_user(user_id: int) -> None:
     if user is not None:
         db.session.delete(User.query.get(user_id))
         db.session.commit()
+
+
+def iterate_users() -> Iterable[User]:
+    """Iterate over all users in DB."""
+    return cast(Iterable[User], User.query.all())
 
 
 def update_user_qualifications(user: User, user_obj: api.UpdatedUser) -> None:
