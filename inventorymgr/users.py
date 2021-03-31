@@ -98,12 +98,7 @@ def update_user_password(user: User, user_obj: api.UpdatedUser) -> None:
 @requires_permissions("update_users")
 def delete_user(user_id: int) -> str:
     """Flask view to delete a user with DELETE."""
-
-    user = User.query.get(user_id)
-    if user is not None:
-        db.session.delete(User.query.get(user_id))
-        db.session.commit()
-
+    service.delete_user(user_id)
     return str(user_id)
 
 

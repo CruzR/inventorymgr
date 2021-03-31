@@ -15,7 +15,7 @@ from inventorymgr.accesscontrol import (
 from inventorymgr.db import db
 from inventorymgr.db.models import Qualification, User
 
-__all__ = ["create_user", "update_user"]
+__all__ = ["create_user", "update_user", "delete_user"]
 
 
 def create_user(user_obj: api.NewUser) -> User:
@@ -63,6 +63,14 @@ def update_user(user_id: int, user_obj: api.UpdatedUser) -> User:
         raise api.APIError(reason="user_exists", status_code=400) from exc
 
     return cast(User, user)
+
+
+def delete_user(user_id: int) -> None:
+    """Delete a user if they exist."""
+    user = User.query.get(user_id)
+    if user is not None:
+        db.session.delete(User.query.get(user_id))
+        db.session.commit()
 
 
 def update_user_qualifications(user: User, user_obj: api.UpdatedUser) -> None:
