@@ -106,9 +106,7 @@ def delete_user(user_id: int) -> str:
 @authentication_required
 def get_user(user_id: int) -> Any:
     """Flask view to get a specified user."""
-    user = User.query.get(user_id)
-    if user is None:
-        raise APIError(reason="no_such_user", status_code=400)
+    user = service.read_user(user_id)
     return api.User.from_orm(user).dict()
 
 

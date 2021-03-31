@@ -15,7 +15,7 @@ from inventorymgr.accesscontrol import (
 from inventorymgr.db import db
 from inventorymgr.db.models import Qualification, User
 
-__all__ = ["create_user", "update_user", "delete_user"]
+__all__ = ["create_user", "read_user", "update_user", "delete_user"]
 
 
 def create_user(user_obj: api.NewUser) -> User:
@@ -41,6 +41,14 @@ def create_user(user_obj: api.NewUser) -> User:
     db.session.add(user)
     db.session.commit()
     return user
+
+
+def read_user(user_id: int) -> User:
+    """Read a specified user from the DB."""
+    user = User.query.get(user_id)
+    if user is None:
+        raise api.APIError(reason="no_such_user", status_code=400)
+    return cast(User, user)
 
 
 def update_user(user_id: int, user_obj: api.UpdatedUser) -> User:
