@@ -55,24 +55,7 @@ def new_user() -> Dict[str, Any]:
 def update_user(user_id: int) -> Dict[str, Any]:
     """Flask view to update a user using PUT."""
     user_obj = api.UpdatedUser.parse_obj(request.json)
-
-    if user_obj.id != user_id:
-        raise APIError(reason="incorrect_id", status_code=400)
-
-    user = User.query.get(user_id)
-    if user is None:
-        raise APIError(reason="no_such_user", status_code=400)
-
-    try:
-        update_user_qualifications(user, user_obj)
-        update_user_permissions(user, user_obj)
-        update_user_username(user, user_obj)
-        update_user_password(user, user_obj)
-        db.session.commit()
-    except IntegrityError as exc:
-        db.session.rollback()
-        raise APIError(reason="user_exists", status_code=400) from exc
-
+    user = service.update_user(user_id, user_obj)
     return api.User.from_orm(user).dict()
 
 

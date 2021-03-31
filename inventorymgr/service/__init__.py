@@ -7,4 +7,4 @@ and HTML endpoints.
 
 from inventorymgr.service.users import *
 
-__all__ = ["create_user"]
+__all__ = ["create_user", "update_user"]
