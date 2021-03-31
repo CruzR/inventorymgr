@@ -115,9 +115,7 @@ def get_user(user_id: int) -> Any:
 def get_self() -> Any:
     """Flask view to get the current session's user as JSON."""
     self_id = session["user_id"]
-    self_user = User.query.get(self_id)
-    if self_user is None:
-        raise APIError(reason="no_such_user", status_code=400)
+    self_user = service.read_user(self_id)
     return api.User.from_orm(self_user).dict()
 
 
@@ -174,11 +172,7 @@ def wants_to_update_permissions(user: User, user_obj: api.UpdatedUser) -> bool:
 def delete_self() -> Any:
     """Flask view to delete current session's user."""
     user_id = session["user_id"]
-    user = User.query.get(user_id)
-    if user is not None:
-        db.session.delete(User.query.get(user_id))
-        db.session.commit()
-
+    service.delete_user(user_id)
     return logout()
 
 
