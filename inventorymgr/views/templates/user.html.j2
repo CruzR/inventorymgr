@@ -1,13 +1,106 @@
 {% extends "page.html.j2" %}
 
 {% block content %}
-<user-detail-view :session-user="sessionUser" :qualifications="qualifications" :users="users"></user-detail-view>
+<div>
+<form>
+  <div class="field">
+    <label class="label" for="userform-username">{{ "{{ $t('fields.username') }}" }}</label>
+    <div class="control">
+      <input
+        id="userform-username"
+        type="text" required
+        readonly
+        class="input is-static"
+        value="{{ user.username }}">
+    </div>
+  </div>
+  <div class="field">
+    <label class="label" for="userform-barcode">{{ "{{ $t('fields.barcode') }}" }}</label>
+    <div class="control">
+      <input
+        id="userform-barcode"
+        type="text" readonly
+        class="input is-static"
+        value="{{ user.barcode }}">
+    </div>
+  </div>
+  <fieldset class="field">
+    <legend class="label">{{ "{{ $t('fields.permissions') }}" }}</legend>
+    <div class="field">
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          disabled
+          {% if user.create_users %}checked{% endif %}>
+        {{ "{{ $t('permissions.create_users') }}" }}
+      </label>
+    </div>
+    <div class="field">
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          disabled
+          {% if user.update_users %}checked{% endif %}>
+        {{ "{{ $t('permissions.update_users') }}" }}
+      </label>
+    </div>
+    <div class="field">
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          disabled
+          {% if user.edit_qualifications %}checked{% endif %}>
+        {{ "{{ $t('permissions.edit_qualifications') }}" }}
+      </label>
+    </div>
+    <div class="field">
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          disabled
+          {% if user.create_items %}checked{% endif %}>
+        {{ "{{ $t('permissions.create_items') }}" }}
+      </label>
+    </div>
+    <div class="field">
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          disabled
+          {% if user.manage_checkouts %}checked{% endif %}>
+        {{ "{{ $t('permissions.manage_checkouts') }}" }}
+      </label>
+    </div>
+  </fieldset>
+  <div class="field">
+    <label class="label">{{ "{{ $t('fields.qualifications') }}" }}</label>
+    <div class="control">
+      {# <tag-select-box
+        :items.sync="user.qualifications"
+        :readonly="isViewContext"
+        :choices="qualifications">
+      </tag-select-box> #}
+      <div>
+        <div class="tags">
+          {% for qualification in user.qualifications %}
+          <span class="tag">{{ qualification.name }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="field is-grouped">
+    <div class="control">
+      <a class="button is-primary" href="/users/{{ user.id }}/edit">
+        {{ "{{ $t('actions.edit') }}" }}
+      </a>
+    </div>
+    <div class="control">
+      <button type="button" class="button is-danger">
+        {{ "{{ $t('actions.delete') }}" }}
+      </button>
+    </div>
+  </div>
+</form>
+</div>
 {% endblock content %}
-
-{% block additional_imports %}
-import UserDetailView from '/static/views/viewuser.js'
-{% endblock additional_imports %}
-
-{% block additional_components %}
-UserDetailView,
-{%endblock additional_components %}
