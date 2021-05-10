@@ -3,13 +3,14 @@
 from typing import Any
 
 from flask import render_template
+from inventorymgr.service import iterate_users
 from inventorymgr.views.blueprint import views_blueprint
 
 
 @views_blueprint.route("/users")
 def users() -> Any:
     """List view of all users."""
-    return render_template("users.html.j2")
+    return render_template("users.html.j2", users=iterate_users())
 
 
 @views_blueprint.route("/users/new")
