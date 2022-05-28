@@ -2,6 +2,7 @@ import Vue from '/static/vue.esm.browser.js'
 import Vuex from '/static/vuex.esm.browser.js'
 import { mapState } from '/static/vuex.esm.browser.js'
 import VueI18n from '/static/vue-i18n.esm.browser.js'
+import autofocus from '/static/vue-autofocus-directive.js'
 import { messages } from '/static/messages.js'
 import { fetchBorrowStates, fetchItems, fetchLogs, fetchQualifications, fetchRegistrationTokens, fetchTransferRequests, fetchUser, fetchUsers } from '/static/api.js'
 import VueRouter from '/static/vue-router.esm.browser.js'
@@ -34,6 +35,7 @@ Vue.config.errorHandler = (err, vm, info) => {
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueI18n);
+Vue.directive('autofocus', autofocus);
 
 const routes = [
     { path: '/login', component: LoginView },

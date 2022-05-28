@@ -18,7 +18,7 @@ const template = `
               </datalist>
               <input
                 id="checkout-item"
-                autofocus
+                v-autofocus
                 list="checkout-item-names"
                 class="input"
                 v-model="userOrItem">
