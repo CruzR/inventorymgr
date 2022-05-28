@@ -18,6 +18,7 @@ const template = `
               </datalist>
               <input
                 id="checkin-item"
+                ref="userOrItemInput"
                 v-autofocus
                 list="checkin-item-names"
                 class="input"
@@ -99,35 +100,35 @@ function selectUserOrItem() {
     const userOrItem = this.selectedUserOrItem;
     if (!userOrItem) {
         this.errorMessage = 'Could not find user or item with that barcode.';
+        this.$refs.userOrItemInput.focus();
         return;
     }
 
     if (userOrItem.username) {
         this.selected_user = userOrItem;
         this.userOrItem = '';
-        return;
+    } else {
+        const borrowstates = this.borrowstates.filter(
+            b => b.borrowed_item.id === userOrItem.id && b.returned_at === null
+        ).sort((a, b) => {
+            const selected_user_id = this.selected_user?.id;
+            if (a.borrowing_user.id == selected_user_id && b.borrowing_user.id != selected_user_id) {
+                return -1;
+            }
+            if (b.borrowing_user.id == selected_user_id && a.borrowing_user.id != selected_user_id) {
+                return 1;
+            }
+            if (a.received_at < b.received_at) return -1;
+            if (b.received_at < a.received_at) return 1;
+            return 0;
+        })
+        const newBorrowState = borrowstates.find(b => this.selected_borrowstates.findIndex(b0 => b0.borrowstate.id == b.id) == -1);
+        if (newBorrowState) {
+            this.selected_borrowstates.unshift({ borrowstate: newBorrowState, count: 1});
+            this.userOrItem = '';
+        }
     }
-
-    const borrowstates = this.borrowstates.filter(
-      b => b.borrowed_item.id === userOrItem.id && b.returned_at === null
-    ).sort((a, b) => {
-      const selected_user_id = this.selected_user?.id;
-      if (a.borrowing_user.id == selected_user_id && b.borrowing_user.id != selected_user_id) {
-        return -1;
-      }
-      if (b.borrowing_user.id == selected_user_id && a.borrowing_user.id != selected_user_id) {
-        return 1;
-      }
-      if (a.received_at < b.received_at) return -1;
-      if (b.received_at < a.received_at) return 1;
-      return 0;
-    })
-    const newBorrowState = borrowstates.find(b => this.selected_borrowstates.findIndex(b0 => b0.borrowstate.id == b.id) == -1);
-    if (!newBorrowState) return;
-
-
-    this.selected_borrowstates.unshift({ borrowstate: newBorrowState, count: 1});
-    this.userOrItem = '';
+    this.$refs.userOrItemInput.focus();
 }
 
 

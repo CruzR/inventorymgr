@@ -18,6 +18,7 @@ const template = `
               </datalist>
               <input
                 id="checkout-item"
+                ref="userOrItemInput"
                 v-autofocus
                 list="checkout-item-names"
                 class="input"
@@ -100,9 +101,7 @@ function selectUserOrItem() {
     if (userOrItem?.username) {
         this.selected_user = userOrItem;
         this.userOrItem = '';
-        return;
-    }
-    if (userOrItem) {
+    } else if (userOrItem) {
         const index = this.selected_items.findIndex(i => i.item.id === userOrItem.id);
         if (index !== -1) {
             this.selected_items[index].count += 1;
@@ -112,6 +111,7 @@ function selectUserOrItem() {
         }
         this.userOrItem = '';
     }
+    this.$refs.userOrItemInput.focus();
 }
 
 
