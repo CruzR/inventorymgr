@@ -105,6 +105,10 @@ class BorrowableItem(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
+    quantity_total = db.Column(db.Integer, default=1, nullable=False)
+    quantity_in_stock = db.Column(db.Integer, default=1, nullable=False)
+    unmatched_returns = db.Column(db.Integer, default=0, nullable=False)
+    description = db.Column(db.Text)
     required_qualifications = db.relationship(
         "Qualification",
         secondary=_REQUIRED_QUALIFICATIONS_TABLE,
@@ -130,6 +134,7 @@ class BorrowState(db.Model):  # type: ignore
         db.Integer, db.ForeignKey("borrowable_item.id"), nullable=False
     )
     borrowed_item = db.relationship("BorrowableItem", back_populates="borrowstates")
+    quantity = db.Column(db.Integer, nullable=False)
     received_at = db.Column(db.DateTime, nullable=False)
     returned_at = db.Column(db.DateTime)
     transfer_requests = db.relationship(

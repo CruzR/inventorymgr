@@ -21,16 +21,28 @@ bp = Blueprint("items", __name__, url_prefix="/api/v1/items")
 @requires_permissions("create_items")
 def create_item() -> Tuple[Dict[str, Any], int]:
     """JSON endpoint for creating borrowable items."""
-    received_item = BorrowableItemSchema(only=("name", "required_qualifications")).load(
-        request.json
-    )
+    received_item = BorrowableItemSchema(
+            only=(
+                "name",
+                "quantity_total",
+                "quantity_in_stock",
+                "unmatched_returns",
+                "description",
+                "required_qualifications",
+            )
+    ).load(request.json)
     try:
         qual_ids = [q["id"] for q in received_item["required_qualifications"]]
         qualifications = [Qualification.query.get(q_id) for q_id in qual_ids]
         if any(q is None for q in qualifications):
             raise APIError(reason="unknown_qualification", status_code=400)
         item = BorrowableItem(
-            name=received_item["name"], required_qualifications=qualifications
+            name=received_item["name"],
+            quantity_total=received_item["quantity_total"],
+            quantity_in_stock=received_item["quantity_in_stock"],
+            unmatched_returns=received_item["unmatched_returns"],
+            description=received_item["description"],
+            required_qualifications=qualifications,
         )
         db.session.add(item)
         db.session.commit()
@@ -69,6 +81,10 @@ def update_item(item_id: int) -> Dict[str, Any]:
 
     try:
         item.name = received_item["name"]
+        item.quantity_total = received_item["quantity_total"]
+        item.quantity_in_stock = received_item["quantity_in_stock"]
+        item.unmatched_returns = received_item["unmatched_returns"]
+        item.description = received_item["description"]
         item.required_qualifications = qualifications
         db.session.commit()
     except IntegrityError as exc:

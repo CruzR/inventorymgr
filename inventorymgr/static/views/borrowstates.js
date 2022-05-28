@@ -13,6 +13,7 @@ const template = `
         <thead>
           <tr>
             <th>{{ $t('fields.item') }}</th>
+            <th>Anzahl</th>
             <th>{{ $t('fields.borrowed_by') }}</th>
             <th>{{ $t('fields.received_at') }}</th>
             <th>{{ $t('fields.returned_at') }}</th>
@@ -23,6 +24,7 @@ const template = `
             <td :data-label="$t('fields.item')">
               {{ borrowstate.borrowed_item.name }}
             </td>
+            <td data-label="Anzahl">{{ borrowstate.quantity }}</td>
             <td :data-label="$t('fields.borrowed_by')">
               {{ borrowstate.borrowing_user.username }}
             </td>

@@ -1,9 +1,12 @@
 """API endpoints for handling borrow states."""
 
 import datetime
+import itertools
 from typing import Any, Dict, Iterable, Tuple, cast
 
 from flask import Blueprint, request
+from sqlalchemy import func
+from sqlalchemy import distinct
 
 from inventorymgr.accesscontrol import requires_permissions
 from inventorymgr.api.models import (
@@ -50,8 +53,8 @@ def checkout() -> Tuple[Dict[str, Any], int]:
         return {"reason": "no_such_user"}, 400
 
     borrowed_items = [
-        BorrowableItem.query.get(item_id)
-        for item_id in checkout_request["borrowed_item_ids"]
+        BorrowableItem.query.get(elem["id"])
+        for elem in checkout_request["borrowed_item_ids"]
     ]
 
     if any(item is None for item in borrowed_items):
@@ -66,16 +69,19 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     if unqualified_for:
         return {"reason": "missing_qualifications"}, 403
 
-    if any_item_already_borrowed(borrowed_items):
+    quantities = list(map(lambda elem: elem["count"], checkout_request["borrowed_item_ids"]))
+
+    if any_item_already_borrowed(borrowed_items, quantities):
         return {"reason": "already_borrowed"}, 400
 
     borrowstates = [
-        BorrowState(borrowing_user=borrowing_user, borrowed_item=item, received_at=now)
-        for item in borrowed_items
+        BorrowState(borrowing_user=borrowing_user, borrowed_item=item, quantity=qty, received_at=now)
+        for item, qty in zip(borrowed_items, quantities)
     ]
 
     for borrow_state in borrowstates:
         db.session.add(borrow_state)
+        borrow_state.borrowed_item.quantity_in_stock -= borrow_state.quantity
 
     db.session.add(
         LogEntry(
@@ -90,6 +96,17 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     return {"borrowstates": BorrowStateSchema(many=True).dump(borrowstates)}, 200
 
 
+def try_identify_borrowstates(returning_user, item, quantity):
+    open_borrowstate_count = BorrowState.query.with_entities(func.sum(BorrowState.quantity)).filter_by(borrowed_item=item, returned_at=None).scalar()
+    distinct_user_count = BorrowState.query.with_entities(func.count(distinct(BorrowState.borrowing_user_id))).filter_by(borrowed_item=item, returned_at=None).scalar()
+    if open_borrowstate_count == quantity or distinct_user_count == 1:
+        # successfully identified
+        return open_borrowstates_for_item(item)#, 0
+    #open_borrowstate_count_of_user = BorrowState.query.with_entities(func.sum(BorrowState.quantity)).filter_by(borrowed_item=item, returned_at=None, borrowing_user=returning_user)
+    # Otherwise, prefer returning user
+    return BorrowState.query.filter_by(borrowed_item=item, returned_at=None, borrowing_user=returning_user).all()#, max(quantity - open_borrowstate_count_of_user, 0)
+
+
 @bp.route("/checkin", methods=("POST",))
 @authentication_required
 @requires_permissions("manage_checkouts")
@@ -99,13 +116,25 @@ def checkin() -> Dict[str, Any]:
     now = _utcnow()
     returning_user = User.query.get(checkin_request["user_id"])
     returned_items = [
-        BorrowableItem.query.get(item_id) for item_id in checkin_request["item_ids"]
+        BorrowableItem.query.get(elem["id"]) for elem in checkin_request["item_ids"]
     ]
     borrowstates = []
-    for item in returned_items:
-        for borrow_state in open_borrowstates_for_item(item):
-            borrow_state.returned_at = now
-            borrowstates.append(borrow_state)
+    for item, elem in zip(returned_items, checkin_request["item_ids"]):
+        qty = qty_before = elem["count"]
+        for borrow_state in try_identify_borrowstates(returning_user, item, qty_before):
+            #if borrow_state.borrowing_user == returning_user:
+            if qty >= borrow_state.quantity:
+                qty -= borrow_state.quantity
+                borrow_state.returned_at = now
+                borrowstates.append(borrow_state)
+            else:
+                borrow_state.quantity -= qty
+                qty = 0
+            if qty == 0:
+                break
+        else:
+            item.unmatched_returns += qty
+        item.quantity_in_stock += qty_before# - qty
     db.session.add(
         LogEntry(
             action="checkin",
@@ -135,6 +164,6 @@ def has_required_qualifications(user: User, item: BorrowableItem) -> bool:
     return all(q in user.qualifications for q in item.required_qualifications)
 
 
-def any_item_already_borrowed(items: Iterable[BorrowableItem]) -> bool:
+def any_item_already_borrowed(items: Iterable[BorrowableItem], quantities: Iterable[int]) -> bool:
     """Check if any item in item_ids already has an open borrowstate."""
-    return any(bool(open_borrowstates_for_item(item)) for item in items)
+    return any(item.quantity_in_stock < count for item, count in zip(items, quantities))

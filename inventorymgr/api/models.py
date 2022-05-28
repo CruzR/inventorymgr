@@ -61,6 +61,10 @@ class BorrowableItemSchema(Schema):
 
     id = fields.Integer(required=True)
     name = fields.Str(required=True, validate=bool)
+    quantity_total = fields.Integer(required=True)
+    quantity_in_stock = fields.Integer(required=True)
+    unmatched_returns = fields.Integer(required=True)
+    description = fields.Str(required=True)
     required_qualifications = fields.Nested(
         QualificationSchema, required=True, many=True
     )
@@ -89,22 +93,30 @@ class BorrowStateSchema(Schema):
     borrowed_item = fields.Nested(
         BorrowableItemSchema, required=True, only=("id", "name")
     )
+    quantity = fields.Integer(required=True)
     received_at = fields.DateTime(required=True)
     returned_at = fields.DateTime(required=True, allow_none=True)
+
+
+class ItemCountSchema(Schema):
+    """Schema for checkout/checkin of items with count."""
+
+    id = fields.Integer(required=True)
+    count = fields.Integer(required=True)
 
 
 class CheckoutRequestSchema(Schema):
     """Marshmallow schema for checkout requests."""
 
     borrowing_user_id = fields.Integer(required=True)
-    borrowed_item_ids = fields.List(fields.Integer, required=True)
+    borrowed_item_ids = fields.List(fields.Nested(ItemCountSchema), required=True)
 
 
 class CheckinRequestSchema(Schema):
     """Marshmallow schema for checkin requests."""
 
     user_id = fields.Integer(required=True)
-    item_ids = fields.List(fields.Integer, required=True)
+    item_ids = fields.List(fields.Nested(ItemCountSchema), required=True)
 
 
 class LogEntrySchema(Schema):

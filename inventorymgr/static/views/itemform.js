@@ -26,6 +26,30 @@ const template = `
           </div>
         </div>
         <div class="field">
+          <label class="label" for="item-quantity-total">Anzahl Gesamt</label>
+          <div class="control">
+            <input id="item-quantity-total" required :readonly="isViewContext" :class="{ 'input': true, 'is-static': isViewContext }" v-model="item.quantity_total">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="item-quantity-in-stock">Anzahl auf Lager</label>
+          <div class="control">
+            <input id="item-quantity-in-stock" required :readonly="isViewContext" :class="{ 'input': true, 'is-static': isViewContext }" v-model="item.quantity_in_stock">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="item-unmatched-returns">Unbekannte R&uuml;ckgaben</label>
+          <div class="control">
+            <input id="item-unmatched-returns" required :readonly="isViewContext" :class="{ 'input': true, 'is-static': isViewContext }" v-model="item.unmatched_returns">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="item-description">Anmerkungen</label>
+          <div class="control">
+            <textarea id="item-description" :readonly="isViewContext" :class="{ 'textarea': true, 'is-static': isViewContext }" v-model="item.description"></textarea>
+          </div>
+        </div>
+        <div class="field">
           <label class="label">{{ $t('fields.required_qualifications') }}</label>
           <div class="control">
             <tag-select-box
@@ -81,7 +105,7 @@ export default {
     data: function() {
         const item = (typeof(this.current) !== 'undefined')
             ? JSON.parse(JSON.stringify(this.current))
-            : { name: '', barcode: '', required_qualifications: [] };
+            : { name: '', barcode: '', quantity_total: 1, quantity_in_stock: 1, unmatched_returns: 0, description: '', required_qualifications: [] };
         return { item };
     },
     computed: {

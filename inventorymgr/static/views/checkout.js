@@ -7,65 +7,70 @@ const template = `
       <div v-if="errorMessage" class="message is-danger">
         <div class="message-body">{{ errorMessage }}</div>
       </div>
+      <form @submit.prevent="selectUserOrItem">
+        <div class="field">
+          <label class="label" for="checkout-item">Barcode</label>
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <datalist id="checkout-item-names">
+                <option v-for="user in users" :value="user.username"/>
+                <option v-for="item in items" :value="item.name"/>
+              </datalist>
+              <input
+                id="checkout-item"
+                autofocus
+                list="checkout-item-names"
+                class="input"
+                v-model="userOrItem">
+            </div>
+            <div class="control">
+              <button class="button">{{ $t('actions.add') }}</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <!--
+      <form @submit.prevent="selectUser">
+        <div class="field">
+          <label class="label" for="checkout-user">{{ $t('fields.user_barcode') }}</label>
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <datalist id="checkout-user-names">
+                <option v-for="user in users" :value="user.username"/>
+              </datalist>
+              <input
+                id="checkout-user"
+                list="checkout-user-names"
+                class="input"
+                v-model="userBarcodeOrName">
+            </div>
+            <div class="control">
+              <button class="button">{{ $t('actions.add') }}</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      -->
       <div class="columns">
         <div class="column">
-          <form @submit.prevent="selectItem">
-            <div class="field">
-              <label class="label" for="checkout-item">{{ $t('fields.item_barcode') }}</label>
-              <div class="field has-addons">
-                <div class="control is-expanded">
-                  <datalist id="checkout-item-names">
-                    <option v-for="item in items" :value="item.name"/>
-                  </datalist>
-                  <input
-                    id="checkout-item"
-                    autofocus
-                    list="checkout-item-names"
-                    class="input"
-                    v-model="itemBarcodeOrName">
-                </div>
-                <div class="control">
-                  <button class="button">{{ $t('actions.add') }}</button>
-                </div>
-              </div>
-            </div>
-          </form>
           <table v-if="selected_items.length" class="table is-fullwidth responsive-table">
             <thead>
               <tr>
                 <th>{{ $t('fields.barcode') }}</th>
                 <th>{{ $t('fields.item') }}</th>
+                <th>Anzahl</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in selected_items">
-                <td :data-label="$t('fields.barcode')">{{ item.barcode }}</td>
-                <td :data-label="$t('fields.item')">{{ item.name }}</td>
+              <tr v-for="i in selected_items">
+                <td :data-label="$t('fields.barcode')">{{ i.item.barcode }}</td>
+                <td :data-label="$t('fields.item')">{{ i.item.name }}</td>
+                <td data-label="Anzahl">{{ i.count }}</td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="column">
-          <form @submit.prevent="selectUser">
-            <div class="field">
-              <label class="label" for="checkout-user">{{ $t('fields.user_barcode') }}</label>
-              <div class="field has-addons">
-                <div class="control is-expanded">
-                  <datalist id="checkout-user-names">
-                    <option v-for="user in users" :value="user.username"/>
-                  </datalist>
-                  <input
-                    id="checkout-user"
-                    list="checkout-user-names"
-                    class="input"
-                    v-model="userBarcodeOrName">
-                </div>
-                <div class="control">
-                  <button class="button">{{ $t('actions.add') }}</button>
-                </div>
-              </div>
-            </div>
-          </form>
           <table v-if="selected_user" class="table is-fullwidth responsive-table">
             <thead>
               <tr>
@@ -90,24 +95,22 @@ const template = `
     </div>`
 
 
-function selectItem() {
-    const item = this.selectedItem;
-    if (item) {
-        const index = this.selected_items.findIndex(i => i.id === item.id);
-        if (index !== -1) {
-            this.selected_items.splice(index, 1);
-        }
-        this.selected_items.unshift(item);
-        this.itemBarcodeOrName = '';
+function selectUserOrItem() {
+    const userOrItem = this.selectedUserOrItem;
+    if (userOrItem?.username) {
+        this.selected_user = userOrItem;
+        this.userOrItem = '';
+        return;
     }
-}
-
-
-function selectUser(e) {
-    const user = this.selectedUser;
-    if (user) {
-        this.selected_user = user;
-        this.userBarcodeOrName = '';
+    if (userOrItem) {
+        const index = this.selected_items.findIndex(i => i.item.id === userOrItem.id);
+        if (index !== -1) {
+            this.selected_items[index].count += 1;
+            // this.selected_items.splice(index, 1);
+        } else {
+            this.selected_items.unshift({item: userOrItem, count: 1});
+        }
+        this.userOrItem = '';
     }
 }
 
@@ -127,7 +130,7 @@ function sendCheckoutRequest() {
 
     const checkoutRequest = {
         borrowing_user_id: this.selected_user.id,
-        borrowed_item_ids: this.selected_items.map(i => i.id),
+        borrowed_item_ids: this.selected_items.map(i => { return {id: i.item.id, count: i.count} }),
     };
 
     checkout(checkoutRequest).then(response => {
@@ -148,24 +151,23 @@ export default {
     data: () => {
         return {
             errorMessage: '',
-            itemBarcodeOrName: '',
-            userBarcodeOrName: '',
+            userOrItem: '',
             selected_items: [],
             selected_user: null,
         };
     },
     computed: {
-        selectedItem: function() {
-            const barcodeOrName = this.itemBarcodeOrName.trim();
+        selectedUserOrItem: function() {
+            const barcodeOrName = this.userOrItem.trim();
+            const userByBarcode = this.users.find(u => u.barcode === barcodeOrName);
+            if (userByBarcode) return userByBarcode;
             const itemByBarcode = this.items.find(i => i.barcode === barcodeOrName);
-            return itemByBarcode || this.items.find(i => i.name === barcodeOrName);
+            if (itemByBarcode) return itemByBarcode;
+            return this.users.find(u => u.username === barcodeOrName) || this.items.find(i => i.name === barcodeOrName);
         },
         selectedUser: function() {
-            const barcodeOrName = this.userBarcodeOrName.trim();
-            const userByBarcode = this.users.find(u => u.barcode === barcodeOrName);
-            return userByBarcode || this.users.find(u => u.username === barcodeOrName);
         },
         ...mapState(['items', 'users']),
     },
-    methods: { selectItem, selectUser, sendCheckoutRequest },
+    methods: { selectUserOrItem, sendCheckoutRequest },
 }

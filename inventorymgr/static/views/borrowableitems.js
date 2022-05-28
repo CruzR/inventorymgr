@@ -9,6 +9,7 @@ const template = `
           <tr>
             <th>{{ $t('fields.item') }}</th>
             <th>{{ $t('fields.barcode') }}</th>
+	    <th>Auf Lager</th>
             <th>{{ $t('fields.required_qualifications') }}</th>
             <th>{{ $t('fields.actions') }}</th>
           </tr>
@@ -24,6 +25,7 @@ const template = `
               </div>
             </td>
             <td :data-label="$t('fields.barcode')">{{ item.barcode }}</td>
+	    <td data-label="Auf Lager">{{ item.quantity_in_stock }}/{{ item.quantity_total }}</td>
             <td :data-label="$t('fields.required_qualifications')">
               <div class="tags">
                 <span
