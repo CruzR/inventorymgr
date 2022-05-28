@@ -13,10 +13,18 @@ const template = `
         <label class="label" for="userform-username">{{ $t('fields.username') }}</label>
         <div class="control">
           <input
+            v-if="isViewContext"
             id="userform-username"
             type="text" required
-            :readonly="isViewContext"
-            :class="{ 'input': true, 'is-static': isViewContext }"
+            readonly
+            class="input is-static"
+            v-model="user.username">
+          <input
+            v-else
+            v-autofocus
+            id="userform-username"
+            type="text" required
+            class="input"
             v-model="user.username">
         </div>
       </div>

@@ -12,9 +12,19 @@ const template = `
         <div class="field">
           <label class="label" for="item-name">{{ $t('fields.item') }}</label>
           <div class="control">
-            <input id="item-name" type="text" required
-              :readonly="isViewContext"
-              :class="{ 'input': true, 'is-static': isViewContext }"
+            <input
+              v-if="isViewContext"
+              id="item-name"
+              type="text" required
+              readonly
+              class="input is-static"
+              v-model="item.name">
+            <input
+              v-else
+              v-autofocus
+              id="item-name"
+              type="text" required
+              class="input"
               v-model="item.name">
           </div>
         </div>

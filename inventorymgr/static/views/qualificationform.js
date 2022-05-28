@@ -10,10 +10,18 @@ const template = `
           <label class="label" for="qualificationform-name">{{ $t('fields.qualification') }}</label>
           <div class="control">
             <input
+              v-if="isViewContext"
               id="qualificationform-name"
               type="text" required
-              :readonly="isViewContext"
-              :class="{ 'input': true, 'is-static': isViewContext }"
+              readonly
+              class="input is-static"
+              v-model="qualification.name">
+            <input
+              v-else
+              v-autofocus
+              id="qualificationform-name"
+              type="text" required
+              class="input"
               v-model="qualification.name">
           </div>
         </div>
