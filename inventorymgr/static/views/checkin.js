@@ -91,12 +91,16 @@ const template = `
         </div>
       </div>
       <form @submit.prevent="sendCheckinRequest">
-        <button class="button is-primary">{{ $t('actions.checkin') }}</button>
+        <button ref="checkinButton" class="button is-primary">{{ $t('actions.checkin') }}</button>
       </form>
     </div>`
 
 
 function selectUserOrItem() {
+    if (this.userOrItem == "") {
+        this.$refs.checkinButton.focus();
+        return;
+    }
     const userOrItem = this.selectedUserOrItem;
     if (!userOrItem) {
         this.errorMessage = 'Could not find user or item with that barcode.';

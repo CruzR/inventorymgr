@@ -89,7 +89,7 @@ const template = `
       <form @submit.prevent="sendCheckoutRequest">
         <div class="field">
           <div class="control">
-            <button class="button is-primary">{{ $t('actions.checkout') }}</button>
+            <button ref="checkoutButton" class="button is-primary">{{ $t('actions.checkout') }}</button>
           </div>
         </div>
       </form>
@@ -97,6 +97,10 @@ const template = `
 
 
 function selectUserOrItem() {
+    if (this.userOrItem == "") {
+      this.$refs.checkoutButton.focus();
+      return;
+    }
     const userOrItem = this.selectedUserOrItem;
     if (userOrItem?.username) {
         this.selected_user = userOrItem;
