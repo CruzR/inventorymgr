@@ -31,6 +31,10 @@
         color: #777;
         margin: 0.5rem;
     }
+
+    .responsive-table .has-background-danger td::before {
+        color: white;
+    }
 }
 
 .indicator-box {

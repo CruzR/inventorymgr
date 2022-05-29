@@ -63,7 +63,7 @@ const template = `
               </tr>
             </thead>
             <tbody>
-              <tr v-for="i in selected_items">
+              <tr v-for="i in selected_items" :class="{ 'has-background-danger': i.error, 'has-text-white': i.error }">
                 <td :data-label="$t('fields.barcode')">{{ i.item.barcode }}</td>
                 <td :data-label="$t('fields.item')">{{ i.item.name }}</td>
                 <td data-label="Anzahl">{{ i.count }}</td>
@@ -111,7 +111,7 @@ function selectUserOrItem() {
             this.selected_items[index].count += 1;
             // this.selected_items.splice(index, 1);
         } else {
-            this.selected_items.unshift({item: userOrItem, count: 1});
+            this.selected_items.unshift({item: userOrItem, count: 1, error: false});
         }
         this.userOrItem = '';
     }
@@ -145,6 +145,12 @@ function sendCheckoutRequest() {
         } else {
             console.error(response.error);
             this.errorMessage = this.$t(`errors.${response.error.reason}`);
+            for (const item of response.error.items) {
+                for (const selectedItem of this.selected_items) {
+                    if (item.id != selectedItem.item.id) continue;
+                    selectedItem.error = true;
+                }
+            }
         }
     });
 }

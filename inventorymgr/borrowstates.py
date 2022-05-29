@@ -2,7 +2,7 @@
 
 import datetime
 import itertools
-from typing import Any, Dict, Iterable, Tuple, cast
+from typing import Any, Dict, Iterable, Sequence, Tuple, cast
 
 from flask import Blueprint, request
 from sqlalchemy import func
@@ -13,6 +13,7 @@ from inventorymgr.api.models import (
     BorrowStateSchema,
     CheckinRequestSchema,
     CheckoutRequestSchema,
+    ItemCountSchema,
 )
 from inventorymgr.auth import authentication_required
 from inventorymgr.db import db
@@ -71,8 +72,10 @@ def checkout() -> Tuple[Dict[str, Any], int]:
 
     quantities = list(map(lambda elem: elem["count"], checkout_request["borrowed_item_ids"]))
 
-    if any_item_already_borrowed(borrowed_items, quantities):
-        return {"reason": "already_borrowed"}, 400
+    already_borrowed = any_item_already_borrowed(borrowed_items, quantities)
+    if already_borrowed:
+        items = ItemCountSchema(many=True).dump([{"id": item.id, "count": item.quantity_in_stock} for item, count in already_borrowed])
+        return {"reason": "already_borrowed", "items": items}, 400
 
     borrowstates = [
         BorrowState(borrowing_user=borrowing_user, borrowed_item=item, quantity=qty, received_at=now)
@@ -164,6 +167,6 @@ def has_required_qualifications(user: User, item: BorrowableItem) -> bool:
     return all(q in user.qualifications for q in item.required_qualifications)
 
 
-def any_item_already_borrowed(items: Iterable[BorrowableItem], quantities: Iterable[int]) -> bool:
+def any_item_already_borrowed(items: Iterable[BorrowableItem], quantities: Iterable[int]) -> Sequence[Tuple[BorrowableItem, int]]:
     """Check if any item in item_ids already has an open borrowstate."""
-    return any(item.quantity_in_stock < count for item, count in zip(items, quantities))
+    return [(item, count) for item, count in zip(items, quantities) if item.quantity_in_stock < count]
