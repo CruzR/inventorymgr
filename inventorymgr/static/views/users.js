@@ -4,6 +4,9 @@ import RouterButton from '/static/views/routerbutton.js'
 
 const template = `
     <div>
+      <router-button to="/users/new">
+        {{ $t('actions.create_user') }}
+      </router-button>
       <table class="table is-fullwidth responsive-table">
         <thead>
           <tr>
@@ -64,9 +67,6 @@ const template = `
           </tr>
         </tbody>
       </table>
-      <router-button to="/users/new">
-        {{ $t('actions.create_user') }}
-      </router-button>
     </div>
     `
 

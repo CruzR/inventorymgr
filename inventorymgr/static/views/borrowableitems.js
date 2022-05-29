@@ -4,12 +4,15 @@ import RouterButton from '/static/views/routerbutton.js'
 
 const template = `
     <div>
+      <router-button to="/items/new">
+        {{ $t('actions.create_item') }}
+      </router-button>
       <table class="table is-fullwidth responsive-table">
         <thead>
           <tr>
             <th>{{ $t('fields.item') }}</th>
             <th>{{ $t('fields.barcode') }}</th>
-	    <th>Auf Lager</th>
+            <th>Auf Lager</th>
             <th>{{ $t('fields.required_qualifications') }}</th>
             <th>{{ $t('fields.actions') }}</th>
           </tr>
@@ -49,9 +52,6 @@ const template = `
           </tr>
         </tbody>
       </table>
-      <router-button to="/items/new">
-        {{ $t('actions.create_item') }}
-      </router-button>
     </div>`
 
 

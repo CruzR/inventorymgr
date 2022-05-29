@@ -4,6 +4,12 @@ import { generateRegistrationToken, deleteRegistrationToken } from '/static/api.
 
 const template = `
     <div>
+      <div class="field is-grouped is-grouped-right">
+        <div class="control">
+          <button type="button" class="button"
+            @click="sendGenerateTokenRequest">{{ $t('actions.generate_token') }}</button>
+        </div>
+      </div>
       <div v-if="error" class="message is-danger">
         <div class="message-body">
           {{ error }}
@@ -32,12 +38,6 @@ const template = `
           </tr>
         </tbody>
       </table>
-      <div class="field is-grouped is-grouped-right">
-        <div class="control">
-          <button type="button" class="button"
-            @click="sendGenerateTokenRequest">{{ $t('actions.generate_token') }}</button>
-        </div>
-      </div>
     </div>`
 
 
