@@ -68,14 +68,22 @@ const template = `
             <tbody>
               <tr v-for="b in selected_borrowstates">
                 <td :data-label="$t('fields.item')">{{ b.borrowstate.borrowed_item.name }}</td>
-                <td data-label="Anzahl">{{ b.count }}</td>
+                <td data-label="Anzahl">
+                  <div class="is-flex">
+                    <span style="margin-right: 5px;">{{ b.count }}</span>
+                    <div class="buttons are-small has-addons">
+                      <button type="button" class="button" @click="decrementCount(b)">-</button>
+                      <button type="button" class="button" @click="incrementCount(b)">+</button>
+                    </div>
+                  </div>
+                </td>
                 <td :data-label="$t('fields.borrowed_by')">{{ b.borrowstate.borrowing_user.username }}</td>
                 <td :data-label="$t('fields.received_at')">{{ b.borrowstate.received_at }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="column">
+        <div class="column is-one-third">
           <table v-if="selected_user" class="table is-fullwidth responsive-table">
             <thead>
               <tr>
@@ -94,6 +102,18 @@ const template = `
         <button ref="checkinButton" class="button is-primary">{{ $t('actions.checkin') }}</button>
       </form>
     </div>`
+
+
+function decrementCount(b) {
+    if (b.count > 0) {
+        b.count--;
+    }
+}
+
+
+function incrementCount(b) {
+    b.count++;
+}
 
 
 function selectUserOrItem() {
@@ -183,5 +203,5 @@ export default {
         },
         ...mapState(['borrowstates', 'items', 'users']),
     },
-    methods: { selectUserOrItem, sendCheckinRequest },
+    methods: { selectUserOrItem, sendCheckinRequest, decrementCount, incrementCount },
 };

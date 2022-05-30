@@ -66,12 +66,20 @@ const template = `
               <tr v-for="i in selected_items" :class="{ 'has-background-danger': i.error, 'has-text-white': i.error }">
                 <td :data-label="$t('fields.barcode')">{{ i.item.barcode }}</td>
                 <td :data-label="$t('fields.item')">{{ i.item.name }}</td>
-                <td data-label="Anzahl">{{ i.count }}</td>
+                <td data-label="Anzahl">
+                  <div class="is-flex">
+                    <span style="margin-right: 5px;">{{ i.count }}</span>
+                    <div class="buttons has-addons are-small">
+                      <button type="button" class="button" @click="decrementCount(i)">-</button>
+                      <button type="button" class="button" @click="incrementCount(i)">+</button>
+                    </div>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="column">
+        <div class="column is-one-third">
           <table v-if="selected_user" class="table is-fullwidth responsive-table">
             <thead>
               <tr>
@@ -94,6 +102,20 @@ const template = `
         </div>
       </form>
     </div>`
+
+
+function decrementCount(i) {
+    if (i.count > 0) {
+        i.count--;
+    }
+}
+
+
+function incrementCount(i) {
+    if (i.count < i.item.quantity_total) {
+        i.count++;
+    }
+}
 
 
 function selectUserOrItem() {
@@ -179,5 +201,5 @@ export default {
         },
         ...mapState(['items', 'users']),
     },
-    methods: { selectUserOrItem, sendCheckoutRequest },
+    methods: { selectUserOrItem, sendCheckoutRequest, incrementCount, decrementCount },
 }

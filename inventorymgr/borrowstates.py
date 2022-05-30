@@ -53,9 +53,13 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     if borrowing_user is None:
         return {"reason": "no_such_user"}, 400
 
+    borrowed_item_ids = [
+        elem for elem in checkout_request["borrowed_item_ids"] if elem["count"] > 0
+    ]
+
     borrowed_items = [
         BorrowableItem.query.get(elem["id"])
-        for elem in checkout_request["borrowed_item_ids"]
+        for elem in borrowed_item_ids
     ]
 
     if any(item is None for item in borrowed_items):
@@ -70,7 +74,7 @@ def checkout() -> Tuple[Dict[str, Any], int]:
     if unqualified_for:
         return {"reason": "missing_qualifications"}, 403
 
-    quantities = list(map(lambda elem: elem["count"], checkout_request["borrowed_item_ids"]))
+    quantities = [elem["count"] for elem in borrowed_item_ids]
 
     already_borrowed = any_item_already_borrowed(borrowed_items, quantities)
     if already_borrowed:
