@@ -7,7 +7,7 @@ const template = `
       <div v-if="errorMessage" class="message is-danger">
         <div class="message-body">{{ errorMessage }}</div>
       </div>
-      <form @submit.prevent="selectUserOrItem">
+      <form @submit.prevent="selectUserOrItem" class="block">
         <div class="field">
           <label class="label" for="checkin-item">Barcode</label>
           <div class="field has-addons">
@@ -84,18 +84,19 @@ const template = `
           </table>
         </div>
         <div class="column is-one-third">
-          <table v-if="selected_user" class="table is-fullwidth responsive-table">
-            <thead>
-              <tr>
-                <th>{{ $t('fields.user') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="selected_user">
-                <td :data-label="$t('fields.user')">{{ selected_user.username }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div v-if="selected_user" class="panel">
+            <p class="panel-heading">{{ selected_user.username }}</p>
+            <div v-for="i in borrowedItemsOfSelectedUser" class="panel-block info-box-item">
+              <span :class="{ 'info-box-item--checked': i.checked }">{{ i.name }}</span>
+              <span :class="{ 'info-box-item__count': true, 'info-box-item--checked': i.checked }">{{ i.count }}</span>
+              <button
+                type="button"
+                title="Annehmen"
+                :class="{ 'button': true, 'is-small': true, 'is-disabled': i.checked }"
+                :disabled="i.checked"
+                @click="selectBorrowstate(i)">✔</button>
+            </div>
+          </div>
         </div>
       </div>
       <form @submit.prevent="sendCheckinRequest">
@@ -115,6 +116,17 @@ function incrementCount(b) {
     b.count++;
 }
 
+
+function selectBorrowstate(infoBoxItem) {
+    const borrowstate = this.borrowstates.find(b => b.id == infoBoxItem.borrowstate_id);
+    if (!borrowstate) {
+      console.error(`Could not find borrowstate with id ${infoBoxItem.borrowstate_id}`);
+      this.errorMessage = "Upps, da ist was schiefgelaufen 🙁";
+      return;
+    }
+    infoBoxItem.checked = true;
+    this.selected_borrowstates.unshift({ borrowstate, count: infoBoxItem.count });
+}
 
 function selectUserOrItem() {
     if (this.userOrItem == "") {
@@ -201,7 +213,23 @@ export default {
             if (itemByBarcode) return itemByBarcode;
             return this.users.find(u => u.username === barcodeOrName) || this.items.find(i => i.name === barcodeOrName);
         },
+        borrowedItemsOfSelectedUser: function() {
+            if (!this.selected_user) {
+              return [];
+            }
+            return this.borrowstates
+                .filter(b => !b.returned_at && b.borrowing_user.id == this.selected_user.id)
+                .map(b => {
+                    return {
+                        borrowstate_id: b.id,
+                        id: b.borrowed_item.id,
+                        name: b.borrowed_item.name,
+                        count: b.quantity,
+                        checked: false
+                    };
+                });
+        },
         ...mapState(['borrowstates', 'items', 'users']),
     },
-    methods: { selectUserOrItem, sendCheckinRequest, decrementCount, incrementCount },
+    methods: { selectUserOrItem, sendCheckinRequest, decrementCount, incrementCount, selectBorrowstate },
 };

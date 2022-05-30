@@ -61,3 +61,17 @@
 .indicator.borrowed {
     border: medium solid rgb(200, 134, 10);
 }
+
+.info-box-item {
+    display: grid;
+    grid-template-columns: 1fr 2em min-content;
+    gap: 1em;
+}
+
+.info-box-item__count {
+    text-align: right;
+}
+
+.info-box-item--checked {
+    text-decoration: line-through;
+}
