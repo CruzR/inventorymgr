@@ -1,5 +1,5 @@
 import { mapState } from '/static/vuex.esm.browser.js'
-import { logout } from '/static/api.js'
+import { fetchBorrowStates, fetchItems, fetchUsers, logout } from '/static/api.js'
 
 
 const navbarLinkTemplate = `
@@ -42,6 +42,11 @@ const template = `
           <navbar-link href="/borrowstates">{{ $t('page.borrowed_items') }}</navbar-link>
         </div>
         <div class="navbar-end">
+          <div class="navbar-item">
+            <button
+              :class="{ 'button': true, 'is-info': true, 'is-outlined': true, 'is-loading': refreshingData }"
+              title="Daten neuladen" @click="refreshData">🔄</button>
+          </div>
           <navbar-link
             v-if="sessionUser"
             href="/users/me">{{ sessionUser.username }}</navbar-link>
@@ -51,6 +56,35 @@ const template = `
         </div>
       </div>
     </nav>`
+
+function refreshData() {
+    this.refreshingData = true;
+    Promise.all([fetchUsers(), fetchItems(), fetchBorrowStates()])
+        .then(([usersResponse, itemsResponse, borrowStatesResponse]) => {
+            let overallSuccess = true;
+            if (usersResponse.success) {
+                this.$store.commit('setUsers', usersResponse.data.users);
+            } else {
+                console.error(usersResponse.error);
+                overallSuccess = false;
+            }
+            if (itemsResponse.success) {
+                this.$store.commit('setItems', itemsResponse.data.items);
+            } else {
+                console.error(itemsResponse.error)
+                overallSuccess = false;
+            }
+            if (borrowStatesResponse.success) {
+                this.$store.commit('setBorrowStates', borrowStatesResponse.data.borrowstates);
+            } else {
+                console.error(borrowStatesResponse.error);
+                overallSuccess = false;
+            }
+        })
+        .catch(reason => { console.error(reason); })
+        .then(() => { this.refreshingData = false; });
+}
+
 
 function sendLogoutRequest() {
     logout().then(response => {
@@ -68,11 +102,13 @@ export default {
     data: () => {
         return {
             showMenu: false,
+            refreshingData: false,
         }
     },
     computed: mapState(['sessionUser']),
     methods: {
-        sendLogoutRequest
+        sendLogoutRequest,
+        refreshData
     },
     components: { NavbarLink },
 }
