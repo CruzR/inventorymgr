@@ -1,13 +1,19 @@
-import { mapState } from '/static/vuex.esm.browser.js'
-import { checkout } from '/static/api.js'
+import { mapState, mapGetters } from '/static/vuex.esm.browser.js'
+import { checkin, checkout } from '/static/api.js'
 
 
 const template = `
     <div>
       <div v-if="errorMessage" class="message is-danger">
-        <div class="message-body">{{ errorMessage }}</div>
+        <div class="message-body">
+          <p class="block">{{ errorMessage }}</p>
+          <button
+            v-if="errorIsBooked"
+            @click="checkinThenCheckout"
+            class="button is-danger is-small">R&uuml;ckbuchen</button>
+        </div>
       </div>
-      <form @submit.prevent="selectUserOrItem">
+      <form @submit.prevent="selectUserOrItem" class="block">
         <div class="field">
           <label class="label" for="checkout-item">Barcode</label>
           <div class="field has-addons">
@@ -118,6 +124,43 @@ function incrementCount(i) {
 }
 
 
+function checkinThenCheckout() {
+    const items = this.errorObject.items;
+    const item_ids = [];
+    for (const errItem of items) {
+        const item = this.itemById(errItem.id);
+        const selectedItem = this.selected_items.find(s => s.item.id == errItem.id);
+        if (selectedItem.count <= item.quantity_total) {
+            const missingNo = selectedItem.count - errItem.count;
+            item_ids.push({ id: errItem.id, count: missingNo });
+        } else {
+          console.error(`${item.name}: ${selectedItem.count} > ${item.quantity_total}`);
+        }
+    }
+    const checkinRequest = { user_id: this.$store.state.sessionUser.id, item_ids };
+    checkin(checkinRequest)
+        .then(response => {
+            if (response.success) {
+                this.$store.commit('addBorrowStates', response.data.borrowstates);
+                this.errorObject = null;
+                this.errorIsBooked = false;
+                this.errorMessage = '';
+                for (const selectedItem of this.selected_items) {
+                  selectedItem.error = false;
+                }
+                return response.data.borrowstates;
+            } else {
+                console.error(response);
+                this.errorMessage = this.$t(`errors.${response.error.reason}`);
+            }
+        })
+        .catch(reason => {
+            console.error(reason);
+        })
+        .then(() => {});
+}
+
+
 function selectUserOrItem() {
     if (this.userOrItem == "") {
       this.$refs.checkoutButton.focus();
@@ -166,12 +209,16 @@ function sendCheckoutRequest() {
             this.selected_user = null;
         } else {
             console.error(response.error);
+            this.errorObject = response.error;
             this.errorMessage = this.$t(`errors.${response.error.reason}`);
             for (const item of response.error.items) {
                 for (const selectedItem of this.selected_items) {
                     if (item.id != selectedItem.item.id) continue;
                     selectedItem.error = true;
                 }
+            }
+            if (this.errorObject.reason == "already_borrowed") {
+              this.errorIsBooked = true;
             }
         }
     });
@@ -183,6 +230,8 @@ export default {
     data: () => {
         return {
             errorMessage: '',
+            errorIsBooked: false,
+            errorObject: null,
             userOrItem: '',
             selected_items: [],
             selected_user: null,
@@ -200,6 +249,7 @@ export default {
         selectedUser: function() {
         },
         ...mapState(['items', 'users']),
+        ...mapGetters(['itemById'])
     },
-    methods: { selectUserOrItem, sendCheckoutRequest, incrementCount, decrementCount },
+    methods: { selectUserOrItem, sendCheckoutRequest, incrementCount, decrementCount, checkinThenCheckout },
 }
